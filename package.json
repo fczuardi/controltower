@@ -1,0 +1,56 @@
+{
+  "name": "controltower",
+  "version": "0.1.0",
+  "main": "./src/index.js",
+  "license": "AGPL-3.0",
+  "scripts-info": {
+    "build:npm": "Builds the transpiled npm package under dist/npm",
+    "ppp": "Increases the version patch number, push to github and publish to npm",
+    "mpp": "Increases the version minor number, push to github and publish to npm"
+  },
+  "scripts": {
+    "info": "npm-scripts-info",
+    "start": "NODE_DEBUG=dev babel-node ./src/index.js",
+    "build:npm": "babel --ignore node_modules,dist --out-dir ./dist/npm .",
+    "postbuild:npm": "cp package.json dist/npm/.",
+    "publish:npm": "npm run build:npm && npm publish dist/npm",
+    "ppp": "npm version patch && git push && git push --tags && npm run publish:npm",
+    "mpp": "npm version minor && git push && git push --tags && npm run publish:npm"
+  },
+  "babel": {
+    "plugins": [
+      "transform-es2015-modules-commonjs",
+      "transform-object-rest-spread"
+    ]
+  },
+  "eslintConfig": {
+    "extends": "calamar"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.11.5",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "eslint": "^3.3.1",
+    "eslint-config-calamar": "^2.1.1",
+    "eslint-plugin-import": "^1.13.0",
+    "npm-scripts-info": "^0.3.6"
+  },
+  "description": "a customer control center web app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fczuardi/controltower.git"
+  },
+  "keywords": [
+    "webadmin",
+    "dashboard",
+    "control",
+    "center",
+    "control",
+    "panel"
+  ],
+  "author": "Fabricio C Zuardi",
+  "bugs": {
+    "url": "https://github.com/fczuardi/controltower/issues"
+  },
+  "homepage": "https://github.com/fczuardi/controltower#readme"
+}
