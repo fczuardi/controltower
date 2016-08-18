@@ -6,7 +6,7 @@ export default function (isLogged) {
         if (loginResponse.authResponse) {
             console.log('Welcome!  Fetching your information.... ');
             window.FB.api('/me', response => {
-                console.log(`Good to see you, ${response.name}.`);
+                console.table(response);
             });
         } else {
             console.log('User cancelled login or did not fully authorize.');
