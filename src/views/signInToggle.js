@@ -1,7 +1,7 @@
 import html from 'choo/html';
 const fbLoginButton = (isLogged, send) => html`
 <button
-    onclick=${() => send('signInToggle')}
+    onclick=${() => send('user:signInToggle')}
 >
     ${isLogged}
 </button>`;

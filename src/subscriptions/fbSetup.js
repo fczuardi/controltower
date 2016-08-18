@@ -1,16 +1,14 @@
 const fbSetup = config => (send, done) => {
     const { appId } = config;
-
-    // subscription send calls in subscriptions must contain error handlers
-    // see https://github.com/yoshuawuyts/choo/issues/137
     const errorHandler = err => (err ? done(err) : null);
 
     const fbLoginStatusChange = data => {
-        // console.log('fbLoginStatusChange', data);
+        // console.log('----fbLoginStatusChange', data);
         if (data.status === 'connected') {
-            return send('signIn', data, errorHandler);
+            send('user:fetchInfo', data, errorHandler);
+            return send('user:signIn', data, errorHandler);
         }
-        return send('signOut', data, errorHandler);
+        return send('user:signOut', data, errorHandler);
     };
     window.fbAsyncInit = () => {
         // console.log('----fbAsyncInit----');

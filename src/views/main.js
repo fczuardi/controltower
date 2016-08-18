@@ -5,6 +5,7 @@ import signInToggle from './signInToggle';
 const main = (state, prev, send) => html`
 <div>
     ${fbSDK}
-    ${signInToggle(state.isLogged, send)}
+    ${signInToggle(state.user.isLogged, send)}
+    ${state.user.id ? JSON.stringify(state.user) : ''}
 </div>`;
 export default main;
