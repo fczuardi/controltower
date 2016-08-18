@@ -2,8 +2,10 @@ const signIn = (data, state) => ({
     ...state,
     isLogged: true
 });
-const signOut = (data, state) => ({
-    ...state,
+const signOut = () => ({
+    id: null,
+    name: null,
+    email: null,
     isLogged: false
 });
 const setInfo = (data, state) => ({

@@ -1,4 +1,4 @@
-import config from '../config.js';
+import config from '../config';
 import choo from 'choo';
 import { signIn, signOut, setInfo } from './reducers/user';
 import fbSignInToggle from './effects/fbSignInToggle';
