@@ -4,6 +4,9 @@ const fbLoginButton = (isLogged, send) => html`
 <button
     onclick=${() => send('user:signInToggle')}
 >
-    ${isLogged ? messages.user.signOut : messages.user.signIn}
+    ${isLogged
+        ? messages.signInToggle.signOut
+        : messages.signInToggle.signIn
+    }
 </button>`;
 export default fbLoginButton;

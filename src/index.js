@@ -34,16 +34,35 @@ const userModel = {
     effects: {
         signInToggle: (data, state, send) =>
             fbSignInToggle(state.isLogged, config.facebook.loginParams, send),
-        fetchInfo: (data, state, send, done) => {
-            fbGetUserInfo(config.facebook.userFields, send, done);
-        }
+        fetchInfo: (data, state, send, done) =>
+            fbGetUserInfo(config.facebook.userFields, send, done)
     },
     subscriptions: {
         statusChange: fbSetup(config.facebook)
     }
 };
+const setupModel = {
+    namespace: 'setup',
+    state: {
+        id: null
+    },
+    reducers: {
+        setId: (data, state) => ({
+            ...state,
+            id: data.id
+        })
+    },
+    effects: {
+        fetch: (data, state, send, done) => {
+            console.log('---setup:fetch---', data);
+            send('location:setLocation', { location: '/setup' }, done);
+            window.location.hash = 'setup';
+        }
+    }
+};
 app.model(appModel);
 app.model(userModel);
+app.model(setupModel);
 
 const authWrapper = (loggedView, anonView) => (state, prev, send) => (
     state.user.isLogged && state.user.id
@@ -53,7 +72,8 @@ const authWrapper = (loggedView, anonView) => (state, prev, send) => (
 
 app.router(route => [
     route('/', authWrapper(dashboardView, mainView)),
-    route('/b/:botId', authWrapper(setupForm, mainView))
+    route('/b/:botId', authWrapper(setupForm, mainView)),
+    route('/setup', authWrapper(setupForm, mainView))
 ]);
 
 const tree = app.start({ hash: true });

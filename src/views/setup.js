@@ -1,3 +1,4 @@
+import messages from '../../locales/ptBr';
 import html from 'choo/html';
 import toolbar from './toolbar';
 
@@ -20,8 +21,7 @@ const botSetupLabels = {
 };
 export default (state, prev, send) => html`
 <div>
-    <h1>Setup</h1>
-    <p>${JSON.stringify(state.params)}</p>
+    <h1>${messages.setup.title}</h1>
     <form
         action="saveConfig"
         method="POST"
@@ -43,8 +43,13 @@ export default (state, prev, send) => html`
             </fieldset>
             `
         )}
-        <input type="submit" />
+        <input
+            type="submit"
+            value=${messages.setup.update}
+        />
     </form>
     ${toolbar(state.user, state.app, send)}
     <a href="#">back to dashboard</a>
+    <hr>
+    <p>${JSON.stringify(state.setup)}</p>
 </div>`;
