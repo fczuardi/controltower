@@ -27,9 +27,9 @@ const userModel = {
             fbGetUserInfo(config.facebook.userFields, send, done);
         }
     },
-    subscriptions: [
-        fbSetup(config.facebook)
-    ]
+    subscriptions: {
+        statusChange: fbSetup(config.facebook)
+    }
 };
 app.model(userModel);
 app.router(route => [
