@@ -45,6 +45,6 @@ export default (state, prev, send) => html`
         )}
         <input type="submit" />
     </form>
-    ${toolbar(state.user, send)}
+    ${toolbar(state.user, state.app, send)}
     <a href="#">back to dashboard</a>
 </div>`;

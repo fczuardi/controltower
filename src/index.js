@@ -7,8 +7,16 @@ import fbSetup from './subscriptions/fbSetup';
 import mainView from './views/main';
 import dashboardView from './views/dashboard';
 import setupForm from './views/setup';
+import { version, homepage } from '../package.json';
 
 const app = choo();
+const appModel = {
+    namespace: 'app',
+    state: {
+        version,
+        homepage
+    }
+};
 const userModel = {
     namespace: 'user',
     state: {
@@ -33,6 +41,7 @@ const userModel = {
         statusChange: fbSetup(config.facebook)
     }
 };
+app.model(appModel);
 app.model(userModel);
 
 const authWrapper = (loggedView, anonView) => (state, prev, send) => (

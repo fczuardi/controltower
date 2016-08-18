@@ -12,5 +12,5 @@ export default (state, prev, send) => html`
             </a>
         </li>
     </ul>
-    ${toolbar(state.user, send)}
+    ${toolbar(state.user, state.app, send)}
 </div>`;
