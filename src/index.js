@@ -4,6 +4,7 @@ import { signIn, signOut, setInfo } from './reducers/user';
 import fbSignInToggle from './effects/fbSignInToggle';
 import fbGetUserInfo from './effects/fbGetUserInfo';
 import fbSetup from './subscriptions/fbSetup';
+import fbSDK from './views/fbSDK';
 import mainView from './views/main';
 import dashboardView from './views/dashboard';
 import setupForm from './views/setup';
@@ -56,4 +57,7 @@ app.router(route => [
 ]);
 
 const tree = app.start({ hash: true });
+
+// facebook javascript sdk script tag
+document.body.appendChild(fbSDK);
 document.body.appendChild(tree);
