@@ -2,4 +2,4 @@ const shelljs = require('shelljs');
 const { mkdir, cp } = shelljs;
 
 mkdir('-p', 'dist/www/js');
-cp('src/index.html', 'dist/www/.');
+cp('src/index_prod.html', 'dist/www/index.html');
