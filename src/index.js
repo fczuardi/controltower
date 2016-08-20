@@ -1,14 +1,17 @@
-import config from '../config';
+// 3rd party libs
 import choo from 'choo';
-import { signIn, signOut, setInfo } from './reducers/user';
-import fbSignInToggle from './effects/fbSignInToggle';
+// config files
+import config from '../config';
+import { version, homepage } from '../package.json';
+// model helpers
 import fbGetUserInfo from './effects/fbGetUserInfo';
+import fbSignInToggle from './effects/fbSignInToggle';
+import { signIn, signOut, setInfo } from './reducers/user';
 import fbSetup from './subscriptions/fbSetup';
+import dashboardView from './views/dashboard';
 import fbSDK from './views/fbSDK';
 import mainView from './views/main';
-import dashboardView from './views/dashboard';
 import setupForm from './views/setup';
-import { version, homepage } from '../package.json';
 
 const app = choo();
 const appModel = {
