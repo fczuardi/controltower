@@ -1,6 +1,8 @@
-import messages from '../../locales/ptBr';
 import html from 'choo/html';
-const fbLoginButton = (isLogged, send) => html`
+
+import messages from '../../locales/ptBr';
+
+export default (isLogged, send) => html`
 <button
     onclick=${() => send('user:signInToggle')}
 >
@@ -9,4 +11,3 @@ const fbLoginButton = (isLogged, send) => html`
         : messages.signInToggle.signIn
     }
 </button>`;
-export default fbLoginButton;

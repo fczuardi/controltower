@@ -1,4 +1,5 @@
 import html from 'choo/html';
+
 import toolbar from './toolbar';
 
 export default (state, prev, send) => html`

@@ -1,4 +1,5 @@
 import html from 'choo/html';
+
 import signInToggle from './signInToggle';
 
 export default (userState, appState, send) => html`

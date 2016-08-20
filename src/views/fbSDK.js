@@ -1,6 +1,6 @@
 import html from 'choo/html';
 
-const fbSDK = html`
+export default html`
 <script>(function(d, s, id) {
     var js, fjs = d.getElementsByTagName(s)[0];
     if (d.getElementById(id)) return;
@@ -9,5 +9,3 @@ const fbSDK = html`
     fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
 </script>`;
-
-export default fbSDK;

@@ -1,5 +1,6 @@
-import messages from '../../locales/ptBr';
 import html from 'choo/html';
+
+import messages from '../../locales/ptBr';
 import toolbar from './toolbar';
 
 const botSetupLabels = {
