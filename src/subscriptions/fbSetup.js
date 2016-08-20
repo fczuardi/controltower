@@ -1,14 +1,13 @@
 const fbSetup = config => (send, done) => {
     const { appId } = config;
-    const errorHandler = err => (err ? done(err) : null);
 
     const fbLoginStatusChange = data => {
         // console.log('----fbLoginStatusChange', data);
         if (data.status === 'connected') {
-            send('user:fetchInfo', data, errorHandler);
-            return send('user:signIn', data, errorHandler);
+            send('user:fetchInfo', data, done);
+            return send('user:signIn', data, done);
         }
-        return send('user:signOut', data, errorHandler);
+        return send('user:signOut', data, done);
     };
     window.fbAsyncInit = () => {
         // console.log('----fbAsyncInit----');
