@@ -1,9 +1,8 @@
-// 3rd party libs
 import choo from 'choo';
-// config files
+
 import config from '../config';
 import { version, homepage } from '../package.json';
-// model helpers
+
 import fbGetUserInfo from './effects/fbGetUserInfo';
 import fbSignInToggle from './effects/fbSignInToggle';
 import { signIn, signOut, setInfo } from './reducers/user';

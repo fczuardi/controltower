@@ -11,11 +11,15 @@
   "scripts": {
     "info": "npm-scripts-info",
     "start": "budo ./src/index.js --dir ./src",
+    "build:www:js:vendors": "node tasks/vendorLibs.js",
+    "build:www:js:app": "rollup src/index.js -c rollup.config.app.js -o dist/www/app.js",
+    "build:www": "npm run build:www:js:vendors && npm run build:www:js:app",
     "build:npm": "babel --ignore node_modules,dist,tasks --out-dir ./dist/npm .",
-    "postbuild:npm": "babel-node ./tasks/npmPostBuild.js",
     "publish:npm": "npm run build:npm && npm publish dist/npm",
     "ppp": "npm version patch && git push && git push --tags && npm run publish:npm",
-    "mpp": "npm version minor && git push && git push --tags && npm run publish:npm"
+    "mpp": "npm version minor && git push && git push --tags && npm run publish:npm",
+    "postbuild:npm": "babel-node ./tasks/npmPostBuild.js",
+    "prebuild:www": "babel-node tasks/wwwPreBuild.js"
   },
   "browserify": {
     "transform": [
@@ -33,6 +37,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",
+    "babel-plugin-external-helpers": "^6.8.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.11.5",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babelify": "^7.3.0",
@@ -41,6 +46,10 @@
     "eslint-config-calamar": "^2.1.1",
     "eslint-plugin-import": "^1.13.0",
     "npm-scripts-info": "^0.3.6",
+    "rollup": "^0.34.10",
+    "rollup-plugin-babel": "^2.6.1",
+    "rollup-plugin-commonjs": "^3.3.1",
+    "rollup-plugin-json": "^2.0.1",
     "shelljs": "^0.7.3"
   },
   "description": "a customer control center web app",
