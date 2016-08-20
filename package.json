@@ -4,6 +4,9 @@
   "main": "./src/index.js",
   "license": "AGPL-3.0",
   "scripts-info": {
+    "start": "Launches the dev webserver",
+    "build:www": "Builds the web version under dist/www",
+    "start:www": "Launches a static files webserver serving dist/www",
     "build:npm": "Builds the transpiled npm package under dist/npm",
     "ppp": "Increases the version patch number, push to github and publish to npm",
     "mpp": "Increases the version minor number, push to github and publish to npm"
@@ -11,6 +14,7 @@
   "scripts": {
     "info": "npm-scripts-info",
     "start": "budo ./src/index.js --dir ./src",
+    "start:www": "http-server dist/www -p 8081",
     "build:www:js:vendors": "node tasks/vendorLibs.js",
     "build:www:js:app": "rollup src/index.js -c rollup.config.app.js -o dist/www/app.js",
     "build:www": "npm run build:www:js:vendors && npm run build:www:js:app",
@@ -45,6 +49,7 @@
     "eslint": "^3.3.1",
     "eslint-config-calamar": "^2.1.1",
     "eslint-plugin-import": "^1.13.0",
+    "http-server": "^0.9.0",
     "npm-scripts-info": "^0.3.6",
     "rollup": "^0.34.10",
     "rollup-plugin-babel": "^2.6.1",
