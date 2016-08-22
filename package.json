@@ -18,7 +18,7 @@
     "build:www:js:vendors": "node tasks/vendorLibs.js",
     "build:www:js:app": "rollup src/index.js -c rollup.config.app.js -o docs/app.js",
     "build:www": "npm run build:www:js:vendors && npm run build:www:js:app",
-    "build:npm": "babel --ignore node_modules,dist,tasks --out-dir ./dist/npm .",
+    "build:npm": "babel --ignore node_modules,dist,tasks,docs --out-dir ./dist/npm .",
     "publish:npm": "npm run build:npm && npm publish dist/npm",
     "ppp": "npm version patch && git push && git push --tags && npm run publish:npm",
     "mpp": "npm version minor && git push && git push --tags && npm run publish:npm",
