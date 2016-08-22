@@ -3,7 +3,8 @@ const browserify = require('browserify');
 const fs = require('fs');
 const { writeFileSync, createWriteStream } = fs;
 
-const libsPath = 'dist/www/js/';
+const webDistroPath = 'docs/';
+const libsPath = `${webDistroPath}js/`;
 
 // list of babel helpers to include
 const babelHelpers = [

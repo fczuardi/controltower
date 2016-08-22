@@ -1,5 +1,8 @@
 const shelljs = require('shelljs');
 const { mkdir, cp } = shelljs;
 
-mkdir('-p', 'dist/www/js');
-cp('src/index_prod.html', 'dist/www/index.html');
+const webDistroPath = 'docs/';
+const libsPath = `${webDistroPath}js/`;
+
+mkdir('-p', libsPath);
+cp('src/index_prod.html', `${webDistroPath}index.html`);
