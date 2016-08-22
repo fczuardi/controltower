@@ -18,11 +18,11 @@
     "build:www:js:vendors": "node tasks/vendorLibs.js",
     "build:www:js:app": "rollup src/index.js -c rollup.config.app.js -o docs/app.js",
     "build:www": "npm run build:www:js:vendors && npm run build:www:js:app",
-    "build:npm": "babel --out-dir ./dist/npm .",
+    "build:npm": "babel src --out-dir ./dist/npm/src",
     "publish:npm": "npm run build:npm && npm publish dist/npm",
     "ppp": "npm version patch && git push && git push --tags && npm run publish:npm",
     "mpp": "npm version minor && git push && git push --tags && npm run publish:npm",
-    "postbuild:npm": "babel-node ./tasks/npmPostBuild.js",
+    "postbuild:npm": "babel-node ./tasks/npmPostBuild.js && tree dist",
     "prebuild:www": "babel-node tasks/wwwPreBuild.js"
   },
   "browserify": {
@@ -31,12 +31,6 @@
     ]
   },
   "babel": {
-    "ignore": [
-      "node_modules",
-      "dist",
-      "tasks",
-      "docs"
-    ],
     "plugins": [
       "transform-es2015-modules-commonjs",
       "transform-object-rest-spread"
