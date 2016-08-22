@@ -13,7 +13,8 @@ const rootFilesToCopy = [
 ];
 // files created by babel that we want to remove from the npm package
 const rootFilesToRemove = [
-    'config.js'
+    'config.js',
+    'botconfig.js'
 ];
 rootFilesToCopy.forEach(filename => {
     if (test('-f', filename)) { cp(filename, '.'); }
