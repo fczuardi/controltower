@@ -17,6 +17,7 @@
     "start": "budo ./src/index.js --dir ./src",
     "test": "ava --verbose",
     "lint": "eslint src",
+    "create:config": "babel-node tasks/createConfig.js",
     "start:www": "http-server docs/ -p 8081",
     "build:www:js:vendors": "node tasks/vendorLibs.js",
     "build:www:js:app": "rollup src/index.js -c rollup.config.app.js -o docs/app.js",

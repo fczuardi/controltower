@@ -12,6 +12,7 @@ before_install:
   - npm set progress=false
 
 before_script:
+  - npm run create:config
   - npm run lint
 
 # after_success:
