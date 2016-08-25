@@ -5,6 +5,7 @@
   "license": "AGPL-3.0",
   "scripts-info": {
     "start": "Launches the dev webserver",
+    "lint": "Check src for code-styling errors.",
     "build:www": "Builds the web version under dist/docs",
     "start:www": "Launches a static files webserver serving dist/docs",
     "build:npm": "Builds the transpiled npm package under dist/npm",
@@ -14,6 +15,8 @@
   "scripts": {
     "info": "npm-scripts-info",
     "start": "budo ./src/index.js --dir ./src",
+    "test": "ava --verbose",
+    "lint": "eslint src",
     "start:www": "http-server docs/ -p 8081",
     "build:www:js:vendors": "node tasks/vendorLibs.js",
     "build:www:js:app": "rollup src/index.js -c rollup.config.app.js -o docs/app.js",
@@ -40,6 +43,7 @@
     "extends": "calamar"
   },
   "devDependencies": {
+    "ava": "^0.16.0",
     "babel-cli": "^6.11.4",
     "babel-plugin-external-helpers": "^6.8.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.11.5",
