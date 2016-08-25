@@ -27,7 +27,7 @@ var config = createCommonjsModule(function (module) {
 
 var config$1 = interopDefault(config);
 
-var version = "0.6.6";
+var version = "0.6.7";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 function fbGetUserInfo (userFields, send, done) {
