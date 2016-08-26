@@ -29,7 +29,8 @@
     "mpp": "npm version minor && npm run publish:npm && npm run publish:www",
     "prepublish:www": "npm run build:www",
     "postbuild:npm": "babel-node ./tasks/npmPostBuild.js && tree dist",
-    "prebuild:www": "babel-node tasks/wwwPreBuild.js"
+    "prebuild:www": "babel-node tasks/wwwPreBuild.js",
+    "postppp": "npm outdated -l"
   },
   "browserify": {
     "transform": [
