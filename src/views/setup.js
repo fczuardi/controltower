@@ -50,7 +50,7 @@ export default (state, prev, send) => html`
         />
     </form>
     ${toolbar(state.user, state.app, send)}
-    <a href=${state.app.rootPath}>back to dashboard</a>
+    <a href="/${state.app.rootPath}">back to dashboard</a>
     <hr>
     <p>${JSON.stringify(state.setup)}</p>
 </div>`;
