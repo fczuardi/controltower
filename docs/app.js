@@ -11,9 +11,9 @@ function createCommonjsModule(fn, module) {
 
 var config = createCommonjsModule(function (module) {
     module.exports = {
-        rootPath: '/',
+        rootPath: '/controltower',
         facebook: {
-            appId: '1701349696856861',
+            appId: '1691821884476309',
             loginParams: {
                 scope: 'public_profile,email'
             },
@@ -22,7 +22,7 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var version = "0.6.15";
+var version = "0.6.16";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 function fbGetUserInfo (userFields, send, done) {
