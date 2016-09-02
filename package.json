@@ -83,6 +83,7 @@
   },
   "homepage": "https://github.com/fczuardi/controltower#readme",
   "dependencies": {
-    "choo": "^3.2.0"
+    "choo": "github:yoshuawuyts/choo#4",
+    "sheet-router": "github:yoshuawuyts/sheet-router#4"
   }
 }
