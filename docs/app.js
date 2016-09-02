@@ -11,7 +11,7 @@ function createCommonjsModule(fn, module) {
 
 var config = createCommonjsModule(function (module) {
     module.exports = {
-        rootPath: '/controltower/',
+        rootPath: '/controltower',
         facebook: {
             appId: '1691821884476309',
             loginParams: {
@@ -22,7 +22,7 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var version = "0.6.21";
+var version = "0.6.22";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 function fbGetUserInfo (userFields, send, done) {
@@ -281,9 +281,10 @@ app.model(setupModel);
 
 const authWrapper = (loggedView, anonView) => (state, prev, send) => state.user.isLogged && state.user.id ? loggedView(state, prev, send) : anonView(state, prev, send);
 
+console.log('rootPath', rootPath);
 app.router([[`${ rootPath }`, authWrapper(dashboardView, mainView)], [`${ rootPath }b/:botId`, authWrapper(setupForm, mainView)]]);
 
-const tree = app.start({ hash: true });
+const tree = app.start();
 
 // facebook javascript sdk script tag
 document.body.appendChild(fbSDK);
