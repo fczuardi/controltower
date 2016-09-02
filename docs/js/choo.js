@@ -359,7 +359,7 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":23}],2:[function(require,module,exports){
+},{"util/":22}],2:[function(require,module,exports){
 module.exports = applyHook
 
 // apply arguments onto an array of functions, useful for hooks
@@ -560,7 +560,7 @@ function dispatcher (hooks) {
             applyHook(onStateChangeHooks, data, newState, _state, actionName, createSend)
           }
           _state = newState
-          cb()
+          cb(null, newState)
         }
 
         const _effects = ns ? effects[ns] : effects
@@ -605,8 +605,8 @@ function defaultOnError (err) {
 }
 
 function wrapOnError (onError) {
-  return function onErrorWrap (err) {
-    if (err) onError(err)
+  return function onErrorWrap (err, state, createSend) {
+    if (err) onError(err, state, createSend)
   }
 }
 
@@ -752,7 +752,7 @@ function belCreateElement (tag, props, children) {
 module.exports = hyperx(belCreateElement)
 module.exports.createElement = belCreateElement
 
-},{"global/document":8,"hyperx":12,"on-load":16}],5:[function(require,module,exports){
+},{"global/document":12,"hyperx":15,"on-load":19}],5:[function(require,module,exports){
 
 },{}],6:[function(require,module,exports){
 // shim for using process in browser
@@ -917,25 +917,241 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],7:[function(require,module,exports){
-'use strict'
+const document = require('global/document')
+const assert = require('assert')
+const xtend = require('xtend')
 
-var document = require('global/document')
+module.exports = createLocation
 
-module.exports = document.addEventListener ? ready : noop
-
-function ready (callback) {
-  if (document.readyState === 'complete') {
-    return setTimeout(callback, 0)
+// takes an initial representation of the location state
+// and then synchronize a mutation across all fields
+//
+// scenarios:
+// - create a state object from document.location; we got no state yet
+// - create a new state object from a string we pass in; full override mode
+// - patch a state object with some value we pass in - lil patchy stuff
+//
+// (obj?, str?) -> obj
+function createLocation (state, patch) {
+  if (!state) {
+    const newLocation = {
+      pathname: document.location.pathname,
+      search: document.location.search,
+      hash: document.location.hash
+    }
+    newLocation.href = createHref(newLocation)
+    return newLocation
+  } else {
+    assert.equal(typeof state, 'object', 'sheet-router/create-location: state should be an object')
+    if (typeof patch === 'string') {
+      const newLocation = parseUrl(patch)
+      newLocation.href = createHref(newLocation)
+      return newLocation
+    } else {
+      assert.equal(typeof patch, 'object', 'sheet-router/create-location: patch should be an object')
+      const newLocation = xtend(state, patch)
+      newLocation.href = createHref(newLocation)
+      return newLocation
+    }
   }
 
-  document.addEventListener('DOMContentLoaded', function onLoad () {
-    callback()
-  })
+  // compute a href similar to node's href
+  // (obj) -> str
+  function createHref (location) {
+    var ret = location.pathname
+    if (location.hash) ret += (location.hash)
+    if (location.search) ret += (location.search)
+    return ret
+  }
+
+  // parse a URL into a kv object inside the browser
+  // str -> obj
+  function parseUrl (url) {
+    const a = document.createElement('a')
+    a.href = url
+
+    return {
+      href: a.pathname,
+      search: a.search,
+      hash: a.hash
+    }
+  }
 }
 
-function noop () {}
+},{"assert":1,"global/document":12,"xtend":26}],8:[function(require,module,exports){
+const document = require('global/document')
+const window = require('global/window')
+const assert = require('assert')
 
-},{"global/document":8}],8:[function(require,module,exports){
+module.exports = history
+
+// listen to html5 pushstate events
+// and update router accordingly
+// fn(str) -> null
+function history (cb) {
+  assert.equal(typeof cb, 'function', 'sheet-router/history: cb must be a function')
+  window.onpopstate = function () {
+    cb(document.location.href)
+  }
+}
+
+},{"assert":1,"global/document":12,"global/window":13}],9:[function(require,module,exports){
+const window = require('global/window')
+const assert = require('assert')
+
+module.exports = href
+
+const noRoutingAttrName = 'data-no-routing'
+
+// handle a click if is anchor tag with an href
+// and url lives on the same domain. Replaces
+// trailing '#' so empty links work as expected.
+// fn(str) -> null
+function href (cb) {
+  assert.equal(typeof cb, 'function', 'sheet-router/href: cb must be a function')
+
+  window.onclick = function (e) {
+    if ((e.button && e.button !== 0) || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
+
+    const node = (function traverse (node) {
+      if (!node) return
+      if (node.localName !== 'a') return traverse(node.parentNode)
+      if (node.href === undefined) return traverse(node.parentNode)
+      if (window.location.host !== node.host) return traverse(node.parentNode)
+      return node
+    })(e.target)
+
+    if (!node) return
+
+    const isRoutingDisabled = node.hasAttribute(noRoutingAttrName)
+    if (isRoutingDisabled) return
+
+    e.preventDefault()
+    const href = node.href.replace(/#$/, '')
+    cb(href)
+    window.history.pushState({}, null, href)
+  }
+}
+
+},{"assert":1,"global/window":13}],10:[function(require,module,exports){
+const pathname = require('pathname-match')
+const wayfarer = require('wayfarer')
+const assert = require('assert')
+
+module.exports = sheetRouter
+
+// Fast, modular client router
+// fn(str, any[..]) -> fn(str, any[..])
+function sheetRouter (opts, tree) {
+  if (!tree) {
+    tree = opts
+    opts = {}
+  }
+
+  assert.equal(typeof opts, 'object', 'sheet-router: opts must be a object')
+  assert.ok(Array.isArray(tree), 'sheet-router: tree must be an array')
+
+  const dft = opts.default || '/404'
+  assert.equal(typeof dft, 'string', 'sheet-router: dft must be a string')
+
+  const router = wayfarer(dft)
+  var prevCallback = null
+  var prevRoute = null
+
+  match._router = router
+
+  // register tree in router
+  // tree[0] is a string, thus a route
+  // tree[0] is an array, thus not a route
+  // tree[1] is a function
+    // tree[2] is an array
+    // tree[2] is not an array
+  // tree[1] is an array
+  ;(function walk (tree, fullRoute) {
+    if (typeof tree[0] === 'string') {
+      var route = tree[0].replace(/^\//, '')
+    } else {
+      var rootArr = tree[0]
+    }
+
+    const cb = (typeof tree[1] === 'function') ? tree[1] : null
+    const children = (Array.isArray(tree[1]))
+      ? tree[1]
+      : Array.isArray(tree[2]) ? tree[2] : null
+
+    if (rootArr) {
+      tree.forEach(function (node) {
+        walk(node, fullRoute)
+      })
+    }
+
+    if (cb) {
+      const innerRoute = route
+        ? fullRoute.concat(route).join('/')
+        : fullRoute.length ? fullRoute.join('/') : route
+
+      // if opts.thunk is false or only enabled for match, don't thunk
+      const handler = (opts.thunk === false || opts.thunk === 'match')
+        ? cb
+        : thunkify(cb)
+      router.on(innerRoute, handler)
+    }
+
+    if (Array.isArray(children)) {
+      walk(children, fullRoute.concat(route))
+    }
+  })(tree, [])
+
+  return match
+
+  // match a route on the router
+  //
+  // no thunking -> call route with all arguments
+  // thunking only for match -> call route with all arguments
+  // thunking and route is same -> call prev cb with new args
+  // thunking and route is diff -> create cb and call with new args
+  //
+  // (str, [any..]) -> any
+  function match (route, arg1, arg2, arg3, arg4, arg5) {
+    assert.equal(typeof route, 'string', 'sheet-router: route must be a string')
+
+    if (opts.thunk === false) {
+      return router(pathname(route), arg1, arg2, arg3, arg4, arg5)
+    } else if (route === prevRoute) {
+      return prevCallback(arg1, arg2, arg3, arg4, arg5)
+    } else {
+      prevRoute = pathname(pathname(route))
+      prevCallback = router(prevRoute)
+      return prevCallback(arg1, arg2, arg3, arg4, arg5)
+    }
+  }
+}
+
+// wrap a function in a function so it can be called at a later time
+// fn -> null -> fn
+function thunkify (cb) {
+  return function (params) {
+    return function (arg1, arg2, arg3, arg4, arg5) {
+      return cb(params, arg1, arg2, arg3, arg4, arg5)
+    }
+  }
+}
+
+},{"assert":1,"pathname-match":20,"wayfarer":23}],11:[function(require,module,exports){
+const walk = require('wayfarer/walk')
+const assert = require('assert')
+
+module.exports = walkSheetRouter
+
+function walkSheetRouter (router, cb) {
+  assert.equal(typeof router, 'function', 'sheet-router/walk: router should be a function')
+  assert.equal(typeof cb, 'function', 'sheet-router/walk: cb should be a function')
+
+  router = router._router
+  return walk(router, cb)
+}
+
+},{"assert":1,"wayfarer/walk":25}],12:[function(require,module,exports){
 (function (global){
 var topLevel = typeof global !== 'undefined' ? global :
     typeof window !== 'undefined' ? window : {}
@@ -954,7 +1170,7 @@ if (typeof document !== 'undefined') {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"min-document":5}],9:[function(require,module,exports){
+},{"min-document":5}],13:[function(require,module,exports){
 (function (global){
 if (typeof window !== "undefined") {
     module.exports = window;
@@ -967,18 +1183,7 @@ if (typeof window !== "undefined") {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],10:[function(require,module,exports){
-module.exports = function hashMatch (hash, prefix) {
-  var pre = prefix || '/';
-  if (hash.length === 0) return pre;
-  hash = hash.replace('#', '');
-  hash = hash.replace(/\/$/, '')
-  if (hash.indexOf('/') != 0) hash = '/' + hash;
-  if (pre == '/') return hash;
-  else return hash.replace(pre, '');
-}
-
-},{}],11:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 module.exports = attributeToProperty
 
 var transform = {
@@ -999,7 +1204,7 @@ function attributeToProperty (h) {
   }
 }
 
-},{}],12:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var attrToProp = require('hyperscript-attribute-to-property')
 
 var VAR = 0, TEXT = 1, OPEN = 2, CLOSE = 3, ATTR = 4
@@ -1264,7 +1469,7 @@ var closeRE = RegExp('^(' + [
 ].join('|') + ')(?:[\.#][a-zA-Z0-9\u007F-\uFFFF_:-]+)*$')
 function selfClosing (tag) { return closeRE.test(tag) }
 
-},{"hyperscript-attribute-to-property":11}],13:[function(require,module,exports){
+},{"hyperscript-attribute-to-property":14}],16:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1289,7 +1494,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],14:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 // Create a range object for efficently rendering strings to elements.
 var range;
 
@@ -1872,7 +2077,7 @@ function morphdom(fromNode, toNode, options) {
 
 module.exports = morphdom;
 
-},{}],15:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 const window = require('global/window')
 const assert = require('assert')
 
@@ -1918,7 +2123,7 @@ function nanoraf (render, raf) {
   }
 }
 
-},{"assert":1,"global/window":9}],16:[function(require,module,exports){
+},{"assert":1,"global/window":13}],19:[function(require,module,exports){
 /* global MutationObserver */
 var document = require('global/document')
 var window = require('global/window')
@@ -2007,7 +2212,7 @@ function eachMutation (nodes, fn) {
   }
 }
 
-},{"global/document":8,"global/window":9}],17:[function(require,module,exports){
+},{"global/document":12,"global/window":13}],20:[function(require,module,exports){
 const assert = require('assert')
 
 module.exports = match
@@ -2023,153 +2228,18 @@ function match (route) {
   return route.trim()
     .replace(/[\?|#].*$/, '')
     .replace(/^(?:https?\:)\/\//, '')
-    .replace(/^(?:[\w+(?:-\w+)+.])+(?:[\:0-9]{4,5})?/, '')
+    .replace(/^.*?(\/.*)/, '$1')
     .replace(/\/$/, '')
 }
 
-},{"assert":1}],18:[function(require,module,exports){
-const window = require('global/window')
-const assert = require('assert')
-
-module.exports = hash
-
-// listen to window hashchange events
-// and update router accordingly
-// fn(cb) -> null
-function hash (cb) {
-  assert.equal(typeof cb, 'function', 'cb must be a function')
-  window.onhashchange = function (e) {
-    cb(window.location.hash)
-  }
-}
-
-},{"assert":1,"global/window":9}],19:[function(require,module,exports){
-const document = require('global/document')
-const window = require('global/window')
-const assert = require('assert')
-
-module.exports = history
-
-// listen to html5 pushstate events
-// and update router accordingly
-// fn(str) -> null
-function history (cb) {
-  assert.equal(typeof cb, 'function', 'cb must be a function')
-  window.onpopstate = function () {
-    cb(document.location.href)
-  }
-}
-
-},{"assert":1,"global/document":8,"global/window":9}],20:[function(require,module,exports){
-const window = require('global/window')
-const assert = require('assert')
-
-module.exports = href
-
-// handle a click if is anchor tag with an href
-// and url lives on the same domain. Replaces
-// trailing '#' so empty links work as expected.
-// fn(str) -> null
-function href (cb) {
-  assert.equal(typeof cb, 'function', 'cb must be a function')
-
-  window.onclick = function (e) {
-    const node = (function traverse (node) {
-      if (!node) return
-      if (node.localName !== 'a') return traverse(node.parentNode)
-      if (node.href === undefined) return traverse(node.parentNode)
-      if (window.location.host !== node.host) return traverse(node.parentNode)
-      return node
-    })(e.target)
-
-    if (!node) return
-
-    e.preventDefault()
-    const href = node.href.replace(/#$/, '')
-    cb(href)
-    window.history.pushState({}, null, href)
-  }
-}
-
-},{"assert":1,"global/window":9}],21:[function(require,module,exports){
-const pathname = require('pathname-match')
-const wayfarer = require('wayfarer')
-const assert = require('assert')
-
-module.exports = sheetRouter
-
-// Fast, modular client router
-// fn(str, any[..], fn?) -> fn(str, any[..])
-function sheetRouter (dft, createTree, createRoute) {
-  createRoute = (createRoute ? createRoute(_createRoute) : _createRoute)
-
-  if (!createTree) {
-    createTree = dft
-    dft = ''
-  }
-
-  assert.equal(typeof dft, 'string', 'sheet-router: dft must be a string')
-  assert.equal(typeof createTree, 'function', 'sheet-router: createTree must be a function')
-  assert.equal(typeof createRoute, 'function', 'sheet-router: createRoute must be a function')
-
-  const router = wayfarer(dft)
-  const tree = createTree(createRoute)
-
-  // register tree in router
-  ;(function walk (tree, route) {
-    if (Array.isArray(tree[0])) {
-      // walk over all routes at the root of the tree
-      tree.forEach(function (node) {
-        walk(node, route)
-      })
-    } else if (tree[1]) {
-      // handle inline functions as args
-      const innerRoute = tree[0]
-        ? route.concat(tree[0]).join('/')
-        : route.length ? route.join('/') : tree[0]
-      router.on(innerRoute, tree[1])
-      walk(tree[2], route.concat(tree[0]))
-    } else if (Array.isArray(tree[2])) {
-      // traverse and append route
-      walk(tree[2], route.concat(tree[0]))
-    } else {
-      // register path in router
-      const nwRoute = tree[0]
-        ? route.concat(tree[0]).join('/')
-        : route.length ? route.join('/') : tree[0]
-      router.on(nwRoute, tree[2])
-    }
-  })(tree, [])
-
-  // match a route on the router
-  return function match (route) {
-    assert.equal(typeof route, 'string', 'route must be a string')
-    const args = [].slice.call(arguments)
-    args[0] = pathname(args[0])
-    return router.apply(null, args)
-  }
-}
-
-// register regular route
-function _createRoute (route, inline, child) {
-  if (!child) {
-    child = inline
-    inline = null
-  }
-  assert.equal(typeof route, 'string', 'route must be a string')
-  assert.ok(child, 'child exists')
-  route = route.replace(/^\//, '')
-  return [ route, inline, child ]
-}
-
-},{"assert":1,"pathname-match":17,"wayfarer":24}],22:[function(require,module,exports){
+},{"assert":1}],21:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2759,7 +2829,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":22,"_process":6,"inherits":13}],24:[function(require,module,exports){
+},{"./support/isBuffer":21,"_process":6,"inherits":16}],23:[function(require,module,exports){
 const assert = require('assert')
 const trie = require('./trie')
 
@@ -2820,7 +2890,7 @@ function Wayfarer (dft) {
   }
 }
 
-},{"./trie":25,"assert":1}],25:[function(require,module,exports){
+},{"./trie":24,"assert":1}],24:[function(require,module,exports){
 const mutate = require('xtend/mutable')
 const assert = require('assert')
 const xtend = require('xtend')
@@ -2937,7 +3007,40 @@ Trie.prototype.mount = function (route, trie) {
   }
 }
 
-},{"assert":1,"xtend":26,"xtend/mutable":27}],26:[function(require,module,exports){
+},{"assert":1,"xtend":26,"xtend/mutable":27}],25:[function(require,module,exports){
+const assert = require('assert')
+
+module.exports = walk
+
+// walk a wayfarer trie
+// (obj, fn) -> null
+function walk (router, transform) {
+  assert.equal(typeof router, 'function', 'wayfarer.walk: router should be an function')
+  assert.equal(typeof transform, 'function', 'wayfarer.walk: transform should be a function')
+
+  const trie = router._trie
+  assert.equal(typeof trie, 'object', 'wayfarer.walk: trie should be an object')
+
+  // (str, obj) -> null
+  ;(function walk (route, trie) {
+    if (trie.cb) {
+      trie.cb = transform(route, trie.cb)
+    }
+
+    if (trie.nodes) {
+      const nodes = trie.nodes
+      Object.keys(nodes).forEach(function (key) {
+        const node = nodes[key]
+        const newRoute = (key === '$$')
+          ? route + '/:' + trie.name
+          : route + '/' + key
+        walk(newRoute, node)
+      })
+    }
+  })('', trie.trie)
+}
+
+},{"assert":1}],26:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -3013,7 +3116,7 @@ module.exports.update = function (fromNode, toNode, opts) {
   }
 }
 
-},{"./update-events.js":29,"bel":4,"morphdom":14}],29:[function(require,module,exports){
+},{"./update-events.js":29,"bel":4,"morphdom":17}],29:[function(require,module,exports){
 module.exports = [
   // attribute events (can be set with attributes)
   'onclick',
@@ -3052,13 +3155,12 @@ module.exports = [
 ]
 
 },{}],"choo":[function(require,module,exports){
-const history = require('sheet-router/history')
+const createLocation = require('sheet-router/create-location')
+const onHistoryChange = require('sheet-router/history')
 const sheetRouter = require('sheet-router')
-const document = require('global/document')
-const onReady = require('document-ready')
-const href = require('sheet-router/href')
-const hash = require('sheet-router/hash')
-const hashMatch = require('hash-match')
+const onHref = require('sheet-router/href')
+const walk = require('sheet-router/walk')
+const mutate = require('xtend/mutable')
 const barracks = require('barracks')
 const nanoraf = require('nanoraf')
 const assert = require('assert')
@@ -3070,11 +3172,12 @@ module.exports = choo
 // framework for creating sturdy web applications
 // null -> fn
 function choo (opts) {
+console.log('choo opts', opts);
   opts = opts || {}
 
   const _store = start._store = barracks()
   var _router = start._router = null
-  var _defaultRoute = null
+  var _routerOpts = null
   var _rootNode = null
   var _routes = null
   var _frame = null
@@ -3099,7 +3202,7 @@ function choo (opts) {
     _store.start({ subscriptions: false, reducers: false, effects: false })
 
     const state = _store.state({ state: serverState })
-    const router = createRouter(_defaultRoute, _routes, createSend)
+    const router = createRouter(_routerOpts, _routes, createSend)
     const tree = router(route, state)
     return tree.outerHTML || tree.toString()
 
@@ -3112,30 +3215,15 @@ function choo (opts) {
 
   // start the application
   // (str?, obj?) -> DOMNode
-  function start (selector, startOpts) {
-    if (!startOpts && typeof selector !== 'string') {
-      startOpts = selector
-      selector = null
-    }
-    startOpts = startOpts || {}
-
-    _store.model(appInit(startOpts))
-    const createSend = _store.start(startOpts)
-    _router = start._router = createRouter(_defaultRoute, _routes, createSend)
+  function start () {
+    _store.model(createLocationModel(opts))
+    const createSend = _store.start(opts)
+    _router = start._router = createRouter(_routerOpts, _routes, createSend)
     const state = _store.state({state: {}})
 
-    if (!selector) {
-      const tree = _router(state.location.pathname, state)
-      _rootNode = tree
-      return tree
-    } else {
-      onReady(function onReady () {
-        const oldTree = document.querySelector(selector)
-        assert.ok(oldTree, 'could not query selector: ' + selector)
-        const newTree = _router(state.location.pathname, state)
-        _rootNode = yo.update(oldTree, newTree)
-      })
-    }
+    const tree = _router(state.location.pathname, state)
+    _rootNode = tree
+    return tree
   }
 
   // update the DOM after every state mutation
@@ -3153,7 +3241,7 @@ function choo (opts) {
   // register all routes on the router
   // (str?, [fn|[fn]]) -> obj
   function router (defaultRoute, routes) {
-    _defaultRoute = defaultRoute
+    _routerOpts = defaultRoute
     _routes = routes
   }
 
@@ -3171,72 +3259,79 @@ function choo (opts) {
   }
 
   // create a new router with a custom `createRoute()` function
-  // (str?, obj, fn?) -> null
-  function createRouter (defaultRoute, routes, createSend) {
+  // (str?, obj) -> null
+  function createRouter (routerOpts, routes, createSend) {
     var prev = {}
-    return sheetRouter(defaultRoute, routes, createRoute)
+    if (!routes) {
+      routes = routerOpts
+      routerOpts = {}
+    }
+    routerOpts = mutate({ thunk: 'match' }, routerOpts)
+    const router = sheetRouter(routerOpts, routes)
+    walk(router, wrap)
 
-    function createRoute (routeFn) {
-      return function (route, inline, child) {
-        if (typeof inline === 'function') {
-          inline = wrap(inline, route)
-        }
-        return routeFn(route, inline, child)
-      }
+    return router
 
-      function wrap (child, route) {
-        const send = createSend('view: ' + route, true)
-        return function chooWrap (params, state) {
+    function wrap (route, handler) {
+      const send = createSend('view: ' + route, true)
+      return function chooWrap (params) {
+        return function (state) {
           const nwPrev = prev
           const nwState = prev = xtend(state, { params: params })
           if (opts.freeze !== false) Object.freeze(nwState)
-          return child(nwState, nwPrev, send)
+          return handler(nwState, nwPrev, send)
         }
       }
     }
   }
 }
 
-// initial application state model
+// application location model
 // obj -> obj
-function appInit (opts) {
-  const loc = document.location
-  const state = { pathname: (opts.hash) ? hashMatch(loc.hash) : loc.href }
-  const reducers = {
-    setLocation: function setLocation (data, state) {
-      return { pathname: data.location.replace(/#.*/, '') }
-    }
-  }
-  // if hash routing explicitly enabled, subscribe to it
-  const subs = {}
-  if (opts.hash === true) {
-    pushLocationSub(function (navigate) {
-      hash(function (fragment) {
-        navigate(hashMatch(fragment))
-      })
-    }, 'handleHash', subs)
-  } else {
-    if (opts.history !== false) pushLocationSub(history, 'handleHistory', subs)
-    if (opts.href !== false) pushLocationSub(href, 'handleHref', subs)
-  }
-
+function createLocationModel (opts) {
   return {
     namespace: 'location',
-    subscriptions: subs,
-    reducers: reducers,
-    state: state
+    state: createLocation(),
+    subscriptions: createSubscriptions(opts),
+    effects: { set: setLocation },
+    reducers: { update: updateLocation }
   }
 
-  // create a new subscription that modifies
-  // 'app:location' and push it to be loaded
-  // (fn, obj) -> null
-  function pushLocationSub (cb, key, model) {
-    model[key] = function (send, done) {
-      cb(function navigate (pathname) {
-        send('location:setLocation', { location: pathname }, done)
-      })
+  function updateLocation (location, state) {
+    return location
+  }
+
+  // set a new location e.g. "/foo/bar#baz?beep=boop"
+  // (str, obj, fn, fn) -> null
+  function setLocation (patch, state, send, done) {
+    const newLocation = createLocation(state, patch)
+    if (opts.history !== false && newLocation.href !== state.href) {
+      window.history.pushState({}, null, newLocation.href)
     }
+    send('location:update', newLocation, done)
+  }
+
+  function createSubscriptions (opts) {
+    const subs = {}
+
+    if (opts.history !== false) {
+      subs.handleHistory = function (send, done) {
+        onHistoryChange(function navigate (pathname) {
+          send('location:set', { pathname: pathname }, done)
+        })
+      }
+    }
+
+    if (opts.href !== false) {
+      subs.handleHref = function (send, done) {
+        onHref(function navigate (pathname) {
+          send('location:set', { pathname: pathname }, done)
+        })
+      }
+    }
+
+    return subs
   }
 }
 
-},{"assert":1,"barracks":3,"document-ready":7,"global/document":8,"hash-match":10,"nanoraf":15,"sheet-router":21,"sheet-router/hash":18,"sheet-router/history":19,"sheet-router/href":20,"xtend":26,"yo-yo":28}]},{},[]);
+},{"assert":1,"barracks":3,"nanoraf":18,"sheet-router":10,"sheet-router/create-location":7,"sheet-router/history":8,"sheet-router/href":9,"sheet-router/walk":11,"xtend":26,"xtend/mutable":27,"yo-yo":28}]},{},[]);

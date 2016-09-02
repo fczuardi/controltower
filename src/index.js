@@ -56,9 +56,7 @@ const setupModel = {
     },
     effects: {
         fetch: (data, state, send, done) => {
-            console.log('---setup:fetch---', data);
-            send('location:setLocation', { location: '/setup' }, done);
-            window.location.hash = 'setup';
+            send('location:set', { pathname: `/b/${data.setupId}` }, done);
         }
     }
 };
@@ -72,10 +70,9 @@ const authWrapper = (loggedView, anonView) => (state, prev, send) => (
         : anonView(state, prev, send)
 );
 
-app.router(route => [
-    route('/', authWrapper(dashboardView, mainView)),
-    route('/b/:botId', authWrapper(setupForm, mainView)),
-    route('/setup', authWrapper(setupForm, mainView))
+app.router([
+    ['/', authWrapper(dashboardView, mainView)],
+    ['/b/:botId', authWrapper(setupForm, mainView)]
 ]);
 
 const tree = app.start({ hash: true });

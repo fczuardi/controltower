@@ -1,0 +1,20 @@
+language: node_js
+
+node_js:
+  - "6"
+  - "5"
+  - "4"
+
+git:
+  depth: 3
+
+before_install:
+  - npm set progress=false
+
+before_script:
+  - npm run create:config
+  - npm run lint
+
+# after_success:
+#     - echo "${TRAVIS_NODE_VERSION}"
+#     - 'if [ "${TRAVIS_NODE_VERSION}" = "6" ]; then npm run upload:coverage; fi'

@@ -5,10 +5,6 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var choo = _interopDefault(require('choo'));
 var html = _interopDefault(require('choo/html'));
 
-function interopDefault(ex) {
-	return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
-}
-
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
@@ -16,7 +12,8 @@ function createCommonjsModule(fn, module) {
 var config = createCommonjsModule(function (module) {
     module.exports = {
         facebook: {
-            appId: '1691821884476309',
+            appId: '1691821884476309', // prod
+            // appId: '1701349696856861', // dev fcz
             loginParams: {
                 scope: 'public_profile,email'
             },
@@ -25,9 +22,7 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var config$1 = interopDefault(config);
-
-var version = "0.5.3";
+var version = "0.6.13";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 function fbGetUserInfo (userFields, send, done) {
@@ -121,13 +116,11 @@ var ptBr = createCommonjsModule(function (module) {
     };
 });
 
-var messages = interopDefault(ptBr);
-
 var signInToggle$1 = ((isLogged, send) => html`
 <button
     onclick=${ () => send('user:signInToggle') }
 >
-    ${ isLogged ? messages.signInToggle.signOut : messages.signInToggle.signIn }
+    ${ isLogged ? ptBr.signInToggle.signOut : ptBr.signInToggle.signIn }
 </button>`);
 
 var toolbar = ((userState, appState, send) => html`
@@ -143,7 +136,7 @@ var toolbar = ((userState, appState, send) => html`
 
 var dashboardView = ((state, prev, send) => html`
 <div>
-    <h1>${ messages.dashboard.title }</h1>
+    <h1>${ ptBr.dashboard.title }</h1>
     <form
         method="POST"
         action="#/setup"
@@ -155,12 +148,12 @@ var dashboardView = ((state, prev, send) => html`
 } }
     >
         <label>
-            ${ messages.dashboard.botUrl }
+            ${ ptBr.dashboard.botUrl }
             <input type="text" name="setupId"/>
         </label>
         <input
             type="submit"
-            value=${ messages.dashboard.load }
+            value=${ ptBr.dashboard.load }
         />
     </form>
     ${ toolbar(state.user, state.app, send) }
@@ -204,7 +197,7 @@ const botSetupLabels = {
 };
 var setupForm = ((state, prev, send) => html`
 <div>
-    <h1>${ messages.setup.title }</h1>
+    <h1>${ ptBr.setup.title }</h1>
     <form
         action="saveConfig"
         method="POST"
@@ -226,11 +219,11 @@ var setupForm = ((state, prev, send) => html`
             `) }
         <input
             type="submit"
-            value=${ messages.setup.update }
+            value=${ ptBr.setup.update }
         />
     </form>
     ${ toolbar(state.user, state.app, send) }
-    <a href="#">back to dashboard</a>
+    <a href="/">back to dashboard</a>
     <hr>
     <p>${ JSON.stringify(state.setup) }</p>
 </div>`);
@@ -257,11 +250,11 @@ const userModel = {
         signOut
     },
     effects: {
-        signInToggle: (data, state, send) => fbSignInToggle(state.isLogged, config$1.facebook.loginParams, send),
-        fetchInfo: (data, state, send, done) => fbGetUserInfo(config$1.facebook.userFields, send, done)
+        signInToggle: (data, state, send) => fbSignInToggle(state.isLogged, config.facebook.loginParams, send),
+        fetchInfo: (data, state, send, done) => fbGetUserInfo(config.facebook.userFields, send, done)
     },
     subscriptions: {
-        statusChange: fbSetup(config$1.facebook)
+        statusChange: fbSetup(config.facebook)
     }
 };
 const setupModel = {
@@ -276,9 +269,7 @@ const setupModel = {
     },
     effects: {
         fetch: (data, state, send, done) => {
-            console.log('---setup:fetch---', data);
-            send('location:setLocation', { location: '/setup' }, done);
-            window.location.hash = 'setup';
+            send('location:set', { pathname: `/b/${ data.setupId }` }, done);
         }
     }
 };
@@ -288,7 +279,7 @@ app.model(setupModel);
 
 const authWrapper = (loggedView, anonView) => (state, prev, send) => state.user.isLogged && state.user.id ? loggedView(state, prev, send) : anonView(state, prev, send);
 
-app.router(route => [route('/', authWrapper(dashboardView, mainView)), route('/b/:botId', authWrapper(setupForm, mainView)), route('/setup', authWrapper(setupForm, mainView))]);
+app.router([['/', authWrapper(dashboardView, mainView)], ['/b/:botId', authWrapper(setupForm, mainView)]]);
 
 const tree = app.start({ hash: true });
 

@@ -1,10 +1,11 @@
 {
   "name": "controltower",
-  "version": "0.6.1",
+  "version": "0.6.13",
   "main": "./src/index.js",
   "license": "AGPL-3.0",
   "scripts-info": {
     "start": "Launches the dev webserver",
+    "lint": "Check src for code-styling errors.",
     "build:www": "Builds the web version under dist/docs",
     "start:www": "Launches a static files webserver serving dist/docs",
     "build:npm": "Builds the transpiled npm package under dist/npm",
@@ -14,16 +15,22 @@
   "scripts": {
     "info": "npm-scripts-info",
     "start": "budo ./src/index.js --dir ./src",
+    "test": "ava --verbose",
+    "lint": "eslint src",
+    "create:config": "babel-node tasks/createConfig.js",
     "start:www": "http-server docs/ -p 8081",
     "build:www:js:vendors": "node tasks/vendorLibs.js",
     "build:www:js:app": "rollup src/index.js -c rollup.config.app.js -o docs/app.js",
     "build:www": "npm run build:www:js:vendors && npm run build:www:js:app",
+    "publish:www": "git commit -am 'Page update.' && git push && git push --tags",
     "build:npm": "babel src --out-dir ./dist/npm/src",
     "publish:npm": "npm run build:npm && npm publish dist/npm",
-    "ppp": "npm version patch && git push && git push --tags && npm run publish:npm",
-    "mpp": "npm version minor && git push && git push --tags && npm run publish:npm",
+    "ppp": "npm version patch && npm run publish:npm && npm run publish:www",
+    "mpp": "npm version minor && npm run publish:npm && npm run publish:www",
+    "prepublish:www": "npm run build:www",
     "postbuild:npm": "babel-node ./tasks/npmPostBuild.js && tree dist",
-    "prebuild:www": "babel-node tasks/wwwPreBuild.js"
+    "prebuild:www": "babel-node tasks/wwwPreBuild.js",
+    "postppp": "npm outdated -l"
   },
   "browserify": {
     "transform": [
@@ -40,22 +47,24 @@
     "extends": "calamar"
   },
   "devDependencies": {
-    "babel-cli": "^6.11.4",
+    "ava": "^0.16.0",
+    "babel-cli": "^6.14.0",
     "babel-plugin-external-helpers": "^6.8.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.11.5",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.14.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babelify": "^7.3.0",
     "budo": "^9.0.0",
-    "eslint": "^3.3.1",
+    "eslint": "^3.4.0",
     "eslint-config-calamar": "^2.1.1",
-    "eslint-plugin-import": "^1.13.0",
+    "eslint-plugin-babel": "^3.3.0",
+    "eslint-plugin-import": "^1.14.0",
     "http-server": "^0.9.0",
     "npm-scripts-info": "^0.3.6",
-    "rollup": "^0.34.10",
+    "rollup": "^0.34.13",
     "rollup-plugin-babel": "^2.6.1",
-    "rollup-plugin-commonjs": "^3.3.1",
+    "rollup-plugin-commonjs": "^4.1.0",
     "rollup-plugin-json": "^2.0.1",
-    "shelljs": "^0.7.3"
+    "shelljs": "^0.7.4"
   },
   "description": "a customer control center web app",
   "repository": {
@@ -74,6 +83,7 @@
   },
   "homepage": "https://github.com/fczuardi/controltower#readme",
   "dependencies": {
-    "choo": "^3.2.0"
+    "choo": "github:yoshuawuyts/choo#4",
+    "sheet-router": "github:yoshuawuyts/sheet-router#4"
   }
 }

@@ -1,6 +1,6 @@
 module.exports = {
     facebook: {
-        appId: 'YOUR_APP_ID',
+        appId: 'FACEBOOK_APP_ID',
         loginParams: {
             scope: 'public_profile,email'
         },
