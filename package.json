@@ -64,7 +64,7 @@
     "rollup-plugin-babel": "^2.6.1",
     "rollup-plugin-commonjs": "^4.1.0",
     "rollup-plugin-json": "^2.0.1",
-    "shelljs": "^0.7.3"
+    "shelljs": "^0.7.4"
   },
   "description": "a customer control center web app",
   "repository": {
