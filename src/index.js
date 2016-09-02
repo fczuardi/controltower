@@ -72,12 +72,13 @@ const authWrapper = (loggedView, anonView) => (state, prev, send) => (
         : anonView(state, prev, send)
 );
 
+console.log('rootPath', rootPath);
 app.router([
     [`${rootPath}`, authWrapper(dashboardView, mainView)],
     [`${rootPath}b/:botId`, authWrapper(setupForm, mainView)]
 ]);
 
-const tree = app.start({ hash: true });
+const tree = app.start();
 
 // facebook javascript sdk script tag
 document.body.appendChild(fbSDK);
