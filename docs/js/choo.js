@@ -3172,7 +3172,6 @@ module.exports = choo
 // framework for creating sturdy web applications
 // null -> fn
 function choo (opts) {
-console.log('choo opts', opts);
   opts = opts || {}
 
   const _store = start._store = barracks()
