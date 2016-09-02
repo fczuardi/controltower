@@ -58,7 +58,8 @@ const setupModel = {
     },
     effects: {
         fetch: (data, state, send, done) => {
-            send('location:set', { pathname: `${rootPath}/b/${data.setupId}` }, done);
+            console.log(`${rootPath}b/${data.setupId}`);
+            send('location:set', { pathname: `${rootPath}b/${data.setupId}` }, done);
         }
     }
 };
@@ -74,8 +75,8 @@ const authWrapper = (loggedView, anonView) => (state, prev, send) => (
 
 console.log('rootPath', rootPath);
 app.router([
-    [`/${rootPath}`, authWrapper(dashboardView, mainView)],
-    [`${rootPath}/b/:botId`, authWrapper(setupForm, mainView)]
+    [`${rootPath}`, authWrapper(dashboardView, mainView)],
+    [`${rootPath}b/:botId`, authWrapper(setupForm, mainView)]
 ]);
 
 const tree = app.start();
