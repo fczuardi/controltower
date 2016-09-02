@@ -22,7 +22,7 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var version = "0.6.23";
+var version = "0.6.24";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 function fbGetUserInfo (userFields, send, done) {
@@ -271,7 +271,7 @@ const setupModel = {
     },
     effects: {
         fetch: (data, state, send, done) => {
-            send('location:set', { pathname: `${ rootPath }b/${ data.setupId }` }, done);
+            send('location:set', { pathname: `${ rootPath }/b/${ data.setupId }` }, done);
         }
     }
 };
@@ -282,7 +282,7 @@ app.model(setupModel);
 const authWrapper = (loggedView, anonView) => (state, prev, send) => state.user.isLogged && state.user.id ? loggedView(state, prev, send) : anonView(state, prev, send);
 
 console.log('rootPath', rootPath);
-app.router([[`${ rootPath }`, authWrapper(dashboardView, mainView)], [`${ rootPath }/b/:botId`, authWrapper(setupForm, mainView)]]);
+app.router([[`${ rootPath }/`, authWrapper(dashboardView, mainView)], [`${ rootPath }/b/:botId`, authWrapper(setupForm, mainView)]]);
 
 const tree = app.start();
 
