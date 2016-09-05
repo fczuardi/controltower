@@ -22,7 +22,7 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var version = "0.7.0";
+var version = "0.7.1";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 const appModel = {
@@ -294,7 +294,7 @@ var botForm = ((state, prev, send) => html`
         />
     </form>
     ${ toolbar(state.customer, state.app, send) }
-    <a href="../../">back to dashboard</a>
+    <a href="../">back to dashboard</a>
     <hr>
     <p>${ JSON.stringify(state.setup) }</p>
 </div>`);
