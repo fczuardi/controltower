@@ -79,6 +79,7 @@ const authWrapper = (loggedView, anonView) => (state, prev, send) => (
 
 app.router([
     ['/', authWrapper(dashboardView, mainView)],
+    ['/controltower', authWrapper(dashboardView, mainView)],
     ['/b/:botId', authWrapper(setupForm, mainView)]
 ]);
 
