@@ -12,7 +12,7 @@ import fbSDK from './views/fbSDK';
 import mainView from './views/main';
 import setupForm from './views/setup';
 
-const app = choo({ href: false, history: false });
+const app = choo({ href: true, history: true });
 const appModel = {
     namespace: 'app',
     state: {
@@ -56,8 +56,7 @@ const setupModel = {
     },
     effects: {
         fetch: (data, state, send, done) => {
-            console.log(`/b/${data.setupId}`);
-            send('location:set', { pathname: `/b/${data.setupId}` }, done);
+            send('location:set', { pathname: `./b/${data.setupId}` }, done);
         }
     }
 };
@@ -73,8 +72,10 @@ const authWrapper = (loggedView, anonView) => (state, prev, send) => (
 
 app.router([
     ['/', authWrapper(dashboardView, mainView)],
+    ['/b/:botId', authWrapper(setupForm, mainView)],
+    // TODO remove this duplicated routes in a nicer manner
     ['/controltower', authWrapper(dashboardView, mainView)],
-    ['/b/:botId', authWrapper(setupForm, mainView)]
+    ['/controltower/b/:botId', authWrapper(setupForm, mainView)]
 ]);
 
 const tree = app.start();
