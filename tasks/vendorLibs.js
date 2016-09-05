@@ -20,7 +20,8 @@ console.log(`buildExternalHelpers > ${libsPath}babel_external-helpers.js`);
 const externalLibs = [
     'choo',
     'choo/html',
-    'ramda'
+    'ramda',
+    'insert-css'
 ];
 externalLibs.forEach(libName => {
     const outFilename = `${libsPath}${libName.replace('/', '-')}.js`;
