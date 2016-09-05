@@ -3,7 +3,6 @@ import { cp, test, sed, echo } from 'shelljs';
 const configFilename = 'config.js';
 const configSampleFilename = 'config-sample.js';
 const envVars = [
-    'ROOT_PATH',
     'FACEBOOK_APP_ID'
 ];
 
