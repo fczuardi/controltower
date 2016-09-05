@@ -1,6 +1,6 @@
 {
   "name": "controltower",
-  "version": "0.6.20",
+  "version": "0.6.31",
   "main": "./src/index.js",
   "license": "AGPL-3.0",
   "scripts-info": {
@@ -14,7 +14,7 @@
   },
   "scripts": {
     "info": "npm-scripts-info",
-    "start": "budo ./src/index.js --dir ./src",
+    "start": "bankai start --entry=src/index.js --port=9966 --js.transform=babelify",
     "test": "ava --verbose",
     "lint": "eslint src",
     "create:config": "babel-node tasks/createConfig.js",
@@ -53,7 +53,7 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.14.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babelify": "^7.3.0",
-    "budo": "^9.0.0",
+    "bankai": "^3.2.0",
     "eslint": "^3.4.0",
     "eslint-config-calamar": "^2.1.1",
     "eslint-plugin-babel": "^3.3.0",
@@ -83,7 +83,6 @@
   },
   "homepage": "https://github.com/fczuardi/controltower#readme",
   "dependencies": {
-    "choo": "github:yoshuawuyts/choo#4",
-    "sheet-router": "github:yoshuawuyts/sheet-router#4"
+    "choo": "^4.0.0-0"
   }
 }

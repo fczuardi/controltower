@@ -359,7 +359,7 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":22}],2:[function(require,module,exports){
+},{"util/":23}],2:[function(require,module,exports){
 module.exports = applyHook
 
 // apply arguments onto an array of functions, useful for hooks
@@ -610,7 +610,7 @@ function wrapOnError (onError) {
   }
 }
 
-},{"./apply-hook":2,"assert":1,"xtend":26,"xtend/mutable":27}],4:[function(require,module,exports){
+},{"./apply-hook":2,"assert":1,"xtend":27,"xtend/mutable":28}],4:[function(require,module,exports){
 var document = require('global/document')
 var hyperx = require('hyperx')
 var onload = require('on-load')
@@ -752,7 +752,7 @@ function belCreateElement (tag, props, children) {
 module.exports = hyperx(belCreateElement)
 module.exports.createElement = belCreateElement
 
-},{"global/document":12,"hyperx":15,"on-load":19}],5:[function(require,module,exports){
+},{"global/document":7,"hyperx":10,"on-load":14}],5:[function(require,module,exports){
 
 },{}],6:[function(require,module,exports){
 // shim for using process in browser
@@ -917,241 +917,6 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],7:[function(require,module,exports){
-const document = require('global/document')
-const assert = require('assert')
-const xtend = require('xtend')
-
-module.exports = createLocation
-
-// takes an initial representation of the location state
-// and then synchronize a mutation across all fields
-//
-// scenarios:
-// - create a state object from document.location; we got no state yet
-// - create a new state object from a string we pass in; full override mode
-// - patch a state object with some value we pass in - lil patchy stuff
-//
-// (obj?, str?) -> obj
-function createLocation (state, patch) {
-  if (!state) {
-    const newLocation = {
-      pathname: document.location.pathname,
-      search: document.location.search,
-      hash: document.location.hash
-    }
-    newLocation.href = createHref(newLocation)
-    return newLocation
-  } else {
-    assert.equal(typeof state, 'object', 'sheet-router/create-location: state should be an object')
-    if (typeof patch === 'string') {
-      const newLocation = parseUrl(patch)
-      newLocation.href = createHref(newLocation)
-      return newLocation
-    } else {
-      assert.equal(typeof patch, 'object', 'sheet-router/create-location: patch should be an object')
-      const newLocation = xtend(state, patch)
-      newLocation.href = createHref(newLocation)
-      return newLocation
-    }
-  }
-
-  // compute a href similar to node's href
-  // (obj) -> str
-  function createHref (location) {
-    var ret = location.pathname
-    if (location.hash) ret += (location.hash)
-    if (location.search) ret += (location.search)
-    return ret
-  }
-
-  // parse a URL into a kv object inside the browser
-  // str -> obj
-  function parseUrl (url) {
-    const a = document.createElement('a')
-    a.href = url
-
-    return {
-      href: a.pathname,
-      search: a.search,
-      hash: a.hash
-    }
-  }
-}
-
-},{"assert":1,"global/document":12,"xtend":26}],8:[function(require,module,exports){
-const document = require('global/document')
-const window = require('global/window')
-const assert = require('assert')
-
-module.exports = history
-
-// listen to html5 pushstate events
-// and update router accordingly
-// fn(str) -> null
-function history (cb) {
-  assert.equal(typeof cb, 'function', 'sheet-router/history: cb must be a function')
-  window.onpopstate = function () {
-    cb(document.location.href)
-  }
-}
-
-},{"assert":1,"global/document":12,"global/window":13}],9:[function(require,module,exports){
-const window = require('global/window')
-const assert = require('assert')
-
-module.exports = href
-
-const noRoutingAttrName = 'data-no-routing'
-
-// handle a click if is anchor tag with an href
-// and url lives on the same domain. Replaces
-// trailing '#' so empty links work as expected.
-// fn(str) -> null
-function href (cb) {
-  assert.equal(typeof cb, 'function', 'sheet-router/href: cb must be a function')
-
-  window.onclick = function (e) {
-    if ((e.button && e.button !== 0) || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
-
-    const node = (function traverse (node) {
-      if (!node) return
-      if (node.localName !== 'a') return traverse(node.parentNode)
-      if (node.href === undefined) return traverse(node.parentNode)
-      if (window.location.host !== node.host) return traverse(node.parentNode)
-      return node
-    })(e.target)
-
-    if (!node) return
-
-    const isRoutingDisabled = node.hasAttribute(noRoutingAttrName)
-    if (isRoutingDisabled) return
-
-    e.preventDefault()
-    const href = node.href.replace(/#$/, '')
-    cb(href)
-    window.history.pushState({}, null, href)
-  }
-}
-
-},{"assert":1,"global/window":13}],10:[function(require,module,exports){
-const pathname = require('pathname-match')
-const wayfarer = require('wayfarer')
-const assert = require('assert')
-
-module.exports = sheetRouter
-
-// Fast, modular client router
-// fn(str, any[..]) -> fn(str, any[..])
-function sheetRouter (opts, tree) {
-  if (!tree) {
-    tree = opts
-    opts = {}
-  }
-
-  assert.equal(typeof opts, 'object', 'sheet-router: opts must be a object')
-  assert.ok(Array.isArray(tree), 'sheet-router: tree must be an array')
-
-  const dft = opts.default || '/404'
-  assert.equal(typeof dft, 'string', 'sheet-router: dft must be a string')
-
-  const router = wayfarer(dft)
-  var prevCallback = null
-  var prevRoute = null
-
-  match._router = router
-
-  // register tree in router
-  // tree[0] is a string, thus a route
-  // tree[0] is an array, thus not a route
-  // tree[1] is a function
-    // tree[2] is an array
-    // tree[2] is not an array
-  // tree[1] is an array
-  ;(function walk (tree, fullRoute) {
-    if (typeof tree[0] === 'string') {
-      var route = tree[0].replace(/^\//, '')
-    } else {
-      var rootArr = tree[0]
-    }
-
-    const cb = (typeof tree[1] === 'function') ? tree[1] : null
-    const children = (Array.isArray(tree[1]))
-      ? tree[1]
-      : Array.isArray(tree[2]) ? tree[2] : null
-
-    if (rootArr) {
-      tree.forEach(function (node) {
-        walk(node, fullRoute)
-      })
-    }
-
-    if (cb) {
-      const innerRoute = route
-        ? fullRoute.concat(route).join('/')
-        : fullRoute.length ? fullRoute.join('/') : route
-
-      // if opts.thunk is false or only enabled for match, don't thunk
-      const handler = (opts.thunk === false || opts.thunk === 'match')
-        ? cb
-        : thunkify(cb)
-      router.on(innerRoute, handler)
-    }
-
-    if (Array.isArray(children)) {
-      walk(children, fullRoute.concat(route))
-    }
-  })(tree, [])
-
-  return match
-
-  // match a route on the router
-  //
-  // no thunking -> call route with all arguments
-  // thunking only for match -> call route with all arguments
-  // thunking and route is same -> call prev cb with new args
-  // thunking and route is diff -> create cb and call with new args
-  //
-  // (str, [any..]) -> any
-  function match (route, arg1, arg2, arg3, arg4, arg5) {
-    assert.equal(typeof route, 'string', 'sheet-router: route must be a string')
-
-    if (opts.thunk === false) {
-      return router(pathname(route), arg1, arg2, arg3, arg4, arg5)
-    } else if (route === prevRoute) {
-      return prevCallback(arg1, arg2, arg3, arg4, arg5)
-    } else {
-      prevRoute = pathname(pathname(route))
-      prevCallback = router(prevRoute)
-      return prevCallback(arg1, arg2, arg3, arg4, arg5)
-    }
-  }
-}
-
-// wrap a function in a function so it can be called at a later time
-// fn -> null -> fn
-function thunkify (cb) {
-  return function (params) {
-    return function (arg1, arg2, arg3, arg4, arg5) {
-      return cb(params, arg1, arg2, arg3, arg4, arg5)
-    }
-  }
-}
-
-},{"assert":1,"pathname-match":20,"wayfarer":23}],11:[function(require,module,exports){
-const walk = require('wayfarer/walk')
-const assert = require('assert')
-
-module.exports = walkSheetRouter
-
-function walkSheetRouter (router, cb) {
-  assert.equal(typeof router, 'function', 'sheet-router/walk: router should be a function')
-  assert.equal(typeof cb, 'function', 'sheet-router/walk: cb should be a function')
-
-  router = router._router
-  return walk(router, cb)
-}
-
-},{"assert":1,"wayfarer/walk":25}],12:[function(require,module,exports){
 (function (global){
 var topLevel = typeof global !== 'undefined' ? global :
     typeof window !== 'undefined' ? window : {}
@@ -1170,7 +935,7 @@ if (typeof document !== 'undefined') {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"min-document":5}],13:[function(require,module,exports){
+},{"min-document":5}],8:[function(require,module,exports){
 (function (global){
 if (typeof window !== "undefined") {
     module.exports = window;
@@ -1183,7 +948,7 @@ if (typeof window !== "undefined") {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],14:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 module.exports = attributeToProperty
 
 var transform = {
@@ -1204,7 +969,7 @@ function attributeToProperty (h) {
   }
 }
 
-},{}],15:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var attrToProp = require('hyperscript-attribute-to-property')
 
 var VAR = 0, TEXT = 1, OPEN = 2, CLOSE = 3, ATTR = 4
@@ -1469,7 +1234,7 @@ var closeRE = RegExp('^(' + [
 ].join('|') + ')(?:[\.#][a-zA-Z0-9\u007F-\uFFFF_:-]+)*$')
 function selfClosing (tag) { return closeRE.test(tag) }
 
-},{"hyperscript-attribute-to-property":14}],16:[function(require,module,exports){
+},{"hyperscript-attribute-to-property":9}],11:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1494,7 +1259,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],17:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // Create a range object for efficently rendering strings to elements.
 var range;
 
@@ -2077,7 +1842,7 @@ function morphdom(fromNode, toNode, options) {
 
 module.exports = morphdom;
 
-},{}],18:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 const window = require('global/window')
 const assert = require('assert')
 
@@ -2123,7 +1888,7 @@ function nanoraf (render, raf) {
   }
 }
 
-},{"assert":1,"global/window":13}],19:[function(require,module,exports){
+},{"assert":1,"global/window":8}],14:[function(require,module,exports){
 /* global MutationObserver */
 var document = require('global/document')
 var window = require('global/window')
@@ -2212,7 +1977,7 @@ function eachMutation (nodes, fn) {
   }
 }
 
-},{"global/document":12,"global/window":13}],20:[function(require,module,exports){
+},{"global/document":7,"global/window":8}],15:[function(require,module,exports){
 const assert = require('assert')
 
 module.exports = match
@@ -2232,14 +1997,265 @@ function match (route) {
     .replace(/\/$/, '')
 }
 
-},{"assert":1}],21:[function(require,module,exports){
+},{"assert":1}],16:[function(require,module,exports){
+const document = require('global/document')
+const assert = require('assert')
+const xtend = require('xtend')
+
+module.exports = createLocation
+
+// takes an initial representation of the location state
+// and then synchronize a mutation across all fields
+//
+// scenarios:
+// - create a state object from document.location; we got no state yet
+// - create a new state object from a string we pass in; full override mode
+// - patch a state object with some value we pass in - lil patchy stuff
+//
+// (obj?, str?) -> obj
+function createLocation (state, patch) {
+  if (!state) {
+    const newLocation = {
+      pathname: document.location.pathname,
+      search: document.location.search,
+      hash: document.location.hash
+    }
+    newLocation.href = createHref(newLocation)
+    return newLocation
+  } else {
+    assert.equal(typeof state, 'object', 'sheet-router/create-location: state should be an object')
+    if (typeof patch === 'string') {
+      const newLocation = parseUrl(patch)
+      newLocation.href = createHref(newLocation)
+      return newLocation
+    } else {
+      assert.equal(typeof patch, 'object', 'sheet-router/create-location: patch should be an object')
+      const newLocation = xtend(state, patch)
+      newLocation.href = createHref(newLocation)
+      return newLocation
+    }
+  }
+
+  // compute a href similar to node's href
+  // (obj) -> str
+  function createHref (location) {
+    var ret = location.pathname
+    if (location.hash) ret += (location.hash)
+    if (location.search) ret += (location.search)
+    return ret
+  }
+
+  // parse a URL into a kv object inside the browser
+  // str -> obj
+  function parseUrl (url) {
+    const a = document.createElement('a')
+    a.href = url
+
+    return {
+      href: a.pathname,
+      search: a.search,
+      hash: a.hash
+    }
+  }
+}
+
+},{"assert":1,"global/document":7,"xtend":27}],17:[function(require,module,exports){
+const window = require('global/window')
+const assert = require('assert')
+
+module.exports = hash
+
+// listen to window hashchange events
+// and update router accordingly
+// fn(cb) -> null
+function hash (cb) {
+  assert.equal(typeof cb, 'function', 'sheet-router/hash: cb must be a function')
+  window.onhashchange = function (e) {
+    cb(window.location.hash)
+  }
+}
+
+},{"assert":1,"global/window":8}],18:[function(require,module,exports){
+const document = require('global/document')
+const window = require('global/window')
+const assert = require('assert')
+
+module.exports = history
+
+// listen to html5 pushstate events
+// and update router accordingly
+// fn(str) -> null
+function history (cb) {
+  assert.equal(typeof cb, 'function', 'sheet-router/history: cb must be a function')
+  window.onpopstate = function () {
+    cb(document.location.href)
+  }
+}
+
+},{"assert":1,"global/document":7,"global/window":8}],19:[function(require,module,exports){
+const window = require('global/window')
+const assert = require('assert')
+
+module.exports = href
+
+const noRoutingAttrName = 'data-no-routing'
+
+// handle a click if is anchor tag with an href
+// and url lives on the same domain. Replaces
+// trailing '#' so empty links work as expected.
+// fn(str) -> null
+function href (cb) {
+  assert.equal(typeof cb, 'function', 'sheet-router/href: cb must be a function')
+
+  window.onclick = function (e) {
+    if ((e.button && e.button !== 0) || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
+
+    const node = (function traverse (node) {
+      if (!node) return
+      if (node.localName !== 'a') return traverse(node.parentNode)
+      if (node.href === undefined) return traverse(node.parentNode)
+      if (window.location.host !== node.host) return traverse(node.parentNode)
+      return node
+    })(e.target)
+
+    if (!node) return
+
+    const isRoutingDisabled = node.hasAttribute(noRoutingAttrName)
+    if (isRoutingDisabled) return
+
+    e.preventDefault()
+    const href = node.href.replace(/#$/, '')
+    cb(href)
+    window.history.pushState({}, null, href)
+  }
+}
+
+},{"assert":1,"global/window":8}],20:[function(require,module,exports){
+const pathname = require('pathname-match')
+const wayfarer = require('wayfarer')
+const assert = require('assert')
+
+module.exports = sheetRouter
+
+// Fast, modular client router
+// fn(str, any[..]) -> fn(str, any[..])
+function sheetRouter (opts, tree) {
+  if (!tree) {
+    tree = opts
+    opts = {}
+  }
+
+  assert.equal(typeof opts, 'object', 'sheet-router: opts must be a object')
+  assert.ok(Array.isArray(tree), 'sheet-router: tree must be an array')
+
+  const dft = opts.default || '/404'
+  assert.equal(typeof dft, 'string', 'sheet-router: dft must be a string')
+
+  const router = wayfarer(dft)
+  var prevCallback = null
+  var prevRoute = null
+
+  match._router = router
+
+  // register tree in router
+  // tree[0] is a string, thus a route
+  // tree[0] is an array, thus not a route
+  // tree[1] is a function
+    // tree[2] is an array
+    // tree[2] is not an array
+  // tree[1] is an array
+  ;(function walk (tree, fullRoute) {
+    if (typeof tree[0] === 'string') {
+      var route = tree[0].replace(/^\//, '')
+    } else {
+      var rootArr = tree[0]
+    }
+
+    const cb = (typeof tree[1] === 'function') ? tree[1] : null
+    const children = (Array.isArray(tree[1]))
+      ? tree[1]
+      : Array.isArray(tree[2]) ? tree[2] : null
+
+    if (rootArr) {
+      tree.forEach(function (node) {
+        walk(node, fullRoute)
+      })
+    }
+
+    if (cb) {
+      const innerRoute = route
+        ? fullRoute.concat(route).join('/')
+        : fullRoute.length ? fullRoute.join('/') : route
+
+      // if opts.thunk is false or only enabled for match, don't thunk
+      const handler = (opts.thunk === false || opts.thunk === 'match')
+        ? cb
+        : thunkify(cb)
+      router.on(innerRoute, handler)
+    }
+
+    if (Array.isArray(children)) {
+      walk(children, fullRoute.concat(route))
+    }
+  })(tree, [])
+
+  return match
+
+  // match a route on the router
+  //
+  // no thunking -> call route with all arguments
+  // thunking only for match -> call route with all arguments
+  // thunking and route is same -> call prev cb with new args
+  // thunking and route is diff -> create cb and call with new args
+  //
+  // (str, [any..]) -> any
+  function match (route, arg1, arg2, arg3, arg4, arg5) {
+    assert.equal(typeof route, 'string', 'sheet-router: route must be a string')
+
+    if (opts.thunk === false) {
+      return router(pathname(route), arg1, arg2, arg3, arg4, arg5)
+    } else if (route === prevRoute) {
+      return prevCallback(arg1, arg2, arg3, arg4, arg5)
+    } else {
+      prevRoute = pathname(pathname(route))
+      prevCallback = router(prevRoute)
+      return prevCallback(arg1, arg2, arg3, arg4, arg5)
+    }
+  }
+}
+
+// wrap a function in a function so it can be called at a later time
+// fn -> null -> fn
+function thunkify (cb) {
+  return function (params) {
+    return function (arg1, arg2, arg3, arg4, arg5) {
+      return cb(params, arg1, arg2, arg3, arg4, arg5)
+    }
+  }
+}
+
+},{"assert":1,"pathname-match":15,"wayfarer":24}],21:[function(require,module,exports){
+const walk = require('wayfarer/walk')
+const assert = require('assert')
+
+module.exports = walkSheetRouter
+
+function walkSheetRouter (router, cb) {
+  assert.equal(typeof router, 'function', 'sheet-router/walk: router should be a function')
+  assert.equal(typeof cb, 'function', 'sheet-router/walk: cb should be a function')
+
+  router = router._router
+  return walk(router, cb)
+}
+
+},{"assert":1,"wayfarer/walk":26}],22:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2829,7 +2845,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":21,"_process":6,"inherits":16}],23:[function(require,module,exports){
+},{"./support/isBuffer":22,"_process":6,"inherits":11}],24:[function(require,module,exports){
 const assert = require('assert')
 const trie = require('./trie')
 
@@ -2890,7 +2906,7 @@ function Wayfarer (dft) {
   }
 }
 
-},{"./trie":24,"assert":1}],24:[function(require,module,exports){
+},{"./trie":25,"assert":1}],25:[function(require,module,exports){
 const mutate = require('xtend/mutable')
 const assert = require('assert')
 const xtend = require('xtend')
@@ -3007,7 +3023,7 @@ Trie.prototype.mount = function (route, trie) {
   }
 }
 
-},{"assert":1,"xtend":26,"xtend/mutable":27}],25:[function(require,module,exports){
+},{"assert":1,"xtend":27,"xtend/mutable":28}],26:[function(require,module,exports){
 const assert = require('assert')
 
 module.exports = walk
@@ -3040,7 +3056,7 @@ function walk (router, transform) {
   })('', trie.trie)
 }
 
-},{"assert":1}],26:[function(require,module,exports){
+},{"assert":1}],27:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -3061,7 +3077,7 @@ function extend() {
     return target
 }
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -3080,7 +3096,7 @@ function extend(target) {
     return target
 }
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 var bel = require('bel') // turns template tag into DOM elements
 var morphdom = require('morphdom') // efficiently diffs + morphs two DOM elements
 var defaultEvents = require('./update-events.js') // default events to be copied when dom elements update
@@ -3116,7 +3132,7 @@ module.exports.update = function (fromNode, toNode, opts) {
   }
 }
 
-},{"./update-events.js":29,"bel":4,"morphdom":17}],29:[function(require,module,exports){
+},{"./update-events.js":30,"bel":4,"morphdom":12}],30:[function(require,module,exports){
 module.exports = [
   // attribute events (can be set with attributes)
   'onclick',
@@ -3159,6 +3175,7 @@ const createLocation = require('sheet-router/create-location')
 const onHistoryChange = require('sheet-router/history')
 const sheetRouter = require('sheet-router')
 const onHref = require('sheet-router/href')
+const onHash = require('sheet-router/hash')
 const walk = require('sheet-router/walk')
 const mutate = require('xtend/mutable')
 const barracks = require('barracks')
@@ -3328,9 +3345,8 @@ function createLocationModel (opts) {
         })
       }
     }
-
     return subs
   }
 }
 
-},{"assert":1,"barracks":3,"nanoraf":18,"sheet-router":10,"sheet-router/create-location":7,"sheet-router/history":8,"sheet-router/href":9,"sheet-router/walk":11,"xtend":26,"xtend/mutable":27,"yo-yo":28}]},{},[]);
+},{"assert":1,"barracks":3,"nanoraf":13,"sheet-router":20,"sheet-router/create-location":16,"sheet-router/hash":17,"sheet-router/history":18,"sheet-router/href":19,"sheet-router/walk":21,"xtend":27,"xtend/mutable":28,"yo-yo":29}]},{},[]);

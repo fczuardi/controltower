@@ -11,9 +11,8 @@ function createCommonjsModule(fn, module) {
 
 var config = createCommonjsModule(function (module) {
     module.exports = {
-        rootPath: '/controltower',
         facebook: {
-            appId: '1691821884476309',
+            appId: '1701349696856861',
             loginParams: {
                 scope: 'public_profile,email'
             },
@@ -22,7 +21,7 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var version = "0.6.20";
+var version = "0.6.31";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 function fbGetUserInfo (userFields, send, done) {
@@ -223,19 +222,17 @@ var setupForm = ((state, prev, send) => html`
         />
     </form>
     ${ toolbar(state.user, state.app, send) }
-    <a href=${ state.app.rootPath }>back to dashboard</a>
+    <a href="../../">back to dashboard</a>
     <hr>
     <p>${ JSON.stringify(state.setup) }</p>
 </div>`);
 
-const { rootPath } = config;
-const app = choo();
+const app = choo({ href: true, history: true });
 const appModel = {
     namespace: 'app',
     state: {
         version,
-        homepage,
-        rootPath
+        homepage
     }
 };
 const userModel = {
@@ -271,7 +268,7 @@ const setupModel = {
     },
     effects: {
         fetch: (data, state, send, done) => {
-            send('location:set', { pathname: `${ rootPath }/b/${ data.setupId }` }, done);
+            send('location:set', { pathname: `./b/${ data.setupId }` }, done);
         }
     }
 };
@@ -281,9 +278,11 @@ app.model(setupModel);
 
 const authWrapper = (loggedView, anonView) => (state, prev, send) => state.user.isLogged && state.user.id ? loggedView(state, prev, send) : anonView(state, prev, send);
 
-app.router([[`${ rootPath }`, authWrapper(dashboardView, mainView)], [`${ rootPath }/b/:botId`, authWrapper(setupForm, mainView)]]);
+app.router([['/', authWrapper(dashboardView, mainView)], ['/b/:botId', authWrapper(setupForm, mainView)],
+// TODO remove this duplicated routes in a nicer manner
+['/controltower', authWrapper(dashboardView, mainView)], ['/controltower/b/:botId', authWrapper(setupForm, mainView)]]);
 
-const tree = app.start({ hash: true });
+const tree = app.start();
 
 // facebook javascript sdk script tag
 document.body.appendChild(fbSDK);
