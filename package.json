@@ -22,7 +22,7 @@
     "build:www:js:vendors": "node tasks/vendorLibs.js",
     "build:www:js:app": "rollup src/index.js -c rollup.config.app.js -o docs/app.js",
     "build:www": "npm run build:www:js:vendors && npm run build:www:js:app",
-    "publish:www": "git commit -am 'Page update.' && git push && git push --tags",
+    "publish:www": "git add . && git commit -m 'Page update.' && git push && git push --tags",
     "build:npm": "babel src --out-dir ./dist/npm/src",
     "publish:npm": "npm run build:npm && npm publish dist/npm",
     "ppp": "npm version patch && npm run publish:npm && npm run publish:www",
