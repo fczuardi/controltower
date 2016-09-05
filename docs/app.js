@@ -21,7 +21,7 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var version = "0.6.30";
+var version = "0.6.31";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 function fbGetUserInfo (userFields, send, done) {
@@ -222,23 +222,17 @@ var setupForm = ((state, prev, send) => html`
         />
     </form>
     ${ toolbar(state.user, state.app, send) }
-    <a href="/">back to dashboard</a>
+    <a href="../../">back to dashboard</a>
     <hr>
     <p>${ JSON.stringify(state.setup) }</p>
 </div>`);
 
-const app = choo({ href: false, history: false });
+const app = choo({ href: true, history: true });
 const appModel = {
     namespace: 'app',
     state: {
         version,
         homepage
-    },
-    subscriptions: {
-        init: (send, done) => {
-            console.log('app init');
-            send('location:set', { pathname: '/' }, done);
-        }
     }
 };
 const userModel = {
@@ -274,8 +268,7 @@ const setupModel = {
     },
     effects: {
         fetch: (data, state, send, done) => {
-            console.log(`/b/${ data.setupId }`);
-            send('location:set', { pathname: `/b/${ data.setupId }` }, done);
+            send('location:set', { pathname: `./b/${ data.setupId }` }, done);
         }
     }
 };
@@ -285,7 +278,9 @@ app.model(setupModel);
 
 const authWrapper = (loggedView, anonView) => (state, prev, send) => state.user.isLogged && state.user.id ? loggedView(state, prev, send) : anonView(state, prev, send);
 
-app.router([['/', authWrapper(dashboardView, mainView)], ['/controltower', authWrapper(dashboardView, mainView)], ['/b/:botId', authWrapper(setupForm, mainView)]]);
+app.router([['/', authWrapper(dashboardView, mainView)], ['/b/:botId', authWrapper(setupForm, mainView)],
+// TODO remove this duplicated routes in a nicer manner
+['/controltower', authWrapper(dashboardView, mainView)], ['/controltower/b/:botId', authWrapper(setupForm, mainView)]]);
 
 const tree = app.start();
 

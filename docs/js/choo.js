@@ -359,7 +359,7 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":22}],2:[function(require,module,exports){
+},{"util/":23}],2:[function(require,module,exports){
 module.exports = applyHook
 
 // apply arguments onto an array of functions, useful for hooks
@@ -610,7 +610,7 @@ function wrapOnError (onError) {
   }
 }
 
-},{"./apply-hook":2,"assert":1,"xtend":26,"xtend/mutable":27}],4:[function(require,module,exports){
+},{"./apply-hook":2,"assert":1,"xtend":27,"xtend/mutable":28}],4:[function(require,module,exports){
 var document = require('global/document')
 var hyperx = require('hyperx')
 var onload = require('on-load')
@@ -2059,7 +2059,23 @@ function createLocation (state, patch) {
   }
 }
 
-},{"assert":1,"global/document":7,"xtend":26}],17:[function(require,module,exports){
+},{"assert":1,"global/document":7,"xtend":27}],17:[function(require,module,exports){
+const window = require('global/window')
+const assert = require('assert')
+
+module.exports = hash
+
+// listen to window hashchange events
+// and update router accordingly
+// fn(cb) -> null
+function hash (cb) {
+  assert.equal(typeof cb, 'function', 'sheet-router/hash: cb must be a function')
+  window.onhashchange = function (e) {
+    cb(window.location.hash)
+  }
+}
+
+},{"assert":1,"global/window":8}],18:[function(require,module,exports){
 const document = require('global/document')
 const window = require('global/window')
 const assert = require('assert')
@@ -2076,7 +2092,7 @@ function history (cb) {
   }
 }
 
-},{"assert":1,"global/document":7,"global/window":8}],18:[function(require,module,exports){
+},{"assert":1,"global/document":7,"global/window":8}],19:[function(require,module,exports){
 const window = require('global/window')
 const assert = require('assert')
 
@@ -2114,7 +2130,7 @@ function href (cb) {
   }
 }
 
-},{"assert":1,"global/window":8}],19:[function(require,module,exports){
+},{"assert":1,"global/window":8}],20:[function(require,module,exports){
 const pathname = require('pathname-match')
 const wayfarer = require('wayfarer')
 const assert = require('assert')
@@ -2218,7 +2234,7 @@ function thunkify (cb) {
   }
 }
 
-},{"assert":1,"pathname-match":15,"wayfarer":23}],20:[function(require,module,exports){
+},{"assert":1,"pathname-match":15,"wayfarer":24}],21:[function(require,module,exports){
 const walk = require('wayfarer/walk')
 const assert = require('assert')
 
@@ -2232,14 +2248,14 @@ function walkSheetRouter (router, cb) {
   return walk(router, cb)
 }
 
-},{"assert":1,"wayfarer/walk":25}],21:[function(require,module,exports){
+},{"assert":1,"wayfarer/walk":26}],22:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2829,7 +2845,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":21,"_process":6,"inherits":11}],23:[function(require,module,exports){
+},{"./support/isBuffer":22,"_process":6,"inherits":11}],24:[function(require,module,exports){
 const assert = require('assert')
 const trie = require('./trie')
 
@@ -2890,7 +2906,7 @@ function Wayfarer (dft) {
   }
 }
 
-},{"./trie":24,"assert":1}],24:[function(require,module,exports){
+},{"./trie":25,"assert":1}],25:[function(require,module,exports){
 const mutate = require('xtend/mutable')
 const assert = require('assert')
 const xtend = require('xtend')
@@ -3007,7 +3023,7 @@ Trie.prototype.mount = function (route, trie) {
   }
 }
 
-},{"assert":1,"xtend":26,"xtend/mutable":27}],25:[function(require,module,exports){
+},{"assert":1,"xtend":27,"xtend/mutable":28}],26:[function(require,module,exports){
 const assert = require('assert')
 
 module.exports = walk
@@ -3040,7 +3056,7 @@ function walk (router, transform) {
   })('', trie.trie)
 }
 
-},{"assert":1}],26:[function(require,module,exports){
+},{"assert":1}],27:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -3061,7 +3077,7 @@ function extend() {
     return target
 }
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -3080,7 +3096,7 @@ function extend(target) {
     return target
 }
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 var bel = require('bel') // turns template tag into DOM elements
 var morphdom = require('morphdom') // efficiently diffs + morphs two DOM elements
 var defaultEvents = require('./update-events.js') // default events to be copied when dom elements update
@@ -3116,7 +3132,7 @@ module.exports.update = function (fromNode, toNode, opts) {
   }
 }
 
-},{"./update-events.js":29,"bel":4,"morphdom":12}],29:[function(require,module,exports){
+},{"./update-events.js":30,"bel":4,"morphdom":12}],30:[function(require,module,exports){
 module.exports = [
   // attribute events (can be set with attributes)
   'onclick',
@@ -3159,6 +3175,7 @@ const createLocation = require('sheet-router/create-location')
 const onHistoryChange = require('sheet-router/history')
 const sheetRouter = require('sheet-router')
 const onHref = require('sheet-router/href')
+const onHash = require('sheet-router/hash')
 const walk = require('sheet-router/walk')
 const mutate = require('xtend/mutable')
 const barracks = require('barracks')
@@ -3328,9 +3345,8 @@ function createLocationModel (opts) {
         })
       }
     }
-
     return subs
   }
 }
 
-},{"assert":1,"barracks":3,"nanoraf":13,"sheet-router":19,"sheet-router/create-location":16,"sheet-router/history":17,"sheet-router/href":18,"sheet-router/walk":20,"xtend":26,"xtend/mutable":27,"yo-yo":28}]},{},[]);
+},{"assert":1,"barracks":3,"nanoraf":13,"sheet-router":20,"sheet-router/create-location":16,"sheet-router/hash":17,"sheet-router/history":18,"sheet-router/href":19,"sheet-router/walk":21,"xtend":27,"xtend/mutable":28,"yo-yo":29}]},{},[]);
