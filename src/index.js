@@ -18,18 +18,18 @@ app.model(customerModel);
 app.model(createFbSessionModel(config));
 app.model(botsModel);
 
-const authWrapper = (loggedView, anonView) => (state, prev, send) => (
+const authWrapper = (loggedView, anonView = mainView) => (state, prev, send) => (
     state.customer.isLogged && state.customer.id
         ? loggedView(state, prev, send)
         : anonView(state, prev, send)
 );
 
 app.router([
-    ['/', authWrapper(dashboardView, mainView)],
-    ['/b/:botId', authWrapper(botForm, mainView)],
+    ['/', authWrapper(dashboardView)],
+    ['/b/:botId', authWrapper(botForm)],
     // TODO remove this duplicated routes in a nicer manner
-    ['/controltower', authWrapper(dashboardView, mainView)],
-    ['/controltower/b/:botId', authWrapper(botForm, mainView)]
+    ['/controltower', authWrapper(dashboardView)],
+    ['/controltower/b/:botId', authWrapper(botForm)]
 ]);
 
 const tree = app.start();
