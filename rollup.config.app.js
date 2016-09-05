@@ -8,7 +8,8 @@ export default {
     // 3rd party libs to skip
     external: [
         'choo',
-        'choo/html'
+        'choo/html',
+        'ramda'
     ],
     plugins: [
         // to be able to import json files such as package.json

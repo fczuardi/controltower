@@ -19,7 +19,8 @@ console.log(`buildExternalHelpers > ${libsPath}babel_external-helpers.js`);
 // list of 3rd party libraries to browserify
 const externalLibs = [
     'choo',
-    'choo/html'
+    'choo/html',
+    'ramda'
 ];
 externalLibs.forEach(libName => {
     const outFilename = `${libsPath}${libName.replace('/', '-')}.js`;

@@ -49,8 +49,8 @@ export default (state, prev, send) => html`
             value=${messages.setup.update}
         />
     </form>
-    ${toolbar(state.user, state.app, send)}
-    <a href="../../">back to dashboard</a>
+    ${toolbar(state.customer, state.app, send)}
+    <a href="../">back to dashboard</a>
     <hr>
     <p>${JSON.stringify(state.setup)}</p>
 </div>`;
