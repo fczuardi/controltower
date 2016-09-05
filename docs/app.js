@@ -12,7 +12,7 @@ function createCommonjsModule(fn, module) {
 var config = createCommonjsModule(function (module) {
     module.exports = {
         facebook: {
-            appId: '1691821884476309',
+            appId: '1701349696856861',
             loginParams: {
                 scope: 'public_profile,email'
             },
