@@ -4,7 +4,7 @@ import messages from '../../locales/ptBr';
 
 export default (isLogged, send) => html`
 <button
-    onclick=${() => send('user:signInToggle')}
+    onclick=${() => send('fbsession:signInToggle', { isLogged })}
 >
     ${isLogged
         ? messages.signInToggle.signOut

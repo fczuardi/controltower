@@ -7,13 +7,11 @@ export default (state, prev, send) => html`
 <div>
     <h1>${messages.dashboard.title}</h1>
     <form
-        method="POST"
-        action="#/setup"
         onsubmit=${e => {
             e.preventDefault();
-            const setupId = document.forms[0][0].value;
-            send('setup:setId', { id: setupId });
-            send('setup:fetch', { setupId });
+            const botId = document.forms[0][0].value;
+            send('bots:select', { id: botId });
+            send('bots:load', { id: botId });
         }}
     >
         <label>
@@ -25,7 +23,7 @@ export default (state, prev, send) => html`
             value=${messages.dashboard.load}
         />
     </form>
-    ${toolbar(state.user, state.app, send)}
+    ${toolbar(state.customer, state.app, send)}
     <hr>
     <p>${JSON.stringify(state.user)}</p>
 </div>`;

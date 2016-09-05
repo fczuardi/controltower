@@ -18,7 +18,7 @@
     "test": "ava --verbose",
     "lint": "eslint src",
     "create:config": "babel-node tasks/createConfig.js",
-    "start:www": "http-server docs/ -p 8081",
+    "start:www": "http-server docs/ -p 9966",
     "build:www:js:vendors": "node tasks/vendorLibs.js",
     "build:www:js:app": "rollup src/index.js -c rollup.config.app.js -o docs/app.js",
     "build:www": "npm run build:www:js:vendors && npm run build:www:js:app",
@@ -83,6 +83,7 @@
   },
   "homepage": "https://github.com/fczuardi/controltower#readme",
   "dependencies": {
-    "choo": "^4.0.0-0"
+    "choo": "^4.0.0-0",
+    "ramda": "^0.22.1"
   }
 }

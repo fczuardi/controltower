@@ -5,6 +5,6 @@ import toolbar from './toolbar';
 export default (state, prev, send) => html`
 <div>
     <h1>Welcome</h1>
-    ${state.user.id ? JSON.stringify(state.user) : ''}
-    ${toolbar(state.user, state.app, send)}
+    ${state.customer.id ? JSON.stringify(state.customer) : ''}
+    ${toolbar(state.customer, state.app, send)}
 </div>`;
