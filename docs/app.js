@@ -3,6 +3,7 @@
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var choo = _interopDefault(require('choo'));
+var ramda = require('ramda');
 var html = _interopDefault(require('choo/html'));
 
 function createCommonjsModule(fn, module) {
@@ -21,28 +22,16 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var version = "0.6.33";
+var version = "0.6.34";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
-function fbGetUserInfo (userFields, send, done) {
-    window.FB.api(`/me?fields=${ userFields }`, response => {
-        console.table(response);
-        send('user:setInfo', response, done);
-    });
-}
-
-function fbSignInToggle (isLogged, loginParams) {
-    if (isLogged) {
-        return window.FB.logout();
+const appModel = {
+    namespace: 'app',
+    state: {
+        version,
+        homepage
     }
-    return window.FB.login(loginResponse => {
-        if (loginResponse.authResponse) {
-            console.log('Welcome!');
-        } else {
-            console.log('User cancelled login or did not fully authorize.');
-        }
-    }, loginParams);
-}
+};
 
 var _extends = Object.assign || function (target) {
   for (var i = 1; i < arguments.length; i++) {
@@ -58,6 +47,15 @@ var _extends = Object.assign || function (target) {
   return target;
 };
 
+// default state
+const initialState = {
+    id: null,
+    name: null,
+    email: null,
+    isLogged: false
+};
+
+// reducers
 const signIn = (data, state) => _extends({}, state, {
     isLogged: true
 });
@@ -73,16 +71,47 @@ const setInfo = (data, state) => _extends({}, state, {
     email: data.email
 });
 
-const fbSetup = config => (send, done) => {
-    const { appId } = config;
+const customerModel = {
+    namespace: 'customer',
+    state: initialState,
+    reducers: {
+        setInfo,
+        signIn,
+        signOut
+    }
+};
 
-    const fbLoginStatusChange = data => {
+// effects
+const signInToggle = (isLogged, loginParams) => {
+    if (isLogged) {
+        window.FB.logout();
+    } else {
+        window.FB.login(loginResponse => {
+            if (loginResponse.authResponse) {
+                console.log('Welcome!');
+            } else {
+                console.log('User cancelled login or did not fully authorize.');
+            }
+        }, loginParams);
+    }
+};
+const getUserInfo = (userFields, send, done) => {
+    window.FB.api(`/me?fields=${ userFields }`, response => {
+        console.table(response);
+        send('customer:setInfo', response, done);
+    });
+};
+
+// subscriptions
+const createInit = config => (send, done) => {
+    const { appId } = config;
+    const loginStatusChanged = data => {
         // console.log('----fbLoginStatusChange', data);
         if (data.status === 'connected') {
-            send('user:fetchInfo', data, done);
-            return send('user:signIn', data, done);
+            send('fbsession:fetchInfo', data, done);
+            return send('customer:signIn', data, done);
         }
-        return send('user:signOut', data, done);
+        return send('customer:signOut', data, done);
     };
     window.fbAsyncInit = () => {
         // console.log('----fbAsyncInit----');
@@ -92,10 +121,65 @@ const fbSetup = config => (send, done) => {
             xfbml: true, // parse social plugins on this page
             version: 'v2.7' // use graph api version 2.5
         });
-        window.FB.Event.subscribe('auth.statusChange', fbLoginStatusChange);
+        window.FB.Event.subscribe('auth.statusChange', loginStatusChanged);
         window.FB.getLoginStatus();
     };
 };
+
+const createFbSessionModel = config => ({
+    namespace: 'fbsession',
+    state: {},
+    effects: {
+        signInToggle: (data, state, send) => signInToggle(data.isLogged, config.facebook.loginParams, send),
+        fetchInfo: (data, state, send, done) => getUserInfo(config.facebook.userFields, send, done)
+    },
+    subscriptions: {
+        statusChange: createInit(config.facebook)
+    }
+});
+
+// default state
+const initialState$1 = {
+    selectedIndex: null,
+    list: []
+};
+
+// reducers
+const select = (data, state) => _extends({}, state, {
+    selectedIndex: ramda.findIndex(item => item.id === data.id)(state.list)
+});
+const setList = (data, state) => _extends({}, state, {
+    list: data.list
+});
+
+// effects
+const load = (data, state, send, done) => {
+    console.log(`Loading bot config (${ data.id }) from server…`);
+    send('location:set', { pathname: `./b/${ data.id }` }, done);
+};
+
+// model
+const customerModel$1 = {
+    namespace: 'bots',
+    state: initialState$1,
+    reducers: {
+        select,
+        setList
+    },
+    effects: {
+        load
+    }
+};
+
+var fbSDK = html`
+<script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+</script>`;
 
 var ptBr = createCommonjsModule(function (module) {
     module.exports = {
@@ -117,33 +201,38 @@ var ptBr = createCommonjsModule(function (module) {
 
 var signInToggle$1 = ((isLogged, send) => html`
 <button
-    onclick=${ () => send('user:signInToggle') }
+    onclick=${ () => send('fbsession:signInToggle', { isLogged }) }
 >
     ${ isLogged ? ptBr.signInToggle.signOut : ptBr.signInToggle.signIn }
 </button>`);
 
-var toolbar = ((userState, appState, send) => html`
+var toolbar = ((customerState, appState, send) => html`
 <div
     style="border-top: 1px solid black;margin-top: 1rem;padding-top: 1rem;"
 >
-    ${ signInToggle$1(userState.isLogged, send) }
+    ${ signInToggle$1(customerState.isLogged, send) }
     <small>
         • Control Tower v${ appState.version } •
         <a href="${ appState.homepage }">view source</a>
     </small>
 </div>`);
 
+var mainView = ((state, prev, send) => html`
+<div>
+    <h1>Welcome</h1>
+    ${ state.customer.id ? JSON.stringify(state.customer) : '' }
+    ${ toolbar(state.customer, state.app, send) }
+</div>`);
+
 var dashboardView = ((state, prev, send) => html`
 <div>
     <h1>${ ptBr.dashboard.title }</h1>
     <form
-        method="POST"
-        action="#/setup"
         onsubmit=${ e => {
     e.preventDefault();
-    const setupId = document.forms[0][0].value;
-    send('setup:setId', { id: setupId });
-    send('setup:fetch', { setupId });
+    const botId = document.forms[0][0].value;
+    send('bots:select', { id: botId });
+    send('bots:load', { id: botId });
 } }
     >
         <label>
@@ -155,26 +244,9 @@ var dashboardView = ((state, prev, send) => html`
             value=${ ptBr.dashboard.load }
         />
     </form>
-    ${ toolbar(state.user, state.app, send) }
+    ${ toolbar(state.customer, state.app, send) }
     <hr>
     <p>${ JSON.stringify(state.user) }</p>
-</div>`);
-
-var fbSDK = html`
-<script>(function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-</script>`;
-
-var mainView = ((state, prev, send) => html`
-<div>
-    <h1>Welcome</h1>
-    ${ state.user.id ? JSON.stringify(state.user) : '' }
-    ${ toolbar(state.user, state.app, send) }
 </div>`);
 
 const botSetupLabels = {
@@ -194,7 +266,7 @@ const botSetupLabels = {
         appToken: 'VTEX App Token'
     }
 };
-var setupForm = ((state, prev, send) => html`
+var botForm = ((state, prev, send) => html`
 <div>
     <h1>${ ptBr.setup.title }</h1>
     <form
@@ -221,66 +293,23 @@ var setupForm = ((state, prev, send) => html`
             value=${ ptBr.setup.update }
         />
     </form>
-    ${ toolbar(state.user, state.app, send) }
+    ${ toolbar(state.customer, state.app, send) }
     <a href="../../">back to dashboard</a>
     <hr>
     <p>${ JSON.stringify(state.setup) }</p>
 </div>`);
 
 const app = choo({ href: true, history: true });
-const appModel = {
-    namespace: 'app',
-    state: {
-        version,
-        homepage
-    }
-};
-const userModel = {
-    namespace: 'user',
-    state: {
-        id: null,
-        name: null,
-        email: null,
-        isLogged: false
-    },
-    reducers: {
-        setInfo,
-        signIn,
-        signOut
-    },
-    effects: {
-        signInToggle: (data, state, send) => fbSignInToggle(state.isLogged, config.facebook.loginParams, send),
-        fetchInfo: (data, state, send, done) => fbGetUserInfo(config.facebook.userFields, send, done)
-    },
-    subscriptions: {
-        statusChange: fbSetup(config.facebook)
-    }
-};
-const setupModel = {
-    namespace: 'setup',
-    state: {
-        id: null
-    },
-    reducers: {
-        setId: (data, state) => _extends({}, state, {
-            id: data.id
-        })
-    },
-    effects: {
-        fetch: (data, state, send, done) => {
-            send('location:set', { pathname: `./b/${ data.setupId }` }, done);
-        }
-    }
-};
 app.model(appModel);
-app.model(userModel);
-app.model(setupModel);
+app.model(customerModel);
+app.model(createFbSessionModel(config));
+app.model(customerModel$1);
 
-const authWrapper = (loggedView, anonView) => (state, prev, send) => state.user.isLogged && state.user.id ? loggedView(state, prev, send) : anonView(state, prev, send);
+const authWrapper = (loggedView, anonView) => (state, prev, send) => state.customer.isLogged && state.customer.id ? loggedView(state, prev, send) : anonView(state, prev, send);
 
-app.router([['/', authWrapper(dashboardView, mainView)], ['/b/:botId', authWrapper(setupForm, mainView)],
+app.router([['/', authWrapper(dashboardView, mainView)], ['/b/:botId', authWrapper(botForm, mainView)],
 // TODO remove this duplicated routes in a nicer manner
-['/controltower', authWrapper(dashboardView, mainView)], ['/controltower/b/:botId', authWrapper(setupForm, mainView)]]);
+['/controltower', authWrapper(dashboardView, mainView)], ['/controltower/b/:botId', authWrapper(botForm, mainView)]]);
 
 const tree = app.start();
 
