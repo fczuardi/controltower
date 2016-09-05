@@ -12,3 +12,10 @@ a generic control center web app aka "web admin", "dashboard", "panel"…
 
 [badges]: https://github.com/fczuardi/controltower/blob/master/badges.md
 [license]: https://github.com/fczuardi/controltower/blob/master/LICENSE
+
+## Bootstrap theme
+
+This branch uses the [gentelella][gentelella] Bootstrap theme by [Colorlib][colorlib].
+
+[gentelella]: https://github.com/puikinsh/gentelella
+[colorlib]: https://colorlib.com/
