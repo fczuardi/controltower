@@ -12,7 +12,7 @@ function createCommonjsModule(fn, module) {
 var config = createCommonjsModule(function (module) {
     module.exports = {
         facebook: {
-            appId: '1701349696856861',
+            appId: '1691821884476309',
             loginParams: {
                 scope: 'public_profile,email'
             },
@@ -21,7 +21,7 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var version = "0.6.31";
+var version = "0.6.32";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 function fbGetUserInfo (userFields, send, done) {
