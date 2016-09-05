@@ -18,12 +18,6 @@ const appModel = {
     state: {
         version,
         homepage
-    },
-    subscriptions: {
-        init: (send, done) => {
-            console.log('app init');
-            send('location:set', { pathname: '/' }, done);
-        }
     }
 };
 const userModel = {
