@@ -12,14 +12,12 @@ import fbSDK from './views/fbSDK';
 import mainView from './views/main';
 import setupForm from './views/setup';
 
-const { rootPath } = config;
-const app = choo();
+const app = choo({ href: false, history: false });
 const appModel = {
     namespace: 'app',
     state: {
         version,
-        homepage,
-        rootPath
+        homepage
     }
 };
 const userModel = {
@@ -58,8 +56,8 @@ const setupModel = {
     },
     effects: {
         fetch: (data, state, send, done) => {
-            console.log(`${rootPath}b/${data.setupId}`);
-            send('location:set', { pathname: `${rootPath}b/${data.setupId}` }, done);
+            console.log(`/b/${data.setupId}`);
+            send('location:set', { pathname: `/b/${data.setupId}` }, done);
         }
     }
 };
@@ -73,10 +71,9 @@ const authWrapper = (loggedView, anonView) => (state, prev, send) => (
         : anonView(state, prev, send)
 );
 
-console.log('rootPath', rootPath);
 app.router([
-    [`${rootPath}`, authWrapper(dashboardView, mainView)],
-    [`${rootPath}b/:botId`, authWrapper(setupForm, mainView)]
+    ['/', authWrapper(dashboardView, mainView)],
+    ['/b/:botId', authWrapper(setupForm, mainView)]
 ]);
 
 const tree = app.start();

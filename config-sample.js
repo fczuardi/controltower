@@ -1,5 +1,4 @@
 module.exports = {
-    rootPath: 'ROOT_PATH',
     facebook: {
         appId: 'FACEBOOK_APP_ID',
         loginParams: {
