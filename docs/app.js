@@ -11,9 +11,8 @@ function createCommonjsModule(fn, module) {
 
 var config = createCommonjsModule(function (module) {
     module.exports = {
-        rootPath: 'controltower/',
         facebook: {
-            appId: '1691821884476309',
+            appId: '1701349696856861',
             loginParams: {
                 scope: 'public_profile,email'
             },
@@ -22,7 +21,7 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var version = "0.6.26";
+var version = "0.6.27";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 function fbGetUserInfo (userFields, send, done) {
@@ -223,19 +222,17 @@ var setupForm = ((state, prev, send) => html`
         />
     </form>
     ${ toolbar(state.user, state.app, send) }
-    <a href="${ state.app.rootPath }">back to dashboard</a>
+    <a href="/">back to dashboard</a>
     <hr>
     <p>${ JSON.stringify(state.setup) }</p>
 </div>`);
 
-const { rootPath } = config;
-const app = choo();
+const app = choo({ href: false, history: false });
 const appModel = {
     namespace: 'app',
     state: {
         version,
-        homepage,
-        rootPath
+        homepage
     }
 };
 const userModel = {
@@ -271,8 +268,8 @@ const setupModel = {
     },
     effects: {
         fetch: (data, state, send, done) => {
-            console.log(`${ rootPath }b/${ data.setupId }`);
-            send('location:set', { pathname: `${ rootPath }b/${ data.setupId }` }, done);
+            console.log(`/b/${ data.setupId }`);
+            send('location:set', { pathname: `/b/${ data.setupId }` }, done);
         }
     }
 };
@@ -282,8 +279,7 @@ app.model(setupModel);
 
 const authWrapper = (loggedView, anonView) => (state, prev, send) => state.user.isLogged && state.user.id ? loggedView(state, prev, send) : anonView(state, prev, send);
 
-console.log('rootPath', rootPath);
-app.router([[`${ rootPath }`, authWrapper(dashboardView, mainView)], [`${ rootPath }b/:botId`, authWrapper(setupForm, mainView)]]);
+app.router([['/', authWrapper(dashboardView, mainView)], ['/b/:botId', authWrapper(setupForm, mainView)]]);
 
 const tree = app.start();
 
