@@ -21,7 +21,7 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var version = "0.6.29";
+var version = "0.6.30";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 function fbGetUserInfo (userFields, send, done) {
@@ -285,7 +285,7 @@ app.model(setupModel);
 
 const authWrapper = (loggedView, anonView) => (state, prev, send) => state.user.isLogged && state.user.id ? loggedView(state, prev, send) : anonView(state, prev, send);
 
-app.router([['/', authWrapper(dashboardView, mainView)], ['/b/:botId', authWrapper(setupForm, mainView)]]);
+app.router([['/', authWrapper(dashboardView, mainView)], ['/controltower', authWrapper(dashboardView, mainView)], ['/b/:botId', authWrapper(setupForm, mainView)]]);
 
 const tree = app.start();
 
