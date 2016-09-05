@@ -1,4 +1,5 @@
 import choo from 'choo';
+import { pipe } from 'ramda';
 
 import config from '../config';
 
@@ -8,6 +9,7 @@ import createFbSessionModel from './models/fbSession';
 import botsModel from './models/bots';
 
 import fbSDK from './views/fbSDK';
+import stylingWrapper from './style/defaultTheme';
 import mainView from './views/main';
 import dashboardView from './views/dashboard';
 import botForm from './views/bot';
@@ -23,13 +25,14 @@ const authWrapper = (loggedView, anonView = mainView) => (state, prev, send) => 
         ? loggedView(state, prev, send)
         : anonView(state, prev, send)
 );
+const viewWrapper = pipe(stylingWrapper, authWrapper);
 
 app.router([
-    ['/', authWrapper(dashboardView)],
-    ['/b/:botId', authWrapper(botForm)],
+    ['/', viewWrapper(dashboardView)],
+    ['/b/:botId', viewWrapper(botForm)],
     // TODO remove this duplicated routes in a nicer manner
-    ['/controltower', authWrapper(dashboardView)],
-    ['/controltower/b/:botId', authWrapper(botForm)]
+    ['/controltower', viewWrapper(dashboardView)],
+    ['/controltower/b/:botId', viewWrapper(botForm)]
 ]);
 
 const tree = app.start();
