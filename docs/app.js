@@ -13,7 +13,7 @@ function createCommonjsModule(fn, module) {
 
 var config=createCommonjsModule(function(module){module.exports={facebook:{appId:'1691821884476309',loginParams:{scope:'public_profile,email'},userFields:'id,name,email'}};});
 
-var version="0.7.7";var homepage="https://github.com/fczuardi/controltower#readme";
+var version="0.7.8";var homepage="https://github.com/fczuardi/controltower#readme";
 
 const appModel={namespace:'app',state:{version,homepage}};
 
@@ -60,20 +60,20 @@ var fbSDK = html`
   }(document, 'script', 'facebook-jssdk'));
 </script>`;
 
+var ptBr=createCommonjsModule(function(module){module.exports={login:{title:'Conecte-se',subtitle:'Para acessar sua torre de controle é preciso se identificar.',fbSignInButton:'Acessar com Facebook'},dashboard:{title:'Dashboard',botUrl:'Entre o identificador do seu bot (enviado por email)',load:'Carregar'},setup:{title:'Setup',update:'Atualizar'},signInToggle:{signIn:'Entrar',signOut:'Sair'}};});
+
 const click=(send,action)=>e=>{e.preventDefault();send(action);};var loginView = ((send,buttonClassname)=>html`
 <form>
-    <h1>Please Sign In</h1>
-    <h2>You need to be logged to access your control tower.</h2>
+    <h1>${ptBr.login.title}</h1>
+    <h2>${ptBr.login.subtitle}</h2>
     <button
         class=${buttonClassname}
         onclick=${click(send,'fbsession:signIn')}}
     >
-        Sig In with Facebook
+        ${ptBr.login.fbSignInButton}
     </button>
 </form>
 `);
-
-var ptBr=createCommonjsModule(function(module){module.exports={dashboard:{title:'Dashboard',botUrl:'Entre o identificador do seu bot (enviado por email)',load:'Carregar'},setup:{title:'Setup',update:'Atualizar'},signInToggle:{signIn:'Entrar',signOut:'Sair'}};});
 
 var signInToggle$2 = ((isLogged,send)=>html`
 <button
