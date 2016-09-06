@@ -1,4 +1,9 @@
 module.exports = {
+    login: {
+        title: 'Please Sign In',
+        subtitle: 'You need to be logged to access your control tower.',
+        fbSignInButton: 'Sig In with Facebook'
+    },
     dashboard: {
         title: 'Dashboard',
         botUrl: 'Enter your bot identifier (sent by e-mail)',
