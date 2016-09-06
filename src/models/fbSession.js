@@ -47,6 +47,8 @@ const createFbSessionModel = config => ({
     namespace: 'fbsession',
     state: {},
     effects: {
+        signIn: (data, state, send) =>
+            signInToggle(false, config.facebook.loginParams, send),
         signInToggle: (data, state, send) =>
             signInToggle(data.isLogged, config.facebook.loginParams, send),
         fetchInfo: (data, state, send, done) =>
