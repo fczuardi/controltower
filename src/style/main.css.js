@@ -1,11 +1,11 @@
-const sf = require('sheetify');
+const css = require('sheetify');
 
 // load bootstrap css in the global scope (keep this comment)
-sf('bootstrap/dist/css/bootstrap.min.css', { global: true });
+css('bootstrap/dist/css/bootstrap.min.css', { global: true });
 // load gentelella css in the global scope (keep this comment)
-sf('gentelella/build/css/custom.min.css', { global: true });
+css('gentelella/build/css/custom.min.css', { global: true });
 
-const mainClass = sf`
+const mainClass = css`
 :host {
     position: absolute;
     width: 100%;

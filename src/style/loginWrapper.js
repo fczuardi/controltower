@@ -1,6 +1,6 @@
 const html = require('choo/html');
-const sf = require('sheetify');
-const loginCss = sf`
+const css = require('sheetify');
+const loginCss = css`
 .login {
     position: absolute;
     width: 100%;
