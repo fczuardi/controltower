@@ -5,7 +5,7 @@ const signInToggle = (isLogged, loginParams) => {
     } else {
         window.FB.login(loginResponse => {
             if (loginResponse.authResponse) {
-                console.log('Welcome!');
+                console.log('Welcome!', loginResponse.authResponse);
             } else {
                 console.log('User cancelled login or did not fully authorize.');
             }
@@ -13,9 +13,10 @@ const signInToggle = (isLogged, loginParams) => {
     }
 };
 const getUserInfo = (userFields, send, done) => {
+    const accessToken = window.FB.getAuthResponse().accessToken;
     window.FB.api(`/me?fields=${userFields}`, response => {
-        console.table(response);
-        send('customer:setInfo', response, done);
+        console.table({ ...response, accessToken });
+        send('customer:setFbInfo', { ...response, accessToken }, done);
     });
 };
 
@@ -26,7 +27,7 @@ const createInit = config => (send, done) => {
         // console.log('----fbLoginStatusChange', data);
         if (data.status === 'connected') {
             send('fbsession:fetchInfo', data, done);
-            return send('customer:signIn', data, done);
+            return send('customer:signIn', null, done);
         }
         return send('customer:signOut', data, done);
     };

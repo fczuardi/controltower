@@ -27,11 +27,13 @@ app.model(createFbSessionModel(config));
 app.model(botsModel);
 
 const defaultAnonView = loginWrapper(loginView);
-const authWrapper = (loggedView, anonView = defaultAnonView) => (state, prev, send) => (
-    state.customer.isLogged && state.customer.id
-        ? loggedView(state, prev, send)
-        : anonView(state, prev, send)
+const authWrapper =
+    (loggedView, anonView = defaultAnonView) => (state, prev, send) => (
+        state.customer.isLogged
+            ? loggedView(state, prev, send)
+            : anonView(state, prev, send)
 );
+
 const viewWrapper = pipe(authWrapper, mainWrapper);
 
 app.router([
