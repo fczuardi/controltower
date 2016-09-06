@@ -13,7 +13,7 @@ function createCommonjsModule(fn, module) {
 
 var config=createCommonjsModule(function(module){module.exports={facebook:{appId:'1691821884476309',loginParams:{scope:'public_profile,email'},userFields:'id,name,email'}};});
 
-var version="0.7.6";var homepage="https://github.com/fczuardi/controltower#readme";
+var version="0.7.7";var homepage="https://github.com/fczuardi/controltower#readme";
 
 const appModel={namespace:'app',state:{version,homepage}};
 
