@@ -17,7 +17,10 @@ export default {
     plugins: [
         // css-in-js powered by sheetify
         browserifyPlugin(sheetify, {
-            include: 'src/style/*.js'
+            include: [
+                'src/style/*.css.js',
+                'src/style/*Wrapper.js'
+            ]
         }),
         // to be able to import json files such as package.json
         json(),
@@ -29,6 +32,7 @@ export default {
         // individual babel helpers in a separated file
         babel({
             babelrc: false,
+            compact: true,
             plugins: [
                 'external-helpers',
                 'transform-object-rest-spread'
