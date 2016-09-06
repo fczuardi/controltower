@@ -23,7 +23,7 @@ var config = createCommonjsModule(function (module) {
     };
 });
 
-var version = "0.7.3";
+var version = "0.7.4";
 var homepage = "https://github.com/fczuardi/controltower#readme";
 
 const appModel = {
