@@ -17,7 +17,7 @@ export default {
     plugins: [
         // css-in-js powered by sheetify
         browserifyPlugin(sheetify, {
-            include: 'src/style/*.js'
+            include: 'src/style/*.css.js'
         }),
         // to be able to import json files such as package.json
         json(),

@@ -25,7 +25,7 @@ const authWrapper = (loggedView, anonView = mainView) => (state, prev, send) => 
         ? loggedView(state, prev, send)
         : anonView(state, prev, send)
 );
-const viewWrapper = pipe(stylingWrapper, authWrapper);
+const viewWrapper = pipe(authWrapper, stylingWrapper);
 
 app.router([
     ['/', viewWrapper(dashboardView)],
