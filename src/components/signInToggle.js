@@ -1,5 +1,4 @@
 import html from 'choo/html';
-
 import messages from '../../locales/ptBr';
 
 export default (isLogged, send) => html`

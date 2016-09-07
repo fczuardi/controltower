@@ -12,13 +12,10 @@ import botsModel from './models/bots';
 
 // views
 import fbSDK from './views/fbSDK';
+import mainView from './views/main';
 import loginView from './views/login';
 import dashboardView from './views/dashboard';
-import botForm from './views/bot';
-
-// styling
-import mainWrapper from './style/defaultTheme';
-import loginWrapper from './style/loginWrapper';
+// import botForm from './views/bot';
 
 const app = choo({ href: true, history: true });
 app.model(appModel);
@@ -26,7 +23,7 @@ app.model(customerModel);
 app.model(createFbSessionModel(config));
 app.model(botsModel);
 
-const defaultAnonView = loginWrapper(loginView);
+const defaultAnonView = loginView;
 const authWrapper =
     (loggedView, anonView = defaultAnonView) => (state, prev, send) => (
         state.customer.isLogged
@@ -34,14 +31,14 @@ const authWrapper =
             : anonView(state, prev, send)
 );
 
-const viewWrapper = pipe(authWrapper, mainWrapper);
+const viewWrapper = pipe(authWrapper, mainView);
 
 app.router([
     ['/', viewWrapper(dashboardView)],
-    ['/b/:botId', viewWrapper(botForm)],
+    // ['/b/:botId', viewWrapper(botForm)],
     // TODO remove this duplicated routes in a nicer manner
-    ['/controltower', viewWrapper(dashboardView)],
-    ['/controltower/b/:botId', viewWrapper(botForm)]
+    ['/controltower', viewWrapper(dashboardView)]
+    // ['/controltower/b/:botId', viewWrapper(botForm)]
 ]);
 
 const tree = app.start();

@@ -18,8 +18,9 @@ export default {
         // css-in-js powered by sheetify
         browserifyPlugin(sheetify, {
             include: [
-                'src/style/*.css.js',
-                'src/style/*Wrapper.js'
+                'src/views/main.js',
+                'src/views/login.js',
+                'src/views/dashboard.js'
             ]
         }),
         // to be able to import json files such as package.json
