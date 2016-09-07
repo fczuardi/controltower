@@ -1,29 +1,39 @@
-import html from 'choo/html';
+const html = require('choo/html');
+const messages = require('../../locales/ptBr');
+const menuComponent = require('../components/sideMenu');
+const footerComponent = require('../components/footer');
+const css = require('sheetify');
+const dashboardCss = css`
+.right_col {
+    min-height: 1000px;
+}
+`;
+const menuClasses = {
+    list: 'nav side-menu',
+    active: 'active',
+    homeIcon: 'fa fa-home'
+};
 
-import messages from '../../locales/ptBr';
-import toolbar from './toolbar';
-
-export default (state, prev, send) => html`
-<div>
-    <h1>${messages.dashboard.title}</h1>
-    <form
-        onsubmit=${e => {
-            e.preventDefault();
-            const botId = document.forms[0][0].value;
-            send('bots:select', { id: botId });
-            send('bots:load', { id: botId });
-        }}
-    >
-        <label>
-            ${messages.dashboard.botUrl}
-            <input type="text" name="setupId"/>
-        </label>
-        <input
-            type="submit"
-            value=${messages.dashboard.load}
-        />
-    </form>
-    ${toolbar(state.customer, state.app, send)}
-    <hr>
-    <p>${JSON.stringify(state.user)}</p>
-</div>`;
+module.exports = (state, prev, send) => html`
+<div class="nav-sm ${dashboardCss}">
+    <div class="container body">
+        <div class="main_container">
+            <div class="col-md-3 left_col">
+                <div class="left_col scroll-view">
+                    <div class="main_menu_side hidden-print main_menu">
+                        ${menuComponent(menuClasses)}
+                    </div>
+                </div>
+            </div>
+            <div class="right_col">
+            </div>
+            <footer>
+                <div class="pull-right">
+                    ${footerComponent(messages.footer, state.customer, state.app, send)}
+                </div>
+                <div class="clearfix"></div>
+            </footer>
+        </div>
+    </div>
+</div>
+`;

@@ -1,8 +1,12 @@
 module.exports = {
     login: {
-        title: 'Conecte-se',
-        subtitle: 'Para acessar sua torre de controle é preciso se identificar.',
+        title: 'Entrada',
+        subtitle: 'Para acessar a Torre de Controle é necessário identificar-se.',
         fbSignInButton: 'Acessar com Facebook'
+    },
+    footer: {
+        appName: version => `• Control Tower v${version} •`,
+        viewSource: 'ver código-fonte'
     },
     dashboard: {
         title: 'Dashboard',
