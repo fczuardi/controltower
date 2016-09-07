@@ -1,7 +1,7 @@
-import html from 'choo/html';
-import messages from '../../locales/ptBr';
-import menuComponent from '../components/sideMenu';
-import footerComponent from '../components/footer';
+const html = require('choo/html');
+const messages = require('../../locales/ptBr');
+const menuComponent = require('../components/sideMenu');
+const footerComponent = require('../components/footer');
 const css = require('sheetify');
 const dashboardCss = css`
 .right_col {
@@ -14,7 +14,7 @@ const menuClasses = {
     homeIcon: 'fa fa-home'
 };
 
-export default (state, prev, send) => html`
+module.exports = (state, prev, send) => html`
 <div class="nav-sm ${dashboardCss}">
     <div class="container body">
         <div class="main_container">

@@ -1,6 +1,6 @@
-import html from 'choo/html';
-import messages from '../../locales/ptBr';
-import loginComponent from '../components/login';
+const html = require('choo/html');
+const messages = require('../../locales/ptBr');
+const loginComponent = require('../components/login');
 const css = require('sheetify');
 const loginCss = css`
 .login {
