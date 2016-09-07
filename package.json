@@ -39,6 +39,7 @@
   },
   "babel": {
     "plugins": [
+      "add-module-exports",
       "transform-es2015-modules-commonjs",
       "transform-object-rest-spread"
     ]
@@ -49,6 +50,7 @@
   "devDependencies": {
     "ava": "^0.16.0",
     "babel-cli": "^6.14.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-external-helpers": "^6.8.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.14.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
