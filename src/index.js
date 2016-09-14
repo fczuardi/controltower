@@ -20,7 +20,7 @@ import dashboardView from './views/dashboard';
 import homeContent from './views/home';
 import channelsContent from './views/channels';
 
-const app = choo();
+const app = choo({ history: false, href: false });
 app.model(appModel);
 app.model(uiModel);
 app.model(customerModel);
@@ -42,10 +42,8 @@ const channelsView = dashboardView(channelsContent);
 
 app.router([
     ['/', viewWrapper(homeView)],
-    ['/channels', viewWrapper(channelsView)],
-    // TODO find a better solution than duplicate routes
     ['/controltower', viewWrapper(homeView)],
-    ['/controltower/channels', viewWrapper(channelsView)]
+    ['/channels', viewWrapper(channelsView)]
 ]);
 
 const tree = app.start();
