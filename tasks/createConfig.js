@@ -3,7 +3,8 @@ import { cp, test, sed, echo } from 'shelljs';
 const configFilename = 'config.js';
 const configSampleFilename = 'config-sample.js';
 const envVars = [
-    'FACEBOOK_APP_ID'
+    'FACEBOOK_APP_ID',
+    'CONTROL_TOWER_API_URL'
 ];
 
 if (!test('-f', configFilename) || process.argv[2] === 'replace') {

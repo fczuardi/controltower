@@ -359,7 +359,7 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":23}],2:[function(require,module,exports){
+},{"util/":22}],2:[function(require,module,exports){
 module.exports = applyHook
 
 // apply arguments onto an array of functions, useful for hooks
@@ -389,7 +389,12 @@ function dispatcher (hooks) {
   const onActionHooks = []
   const onErrorHooks = []
 
-  useHooks(hooks)
+  const subscriptionWraps = []
+  const initialStateWraps = []
+  const reducerWraps = []
+  const effectWraps = []
+
+  use(hooks)
 
   var reducersCalled = false
   var effectsCalled = false
@@ -405,20 +410,24 @@ function dispatcher (hooks) {
   start.model = setModel
   start.state = getState
   start.start = start
-  start.use = useHooks
+  start.use = use
   return start
 
   // push an object of hooks onto an array
   // obj -> null
-  function useHooks (hooks) {
+  function use (hooks) {
     assert.equal(typeof hooks, 'object', 'barracks.use: hooks should be an object')
     assert.ok(!hooks.onError || typeof hooks.onError === 'function', 'barracks.use: onError should be undefined or a function')
     assert.ok(!hooks.onAction || typeof hooks.onAction === 'function', 'barracks.use: onAction should be undefined or a function')
     assert.ok(!hooks.onStateChange || typeof hooks.onStateChange === 'function', 'barracks.use: onStateChange should be undefined or a function')
 
+    if (hooks.onStateChange) onStateChangeHooks.push(hooks.onStateChange)
     if (hooks.onError) onErrorHooks.push(wrapOnError(hooks.onError))
     if (hooks.onAction) onActionHooks.push(hooks.onAction)
-    if (hooks.onStateChange) onStateChangeHooks.push(hooks.onStateChange)
+    if (hooks.wrapSubscriptions) subscriptionWraps.push(hooks.wrapSubscriptions)
+    if (hooks.wrapInitialState) initialStateWraps.push(hooks.wrapInitialState)
+    if (hooks.wrapReducers) reducerWraps.push(hooks.wrapReducers)
+    if (hooks.wrapEffects) effectWraps.push(hooks.wrapEffects)
   }
 
   // push a model to be initiated
@@ -433,26 +442,42 @@ function dispatcher (hooks) {
   function getState (opts) {
     opts = opts || {}
     assert.equal(typeof opts, 'object', 'barracks.store.state: opts should be an object')
-    if (opts.state) {
-      const initialState = {}
-      const nsState = {}
-      models.forEach(function (model) {
-        const ns = model.namespace
-        const modelState = model.state || {}
-        if (ns) {
-          nsState[ns] = {}
-          apply(ns, modelState, nsState)
-          nsState[ns] = xtend(nsState[ns], opts.state[ns])
-        } else {
-          apply(model.namespace, modelState, initialState)
-        }
-      })
-      return xtend(_state, xtend(opts.state, nsState))
-    } else if (opts.freeze === false) {
-      return xtend(_state)
-    } else {
-      return Object.freeze(xtend(_state))
-    }
+
+    const state = opts.state
+    if (!opts.state && opts.freeze === false) return xtend(_state)
+    else if (!opts.state) return Object.freeze(xtend(_state))
+    assert.equal(typeof state, 'object', 'barracks.store.state: state should be an object')
+
+    const namespaces = []
+    const newState = {}
+
+    // apply all fields from the model, and namespaced fields from the passed
+    // in state
+    models.forEach(function (model) {
+      const ns = model.namespace
+      namespaces.push(ns)
+      const modelState = model.state || {}
+      if (ns) {
+        newState[ns] = newState[ns] || {}
+        apply(ns, modelState, newState)
+        newState[ns] = xtend(newState[ns], state[ns])
+      } else {
+        mutate(newState, modelState)
+      }
+    })
+
+    // now apply all fields that weren't namespaced from the passed in state
+    Object.keys(state).forEach(function (key) {
+      if (namespaces.indexOf(key) !== -1) return
+      newState[key] = state[key]
+    })
+
+    const tmpState = xtend(_state, xtend(state, newState))
+    const wrappedState = wrapHook(tmpState, initialStateWraps)
+
+    return (opts.freeze === false)
+      ? wrappedState
+      : Object.freeze(wrappedState)
   }
 
   // initialize the store hooks, get the send() function
@@ -465,25 +490,46 @@ function dispatcher (hooks) {
     models.forEach(function (model) {
       const ns = model.namespace
       if (!stateCalled && model.state && opts.state !== false) {
-        apply(ns, model.state, _state)
+        const modelState = model.state || {}
+        if (ns) {
+          _state[ns] = _state[ns] || {}
+          apply(ns, modelState, _state)
+        } else {
+          mutate(_state, modelState)
+        }
       }
       if (!reducersCalled && model.reducers && opts.reducers !== false) {
-        apply(ns, model.reducers, reducers)
+        apply(ns, model.reducers, reducers, function (cb) {
+          return wrapHook(cb, reducerWraps)
+        })
       }
       if (!effectsCalled && model.effects && opts.effects !== false) {
-        apply(ns, model.effects, effects)
+        apply(ns, model.effects, effects, function (cb) {
+          return wrapHook(cb, effectWraps)
+        })
       }
       if (!subsCalled && model.subscriptions && opts.subscriptions !== false) {
-        apply(ns, model.subscriptions, subscriptions, createSend, function (err) {
-          applyHook(onErrorHooks, err)
+        apply(ns, model.subscriptions, subscriptions, function (cb, key) {
+          const send = createSend('subscription: ' + (ns ? ns + ':' + key : key))
+          cb = wrapHook(cb, subscriptionWraps)
+          cb(send, function (err) {
+            applyHook(onErrorHooks, err)
+          })
+          return cb
         })
       }
     })
 
-    if (!opts.noState) stateCalled = true
+    // the state wrap is special because we want to operate on the full
+    // state rather than indvidual chunks, so we apply it outside the loop
+    if (!stateCalled && opts.state !== false) {
+      _state = wrapHook(_state, initialStateWraps)
+    }
+
+    if (!opts.noSubscriptions) subsCalled = true
     if (!opts.noReducers) reducersCalled = true
     if (!opts.noEffects) effectsCalled = true
-    if (!opts.noSubscriptions) subsCalled = true
+    if (!opts.noState) stateCalled = true
 
     if (!onErrorHooks.length) onErrorHooks.push(wrapOnError(defaultOnError))
 
@@ -583,18 +629,12 @@ function dispatcher (hooks) {
 // optionally contains a namespace
 // which is used to nest properties.
 // (str, obj, obj, fn?) -> null
-function apply (ns, source, target, createSend, done) {
+function apply (ns, source, target, wrap) {
   if (ns && !target[ns]) target[ns] = {}
   Object.keys(source).forEach(function (key) {
-    if (ns) {
-      target[ns][key] = source[key]
-    } else {
-      target[key] = source[key]
-    }
-    if (createSend && done) {
-      const send = createSend('subscription: ' + (ns ? ns + ':' + key : key))
-      source[key](send, done)
-    }
+    const cb = wrap ? wrap(source[key], key) : source[key]
+    if (ns) target[ns][key] = cb
+    else target[key] = cb
   })
 }
 
@@ -610,7 +650,17 @@ function wrapOnError (onError) {
   }
 }
 
-},{"./apply-hook":2,"assert":1,"xtend":27,"xtend/mutable":28}],4:[function(require,module,exports){
+// take a apply an array of transforms onto a value. The new value
+// must be returned synchronously from the transform
+// (any, [fn]) -> any
+function wrapHook (value, transforms) {
+  transforms.forEach(function (transform) {
+    value = transform(value)
+  })
+  return value
+}
+
+},{"./apply-hook":2,"assert":1,"xtend":26,"xtend/mutable":27}],4:[function(require,module,exports){
 var document = require('global/document')
 var hyperx = require('hyperx')
 var onload = require('on-load')
@@ -2059,23 +2109,7 @@ function createLocation (state, patch) {
   }
 }
 
-},{"assert":1,"global/document":7,"xtend":27}],17:[function(require,module,exports){
-const window = require('global/window')
-const assert = require('assert')
-
-module.exports = hash
-
-// listen to window hashchange events
-// and update router accordingly
-// fn(cb) -> null
-function hash (cb) {
-  assert.equal(typeof cb, 'function', 'sheet-router/hash: cb must be a function')
-  window.onhashchange = function (e) {
-    cb(window.location.hash)
-  }
-}
-
-},{"assert":1,"global/window":8}],18:[function(require,module,exports){
+},{"assert":1,"global/document":7,"xtend":26}],17:[function(require,module,exports){
 const document = require('global/document')
 const window = require('global/window')
 const assert = require('assert')
@@ -2092,7 +2126,7 @@ function history (cb) {
   }
 }
 
-},{"assert":1,"global/document":7,"global/window":8}],19:[function(require,module,exports){
+},{"assert":1,"global/document":7,"global/window":8}],18:[function(require,module,exports){
 const window = require('global/window')
 const assert = require('assert')
 
@@ -2130,7 +2164,7 @@ function href (cb) {
   }
 }
 
-},{"assert":1,"global/window":8}],20:[function(require,module,exports){
+},{"assert":1,"global/window":8}],19:[function(require,module,exports){
 const pathname = require('pathname-match')
 const wayfarer = require('wayfarer')
 const assert = require('assert')
@@ -2234,7 +2268,7 @@ function thunkify (cb) {
   }
 }
 
-},{"assert":1,"pathname-match":15,"wayfarer":24}],21:[function(require,module,exports){
+},{"assert":1,"pathname-match":15,"wayfarer":23}],20:[function(require,module,exports){
 const walk = require('wayfarer/walk')
 const assert = require('assert')
 
@@ -2248,14 +2282,14 @@ function walkSheetRouter (router, cb) {
   return walk(router, cb)
 }
 
-},{"assert":1,"wayfarer/walk":26}],22:[function(require,module,exports){
+},{"assert":1,"wayfarer/walk":25}],21:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2845,7 +2879,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":22,"_process":6,"inherits":11}],24:[function(require,module,exports){
+},{"./support/isBuffer":21,"_process":6,"inherits":11}],23:[function(require,module,exports){
 const assert = require('assert')
 const trie = require('./trie')
 
@@ -2906,7 +2940,7 @@ function Wayfarer (dft) {
   }
 }
 
-},{"./trie":25,"assert":1}],25:[function(require,module,exports){
+},{"./trie":24,"assert":1}],24:[function(require,module,exports){
 const mutate = require('xtend/mutable')
 const assert = require('assert')
 const xtend = require('xtend')
@@ -3023,7 +3057,7 @@ Trie.prototype.mount = function (route, trie) {
   }
 }
 
-},{"assert":1,"xtend":27,"xtend/mutable":28}],26:[function(require,module,exports){
+},{"assert":1,"xtend":26,"xtend/mutable":27}],25:[function(require,module,exports){
 const assert = require('assert')
 
 module.exports = walk
@@ -3056,7 +3090,7 @@ function walk (router, transform) {
   })('', trie.trie)
 }
 
-},{"assert":1}],27:[function(require,module,exports){
+},{"assert":1}],26:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -3077,7 +3111,7 @@ function extend() {
     return target
 }
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -3096,7 +3130,7 @@ function extend(target) {
     return target
 }
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 var bel = require('bel') // turns template tag into DOM elements
 var morphdom = require('morphdom') // efficiently diffs + morphs two DOM elements
 var defaultEvents = require('./update-events.js') // default events to be copied when dom elements update
@@ -3132,7 +3166,7 @@ module.exports.update = function (fromNode, toNode, opts) {
   }
 }
 
-},{"./update-events.js":30,"bel":4,"morphdom":12}],30:[function(require,module,exports){
+},{"./update-events.js":29,"bel":4,"morphdom":12}],29:[function(require,module,exports){
 module.exports = [
   // attribute events (can be set with attributes)
   'onclick',
@@ -3175,7 +3209,6 @@ const createLocation = require('sheet-router/create-location')
 const onHistoryChange = require('sheet-router/history')
 const sheetRouter = require('sheet-router')
 const onHref = require('sheet-router/href')
-const onHash = require('sheet-router/hash')
 const walk = require('sheet-router/walk')
 const mutate = require('xtend/mutable')
 const barracks = require('barracks')
@@ -3345,8 +3378,9 @@ function createLocationModel (opts) {
         })
       }
     }
+
     return subs
   }
 }
 
-},{"assert":1,"barracks":3,"nanoraf":13,"sheet-router":20,"sheet-router/create-location":16,"sheet-router/hash":17,"sheet-router/history":18,"sheet-router/href":19,"sheet-router/walk":21,"xtend":27,"xtend/mutable":28,"yo-yo":29}]},{},[]);
+},{"assert":1,"barracks":3,"nanoraf":13,"sheet-router":19,"sheet-router/create-location":16,"sheet-router/history":17,"sheet-router/href":18,"sheet-router/walk":20,"xtend":26,"xtend/mutable":27,"yo-yo":28}]},{},[]);

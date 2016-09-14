@@ -1,40 +1,24 @@
-// default state
-const initialState = {
-    id: null,
-    isLogged: false,
-    facebook: {
+const customerModel = ({
+    namespace: 'customer',
+    state: {
         id: null,
         name: null,
         email: null,
-        accessToken: null
-    }
-};
-
-// reducers
-const signOut = () => initialState;
-const signIn = (data, state) => ({
-    ...state,
-    isLogged: true
-});
-const setFbInfo = (data, state) => ({
-    ...state,
-    facebook: {
-        ...state.facebook,
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        accessToken: data.accessToken
-    }
-});
-
-const customerModel = {
-    namespace: 'customer',
-    state: initialState,
+        bots: [],
+        facebookId: null,
+        isLogged: null
+    },
     reducers: {
-        setFbInfo,
-        signIn,
-        signOut
+        signIn: (data, state) => ({
+            ...state,
+            isLogged: true
+        }),
+        signOut: (data, state) => ({
+            ...state,
+            isLogged: false
+        }),
+        set: data => data
     }
-};
+});
 
 export default customerModel;

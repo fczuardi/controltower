@@ -11,6 +11,7 @@ export default {
     external: [
         'choo',
         'choo/html',
+        'choo/http',
         'ramda',
         'insert-css'
     ],

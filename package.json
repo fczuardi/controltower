@@ -1,6 +1,6 @@
 {
   "name": "controltower",
-  "version": "0.8.3",
+  "version": "0.9.4",
   "main": "./src/index.js",
   "license": "AGPL-3.0",
   "scripts-info": {
@@ -10,7 +10,8 @@
     "start:www": "Launches a static files webserver serving dist/docs",
     "build:npm": "Builds the transpiled npm package under dist/npm",
     "ppp": "Increases the version patch number, push to github and publish to npm",
-    "mpp": "Increases the version minor number, push to github and publish to npm"
+    "mpp": "Increases the version minor number, push to github and publish to npm",
+    "create:config": "Generates a config.js config file based on your env vars"
   },
   "scripts": {
     "info": "npm-scripts-info",
@@ -57,14 +58,14 @@
     "babelify": "^7.3.0",
     "bankai": "^3.3.0",
     "bootstrap": "^3.3.7",
-    "eslint": "^3.4.0",
+    "eslint": "^3.5.0",
     "eslint-config-calamar": "^2.1.1",
     "eslint-plugin-babel": "^3.3.0",
-    "eslint-plugin-import": "^1.14.0",
+    "eslint-plugin-import": "^1.15.0",
     "gentelella": "^1.3.0",
     "http-server": "^0.9.0",
     "npm-scripts-info": "^0.3.6",
-    "rollup": "^0.34.13",
+    "rollup": "^0.35.10",
     "rollup-plugin-babel": "^2.6.1",
     "rollup-plugin-browserify-transform": "^0.1.0",
     "rollup-plugin-commonjs": "^4.1.0",
