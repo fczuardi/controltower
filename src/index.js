@@ -8,7 +8,7 @@ import config from '../config';
 import appModel from './models/app';
 import customerModel from './models/customer';
 import createFbSessionModel from './models/fbSession';
-import botsModel from './models/bots';
+// import botsModel from './models/bots';
 
 // views
 import fbSDK from './views/fbSDK';
@@ -20,8 +20,8 @@ import dashboardView from './views/dashboard';
 const app = choo({ href: true, history: true });
 app.model(appModel);
 app.model(customerModel);
-app.model(createFbSessionModel(config));
-app.model(botsModel);
+app.model(createFbSessionModel(config.facebook));
+// app.model(botsModel);
 
 const defaultAnonView = loginView;
 const authWrapper =
