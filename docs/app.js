@@ -14,7 +14,7 @@ function createCommonjsModule(fn, module) {
 
 var config=createCommonjsModule(function(module){module.exports={calamar:{apiUrl:'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'},facebook:{appId:'1691821884476309',loginParams:{scope:'public_profile,email,pages_show_list'},userFields:'id,name,email'}};});
 
-var version="0.9.4";var homepage="https://github.com/fczuardi/controltower#readme";
+var version="0.9.5";var homepage="https://github.com/fczuardi/controltower#readme";
 
 const appModel={namespace:'app',state:{version,homepage}};
 
@@ -72,11 +72,13 @@ var set = function set(object, property, value, receiver) {
   return value;
 };
 
+const uiModel={namespace:'ui',state:{selectedSection:'home',enabledSections:['home'],menu:['home','channels']},reducers:{enableSection:(name,state)=>_extends({},state,{enabledSections:state.enabledSections.concat([name])}),disableSection:(name,state)=>_extends({},state,{enabledSections:state.enabledSections.filter(item=>item!==name)}),selectSection:(name,state)=>_extends({},state,{selectedSection:name})}};
+
 const customerModel={namespace:'customer',state:{id:null,name:null,email:null,bots:[],facebookId:null,isLogged:null},reducers:{signIn:(data,state)=>_extends({},state,{isLogged:true}),signOut:(data,state)=>_extends({},state,{isLogged:false}),set:data=>data}};
 
-const botModel={namespace:'bot',state:{id:null,customerId:null,users:[]},reducers:{set:data=>data}};
+const botModel={namespace:'bot',state:{id:null,customerId:null,type:null,users:[]},reducers:{set:data=>data}};
 
-const defaultOptions=token=>({json:true,headers:{Authorization:`Bearer ${token}`}});const createApiModel=config=>({namespace:'api',state:{token:null},reducers:{set:data=>data},effects:{getCustomer:(data,state,send,done)=>{const url=`${config.apiUrl}/v1/customers`;const options=defaultOptions(state.token);http.post(url,options,(error,response)=>{if(error){console.error(error);return done();}send('customer:set',response.body,done);return send('api:getBot',{botId:response.body.bots[0]},done);});},getBot:(data,state,send,done)=>{const url=`${config.apiUrl}/v1/bots/${data.botId}`;const options=defaultOptions(state.token);http.get(url,options,(error,response)=>{if(error){console.error(error);return done();}return send('bot:set',response.body,done);});}}});
+const defaultOptions=token=>({json:true,headers:{Authorization:`Bearer ${token}`}});const createApiModel=config=>({namespace:'api',state:{token:null},reducers:{set:data=>data},effects:{getCustomer:(data,state,send,done)=>{const url=`${config.apiUrl}/v1/customers`;const options=defaultOptions(state.token);http.post(url,options,(error,response)=>{if(error){console.error(error);return done();}send('customer:set',response.body,done);return send('api:getBot',{botId:response.body.bots[0]},done);});},getBot:(data,state,send,done)=>{const url=`${config.apiUrl}/v1/bots/${data.botId}`;const options=defaultOptions(state.token);http.get(url,options,(error,response)=>{if(error){console.error(error);return done();}if(response.body.facebook){send('ui:enableSection','channels',done);}else{send('ui:disableSection','channels',done);}return send('bot:set',response.body,done);});}}});
 
 const signInToggle=(isLogged,loginParams)=>{if(isLogged){window.FB.logout();}else{window.FB.login(loginResponse=>{if(loginResponse.authResponse){console.log('Welcome!',loginResponse.authResponse);}else{console.log('User cancelled login or did not fully authorize.');}},loginParams);}};const createFbSessionModel=config=>({namespace:'fbsession',subscriptions:{init:(send,done)=>{window.fbAsyncInit=()=>{window.FB.init({appId:config.appId,cookie:true,xfbml:true,version:'v2.7'});window.FB.Event.subscribe('auth.statusChange',data=>send('fbsession:statusChange',data,done));window.FB.getLoginStatus();};done();}},effects:{statusChange:(data,state,send,done)=>{if(data.status==='connected'){send('customer:signIn',data.authResponse,done);send('api:set',{token:data.authResponse.accessToken},done);return send('api:getCustomer',null,done);}return send('customer:signOut',data,done);},signIn:(data,state,send)=>signInToggle(false,config.loginParams,send),signInToggle:(data,state,send)=>signInToggle(data.isLogged,config.loginParams,send)}});
 
@@ -106,7 +108,7 @@ var main$1=createCommonjsModule(function(module){const html$$1=html;const fontAw
     ${view(state,prev,send)}
 </div>`;});
 
-var ptBr=createCommonjsModule(function(module){module.exports={login:{title:'Entrada',subtitle:'Para acessar a Torre de Controle é necessário identificar-se.',fbSignInButton:'Acessar com Facebook'},footer:{appName:version=>`• Control Tower v${version} •`,viewSource:'ver código-fonte'},dashboard:{title:'Dashboard',botUrl:'Entre o identificador do seu bot (enviado por email)',load:'Carregar'},setup:{title:'Setup',update:'Atualizar'},signInToggle:{signIn:'Entrar',signOut:'Sair'}};});
+var ptBr=createCommonjsModule(function(module){module.exports={login:{title:'Entrada',subtitle:'Para acessar a Torre de Controle é necessário identificar-se.',fbSignInButton:'Acessar com Facebook'},sidebar:{home:'Home',channels:'Canais'},footer:{appName:version=>`• Control Tower v${version} •`,viewSource:'ver código-fonte'},dashboard:{title:'Dashboard',botUrl:'Entre o identificador do seu bot (enviado por email)',load:'Carregar'},setup:{title:'Setup',update:'Atualizar'},signInToggle:{signIn:'Entrar',signOut:'Sair'}};});
 
 const click=(send,action)=>e=>{e.preventDefault();send(action);};var login$2 = ((labels,classes,send)=>html`
 <form>
@@ -140,13 +142,16 @@ var login=createCommonjsModule(function(module){const html$$1=html;const message
     </div>
 </div>`;});
 
-var sideMenu = (classes=>html`
+const click$1=(send,key)=>e=>{e.preventDefault();const pathname=key==='home'?'/':`/${key}`;send('ui:selectSection',key);send('location:set',{pathname});};var sideMenu = ((uiState,classes,send)=>html`
 <ul class=${classes.list}>
-    <li class=${classes.active}>
-        <a>
-            <i class=${classes.homeIcon}></i>
+${uiState.menu.map(key=>!uiState.enabledSections.includes(key)?null:html`
+    <li class=${key===uiState.selectedSection?classes.active:''}>
+        <a onclick=${click$1(send,key)}">
+            <i class=${classes.icons[key]}></i>
+            ${ptBr.sidebar[key]}
         </a>
     </li>
+`)}
 </ul>`);
 
 var sideMenu = Object.freeze({
@@ -175,22 +180,19 @@ var require$$2 = ( sideMenu && sideMenu['default'] ) || sideMenu;
 
 var require$$1$2 = ( footer && footer['default'] ) || footer;
 
-var dashboard$1=createCommonjsModule(function(module){const html$$1=html;const messages=ptBr;const menuComponent=require$$2;const footerComponent=require$$1$2;const css=0;const dashboardCss=(require$$0("._29341f67 .right_col {\n    min-height: 1000px;\n}")||true)&&"_29341f67";const menuClasses={list:'nav side-menu',active:'active',homeIcon:'fa fa-home'};module.exports=(state,prev,send)=>html$$1`
+var dashboard$2=createCommonjsModule(function(module){const html$$1=html;const messages=ptBr;const menuComponent=require$$2;const footerComponent=require$$1$2;const css=0;const dashboardCss=(require$$0("._29341f67 .right_col {\n    min-height: 1000px;\n}")||true)&&"_29341f67";const menuClasses={list:'nav side-menu',active:'active',icons:{home:'fa fa-home',channels:'fa fa-weixin'}};module.exports=content=>(state,prev,send)=>html$$1`
 <div class="nav-sm ${dashboardCss}">
     <div class="container body">
         <div class="main_container">
             <div class="col-md-3 left_col">
                 <div class="left_col scroll-view">
                     <div class="main_menu_side hidden-print main_menu">
-                        ${menuComponent(menuClasses)}
+                        ${menuComponent(state.ui,menuClasses,send)}
                     </div>
                 </div>
             </div>
             <div class="right_col">
-            <h1>Customer</h1>
-<code><pre>${JSON.stringify(state.customer,' ',2)}</pre></code>
-            <h1>Bot</h1>
-<code><pre>${JSON.stringify(state.bot,' ',2)}</pre></code>
+                ${content(state)}
             </div>
             <footer>
                 <div class="pull-right">
@@ -203,8 +205,27 @@ var dashboard$1=createCommonjsModule(function(module){const html$$1=html;const m
 </div>
 `;});
 
-const app=choo({href:true,history:true});app.model(appModel);app.model(customerModel);app.model(botModel);app.model(createApiModel(config.calamar));app.model(createFbSessionModel(config.facebook));const defaultAnonView=login;const authWrapper=(loggedView,anonView=defaultAnonView)=>(state,prev,send)=>state.customer.isLogged?loggedView(state,prev,send):anonView(state,prev,send);const viewWrapper=ramda.pipe(authWrapper,main$1);app.router([['/',viewWrapper(dashboard$1)],// ['/b/:botId', viewWrapper(botForm)],
-// TODO remove this duplicated routes in a nicer manner
-['/controltower',viewWrapper(dashboard$1)]// ['/controltower/b/:botId', viewWrapper(botForm)]
+var home=createCommonjsModule(function(module){const html$$1=html;module.exports=state=>html$$1`
+<div>
+    <h2>${JSON.stringify(state.location)}</h2>
+    <h1>Auth</h1>
+<code><pre>${JSON.stringify(state.api,' ',2)}</pre></code>
+    <h1>Customer</h1>
+<code><pre>${JSON.stringify(state.customer,' ',2)}</pre></code>
+    <h1>Bot</h1>
+<code><pre>${JSON.stringify(state.bot,' ',2)}</pre></code>
+</div>
+`;});
+
+var channels=createCommonjsModule(function(module){const html$$1=html;module.exports=state=>html$$1`
+<div>
+    <h1>Channels</h1>
+<code><pre>${JSON.stringify(state,' ',2)}</pre></code>
+</div>
+`;});
+
+const app=choo();app.model(appModel);app.model(uiModel);app.model(customerModel);app.model(botModel);app.model(createApiModel(config.calamar));app.model(createFbSessionModel(config.facebook));const defaultAnonView=login;const authWrapper=(loggedView,anonView=defaultAnonView)=>(state,prev,send)=>state.customer.isLogged?loggedView(state,prev,send):anonView(state,prev,send);const viewWrapper=ramda.pipe(authWrapper,main$1);const homeView=dashboard$2(home);const channelsView=dashboard$2(channels);app.router([['/',viewWrapper(homeView)],['/channels',viewWrapper(channelsView)]// TODO find a better solution than duplicate routes
+// ['/controltower', viewWrapper(homeView)],
+// ['/controltower/channels', viewWrapper(channelsView)]
 ]);const tree=app.start();// facebook javascript sdk script tag
 document.body.appendChild(fbSDK);document.body.appendChild(tree);
