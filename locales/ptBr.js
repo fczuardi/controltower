@@ -4,6 +4,10 @@ module.exports = {
         subtitle: 'Para acessar a Torre de Controle é necessário identificar-se.',
         fbSignInButton: 'Acessar com Facebook'
     },
+    sidebar: {
+        home: 'Home',
+        channels: 'Canais'
+    },
     footer: {
         appName: version => `• Control Tower v${version} •`,
         viewSource: 'ver código-fonte'

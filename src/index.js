@@ -6,6 +6,7 @@ import config from '../config';
 
 // models
 import appModel from './models/app';
+import uiModel from './models/ui';
 import customerModel from './models/customer';
 import botModel from './models/bot';
 import createApiModel from './models/api';
@@ -16,10 +17,12 @@ import fbSDK from './views/fbSDK';
 import mainView from './views/main';
 import loginView from './views/login';
 import dashboardView from './views/dashboard';
-// import botForm from './views/bot';
+import homeContent from './views/home';
+import channelsContent from './views/channels';
 
-const app = choo({ href: true, history: true });
+const app = choo();
 app.model(appModel);
+app.model(uiModel);
 app.model(customerModel);
 app.model(botModel);
 app.model(createApiModel(config.calamar));
@@ -34,13 +37,15 @@ const authWrapper =
 );
 
 const viewWrapper = pipe(authWrapper, mainView);
+const homeView = dashboardView(homeContent);
+const channelsView = dashboardView(channelsContent);
 
 app.router([
-    ['/', viewWrapper(dashboardView)],
-    // ['/b/:botId', viewWrapper(botForm)],
-    // TODO remove this duplicated routes in a nicer manner
-    ['/controltower', viewWrapper(dashboardView)]
-    // ['/controltower/b/:botId', viewWrapper(botForm)]
+    ['/', viewWrapper(homeView)],
+    ['/channels', viewWrapper(channelsView)]
+    // TODO find a better solution than duplicate routes
+    // ['/controltower', viewWrapper(homeView)],
+    // ['/controltower/channels', viewWrapper(channelsView)]
 ]);
 
 const tree = app.start();

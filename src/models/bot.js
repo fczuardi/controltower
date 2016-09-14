@@ -3,6 +3,7 @@ const botModel = {
     state: {
         id: null,
         customerId: null,
+        type: null,
         users: []
     },
     reducers: {

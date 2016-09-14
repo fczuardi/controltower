@@ -11,25 +11,25 @@ const dashboardCss = css`
 const menuClasses = {
     list: 'nav side-menu',
     active: 'active',
-    homeIcon: 'fa fa-home'
+    icons: {
+        home: 'fa fa-home',
+        channels: 'fa fa-weixin'
+    }
 };
 
-module.exports = (state, prev, send) => html`
+module.exports = content => (state, prev, send) => html`
 <div class="nav-sm ${dashboardCss}">
     <div class="container body">
         <div class="main_container">
             <div class="col-md-3 left_col">
                 <div class="left_col scroll-view">
                     <div class="main_menu_side hidden-print main_menu">
-                        ${menuComponent(menuClasses)}
+                        ${menuComponent(state.ui, menuClasses, send)}
                     </div>
                 </div>
             </div>
             <div class="right_col">
-            <h1>Customer</h1>
-<code><pre>${JSON.stringify(state.customer, ' ', 2)}</pre></code>
-            <h1>Bot</h1>
-<code><pre>${JSON.stringify(state.bot, ' ', 2)}</pre></code>
+                ${content(state)}
             </div>
             <footer>
                 <div class="pull-right">

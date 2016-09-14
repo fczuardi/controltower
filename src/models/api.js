@@ -36,6 +36,11 @@ const createApiModel = config => ({
                     console.error(error);
                     return done();
                 }
+                if (response.body.facebook) {
+                    send('ui:enableSection', 'channels', done);
+                } else {
+                    send('ui:disableSection', 'channels', done);
+                }
                 return send('bot:set', response.body, done);
             });
         }
