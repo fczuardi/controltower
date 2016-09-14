@@ -1,4 +1,7 @@
 module.exports = {
+    calamar: {
+        apiUrl: 'CONTROL_TOWER_API_URL'
+    },
     facebook: {
         appId: 'FACEBOOK_APP_ID',
         loginParams: {

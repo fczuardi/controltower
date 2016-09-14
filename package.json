@@ -10,7 +10,8 @@
     "start:www": "Launches a static files webserver serving dist/docs",
     "build:npm": "Builds the transpiled npm package under dist/npm",
     "ppp": "Increases the version patch number, push to github and publish to npm",
-    "mpp": "Increases the version minor number, push to github and publish to npm"
+    "mpp": "Increases the version minor number, push to github and publish to npm",
+    "create:config": "Generates a config.js config file based on your env vars"
   },
   "scripts": {
     "info": "npm-scripts-info",
