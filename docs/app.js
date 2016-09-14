@@ -14,7 +14,7 @@ function createCommonjsModule(fn, module) {
 
 var config=createCommonjsModule(function(module){module.exports={calamar:{apiUrl:'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'},facebook:{appId:'1691821884476309',loginParams:{scope:'public_profile,email,pages_show_list'},userFields:'id,name,email'}};});
 
-var version="0.9.5";var homepage="https://github.com/fczuardi/controltower#readme";
+var version="0.9.6";var homepage="https://github.com/fczuardi/controltower#readme";
 
 const appModel={namespace:'app',state:{version,homepage}};
 
@@ -224,8 +224,6 @@ var channels=createCommonjsModule(function(module){const html$$1=html;module.exp
 </div>
 `;});
 
-const app=choo();app.model(appModel);app.model(uiModel);app.model(customerModel);app.model(botModel);app.model(createApiModel(config.calamar));app.model(createFbSessionModel(config.facebook));const defaultAnonView=login;const authWrapper=(loggedView,anonView=defaultAnonView)=>(state,prev,send)=>state.customer.isLogged?loggedView(state,prev,send):anonView(state,prev,send);const viewWrapper=ramda.pipe(authWrapper,main$1);const homeView=dashboard$2(home);const channelsView=dashboard$2(channels);app.router([['/',viewWrapper(homeView)],['/channels',viewWrapper(channelsView)]// TODO find a better solution than duplicate routes
-// ['/controltower', viewWrapper(homeView)],
-// ['/controltower/channels', viewWrapper(channelsView)]
-]);const tree=app.start();// facebook javascript sdk script tag
+const app=choo();app.model(appModel);app.model(uiModel);app.model(customerModel);app.model(botModel);app.model(createApiModel(config.calamar));app.model(createFbSessionModel(config.facebook));const defaultAnonView=login;const authWrapper=(loggedView,anonView=defaultAnonView)=>(state,prev,send)=>state.customer.isLogged?loggedView(state,prev,send):anonView(state,prev,send);const viewWrapper=ramda.pipe(authWrapper,main$1);const homeView=dashboard$2(home);const channelsView=dashboard$2(channels);app.router([['/',viewWrapper(homeView)],['/channels',viewWrapper(channelsView)],// TODO find a better solution than duplicate routes
+['/controltower',viewWrapper(homeView)],['/controltower/channels',viewWrapper(channelsView)]]);const tree=app.start();// facebook javascript sdk script tag
 document.body.appendChild(fbSDK);document.body.appendChild(tree);
