@@ -15,7 +15,6 @@ const signInToggle = (isLogged, loginParams) => {
 const getUserInfo = (userFields, send, done) => {
     const accessToken = window.FB.getAuthResponse().accessToken;
     window.FB.api(`/me?fields=${userFields}`, response => {
-        console.table({ ...response, accessToken });
         send('customer:setFbInfo', { ...response, accessToken }, done);
     });
 };
