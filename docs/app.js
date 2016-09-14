@@ -14,7 +14,7 @@ function createCommonjsModule(fn, module) {
 
 var config=createCommonjsModule(function(module){module.exports={calamar:{apiUrl:'https://j3zeml7hyc.execute-api.us-east-1.amazonaws.com/latest'},facebook:{appId:'1691821884476309',loginParams:{scope:'public_profile,email,pages_show_list'},userFields:'id,name,email'}};});
 
-var version="0.9.1";var homepage="https://github.com/fczuardi/controltower#readme";
+var version="0.9.2";var homepage="https://github.com/fczuardi/controltower#readme";
 
 const appModel={namespace:'app',state:{version,homepage}};
 
