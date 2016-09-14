@@ -42,10 +42,10 @@ const channelsView = dashboardView(channelsContent);
 
 app.router([
     ['/', viewWrapper(homeView)],
-    ['/channels', viewWrapper(channelsView)]
+    ['/channels', viewWrapper(channelsView)],
     // TODO find a better solution than duplicate routes
-    // ['/controltower', viewWrapper(homeView)],
-    // ['/controltower/channels', viewWrapper(channelsView)]
+    ['/controltower', viewWrapper(homeView)],
+    ['/controltower/channels', viewWrapper(channelsView)]
 ]);
 
 const tree = app.start();
