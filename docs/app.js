@@ -12,9 +12,9 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-var config=createCommonjsModule(function(module){module.exports={calamar:{apiUrl:'https://j3zeml7hyc.execute-api.us-east-1.amazonaws.com/latest'},facebook:{appId:'1691821884476309',loginParams:{scope:'public_profile,email,pages_show_list'},userFields:'id,name,email'}};});
+var config=createCommonjsModule(function(module){module.exports={calamar:{apiUrl:'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'},facebook:{appId:'1691821884476309',loginParams:{scope:'public_profile,email,pages_show_list'},userFields:'id,name,email'}};});
 
-var version="0.9.3";var homepage="https://github.com/fczuardi/controltower#readme";
+var version="0.9.4";var homepage="https://github.com/fczuardi/controltower#readme";
 
 const appModel={namespace:'app',state:{version,homepage}};
 
