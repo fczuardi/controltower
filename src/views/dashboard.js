@@ -26,6 +26,10 @@ module.exports = (state, prev, send) => html`
                 </div>
             </div>
             <div class="right_col">
+            <h1>Customer</h1>
+<code><pre>${JSON.stringify(state.customer, ' ', 2)}</pre></code>
+            <h1>Bot</h1>
+<code><pre>${JSON.stringify(state.bot, ' ', 2)}</pre></code>
             </div>
             <footer>
                 <div class="pull-right">

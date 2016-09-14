@@ -14,9 +14,6 @@ const signInToggle = (isLogged, loginParams) => {
 
 const createFbSessionModel = config => ({
     namespace: 'fbsession',
-    state: {
-        accessToken: null
-    },
     subscriptions: {
         init: (send, done) => {
             window.fbAsyncInit = () => {
@@ -38,8 +35,9 @@ const createFbSessionModel = config => ({
     effects: {
         statusChange: (data, state, send, done) => {
             if (data.status === 'connected') {
-                send('customer:signIn', data, done);
-                return send('customer:fetchInfo', data, done);
+                send('customer:signIn', data.authResponse, done);
+                send('api:set', { token: data.authResponse.accessToken }, done);
+                return send('api:getCustomer', null, done);
             }
             return send('customer:signOut', data, done);
         },
