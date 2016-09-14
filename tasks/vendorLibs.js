@@ -20,6 +20,7 @@ console.log(`buildExternalHelpers > ${libsPath}babel_external-helpers.js`);
 const externalLibs = [
     'choo',
     'choo/html',
+    'choo/http',
     'ramda',
     'insert-css'
 ];
