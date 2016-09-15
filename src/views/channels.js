@@ -1,7 +1,7 @@
 const html = require('choo/html');
 const pageListFormComponent = require('../components/pageListForm');
 
-import messages from '../../locales/ptBr';
+const messages = require('../../locales/ptBr');
 
 const pageListClasses = {
     form: 'form-horizontal form-label-left',
