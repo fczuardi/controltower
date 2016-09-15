@@ -1,7 +1,7 @@
-import html from 'choo/html';
+const html = require('choo/html');
 const pageListComponent = require('../components/pageList');
 
-export default (pages, selectedPage, isUpdating, classes, messages, onSubmit) => html`
+module.exports = (pages, selectedPage, isUpdating, classes, messages, onSubmit) => html`
 <form class=${classes.form} onsubmit=${onSubmit}>
     <div class=${classes.formGroup}>
         <label class=${classes.label}>
