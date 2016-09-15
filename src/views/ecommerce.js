@@ -1,5 +1,5 @@
 const vtexFormComponent = require('../components/vtexForm');
-const botSetupPage = require('./botSetup');
+const botSetupPage = require('../views/botSetup');
 const messages = require('../../locales/ptBr');
 
 const createSubmit = (botId, send) => e => {
@@ -12,10 +12,11 @@ const createSubmit = (botId, send) => e => {
         'appKey',
         'appToken'
     ];
-    const update = fieldNames.reduce((prev, name) => ({
-        ...prev,
-        [name]: e.target[name].value
-    }), {});
+    const update = fieldNames.reduce((prev, name) =>
+        Object.assign(prev, {
+            [name]: e.target[name].value
+        })
+    , {});
     send('api:updateBot', { botId, vtex: update });
     return send('bot:setVtexStore', update);
 };
