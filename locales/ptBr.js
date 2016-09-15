@@ -1,3 +1,8 @@
+const formLabels = {
+    cancelButton: 'Cancelar',
+    submitButton: 'Enviar'
+};
+
 module.exports = {
     login: {
         title: 'Entrada',
@@ -6,7 +11,8 @@ module.exports = {
     },
     sidebar: {
         home: 'Home',
-        channels: 'Canais'
+        channels: 'Canais',
+        ecommerce: 'E-commerce'
     },
     footer: {
         appName: version => `• Control Tower v${version} •`,
@@ -21,11 +27,35 @@ module.exports = {
         facebook: {
             title: 'Facebook Messenger',
             description: {
-                ecommerce: 'Selecione uma página para ser o contato de Facebook Messenger com o qual as pessoas farão consultas de rastreio de pedidos via chat.'
+                trackOrder: `
+                    Selecione uma página para ser o contato de
+                    Facebook Messenger com o qual as pessoas farão consultas de
+                    rastreio de pedidos via chat.
+                `
             },
             page: 'Página',
-            cancel: 'Cancelar',
-            submit: 'Enviar'
+            cancel: formLabels.cancelButton,
+            submit: formLabels.submitButton
+        }
+    },
+    ecommerce: {
+        title: 'Integração com APIs de E-commerce',
+        vtex: {
+            title: 'VTEX Store',
+            description: {
+                trackOrder: `
+                    Informe os dados da VTEX Store a ser usada para consultar o
+                    status de pedidos dos clientes.
+                `
+            },
+            apiToken: 'API Token',
+            apiKey: 'API Key',
+            apiAccountName: 'API Account Name',
+            apiEnvironment: 'API Environment',
+            appKey: 'App Key',
+            appToken: 'App Token',
+            cancel: formLabels.cancelButton,
+            submit: formLabels.submitButton
         }
     }
 };

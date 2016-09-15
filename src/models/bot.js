@@ -16,6 +16,13 @@ const botModel = {
                 pageId: page.id,
                 pageName: page.name
             }
+        }),
+        setVtexStore: (update, state) => ({
+            ...state,
+            vtex: {
+                ...state.vtex,
+                ...update
+            }
         })
     }
 };
