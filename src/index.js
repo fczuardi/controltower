@@ -19,6 +19,7 @@ import loginView from './views/login';
 import dashboardView from './views/dashboard';
 import homeContent from './views/home';
 import channelsContent from './views/channels';
+import ecommerceContent from './views/ecommerce';
 
 const app = choo({ history: false, href: false });
 app.model(appModel);
@@ -39,11 +40,13 @@ const authWrapper =
 const viewWrapper = pipe(authWrapper, mainView);
 const homeView = dashboardView(homeContent);
 const channelsView = dashboardView(channelsContent);
+const ecommerceView = dashboardView(ecommerceContent);
 
 app.router([
     ['/', viewWrapper(homeView)],
     ['/controltower', viewWrapper(homeView)],
-    ['/channels', viewWrapper(channelsView)]
+    ['/channels', viewWrapper(channelsView)],
+    ['/ecommerce', viewWrapper(ecommerceView)]
 ]);
 
 const tree = app.start();

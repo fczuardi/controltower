@@ -14,7 +14,7 @@ function createCommonjsModule(fn, module) {
 
 var config=createCommonjsModule(function(module){module.exports={calamar:{apiUrl:'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'},facebook:{appId:'1691821884476309',loginParams:{scope:'public_profile,email,pages_show_list'},userFields:'id,name,email'}};});
 
-var version="0.10.2";var homepage="https://github.com/fczuardi/controltower#readme";
+var version="0.11.0";var homepage="https://github.com/fczuardi/controltower#readme";
 
 const appModel={namespace:'app',state:{version,homepage}};
 
@@ -72,13 +72,13 @@ var set = function set(object, property, value, receiver) {
   return value;
 };
 
-const uiModel={namespace:'ui',state:{selectedSection:'home',enabledSections:['home'],menu:['home','channels'],facebookPages:[]},reducers:{enableSection:(name,state)=>_extends({},state,{enabledSections:state.enabledSections.concat([name])}),disableSection:(name,state)=>_extends({},state,{enabledSections:state.enabledSections.filter(item=>item!==name)}),selectSection:(name,state)=>_extends({},state,{selectedSection:name}),setFbPages:(facebookPages,state)=>_extends({},state,{facebookPages})}};
+const uiModel={namespace:'ui',state:{selectedSection:'home',enabledSections:['home'],menu:['home','channels','ecommerce'],facebookPages:[]},reducers:{enableSection:(name,state)=>_extends({},state,{enabledSections:state.enabledSections.concat([name])}),disableSection:(name,state)=>_extends({},state,{enabledSections:state.enabledSections.filter(item=>item!==name)}),selectSection:(name,state)=>_extends({},state,{selectedSection:name}),setFbPages:(facebookPages,state)=>_extends({},state,{facebookPages})}};
 
 const customerModel={namespace:'customer',state:{id:null,name:null,email:null,bots:[],facebookId:null,isLogged:null},reducers:{signIn:(data,state)=>_extends({},state,{isLogged:true}),signOut:(data,state)=>_extends({},state,{isLogged:false}),set:data=>data}};
 
-const botModel={namespace:'bot',state:{id:null,customerId:null,type:null,users:[]},reducers:{set:data=>data,setFacebookPage:(page,state)=>_extends({},state,{facebook:_extends({},state.facebook,{pageAccessToken:page.access_token,pageId:page.id,pageName:page.name})})}};
+const botModel={namespace:'bot',state:{id:null,customerId:null,type:null,users:[]},reducers:{set:data=>data,setFacebookPage:(page,state)=>_extends({},state,{facebook:_extends({},state.facebook,{pageAccessToken:page.access_token,pageId:page.id,pageName:page.name})}),setVtexStore:(update,state)=>_extends({},state,{vtex:_extends({},state.vtex,update)})}};
 
-const defaultOptions=token=>({json:true,headers:{Authorization:`Bearer ${token}`}});const createApiModel=config=>({namespace:'api',state:{token:null,updatingBot:false},reducers:{set:data=>data,updateBotBegin:(data,state)=>_extends({},state,{updatingBot:true}),updateBotEnd:(data,state)=>_extends({},state,{updatingBot:false})},effects:{getCustomer:(data,state,send,done)=>{const url=`${config.apiUrl}/v1/customers`;const options=defaultOptions(state.token);http.post(url,options,(error,response)=>{if(error){console.error(error);return done();}send('customer:set',response.body,done);return send('api:getBot',{botId:response.body.bots[0]},done);});},getBot:(data,state,send,done)=>{const url=`${config.apiUrl}/v1/bots/${data.botId}`;const options=defaultOptions(state.token);http.get(url,options,(error,response)=>{if(error){console.error(error);return done();}if(response.body.facebook){send('ui:enableSection','channels',done);}else{send('ui:disableSection','channels',done);}return send('bot:set',response.body,done);});},updateBot:(data,state,send,done)=>{const url=`${config.apiUrl}/v1/bots/${data.botId}`;const options=defaultOptions(state.token);const update={facebook:{pageAccessToken:data.page.access_token,pageId:data.page.id,pageName:data.page.name}};send('api:updateBotBegin',null,done);http.put(url,_extends({},options,{json:update}),(error,response)=>{send('api:updateBotEnd',null,done);if(error){console.error(error);return done();}return send('bot:set',response.body,done);});}}});
+const defaultOptions=token=>({json:true,headers:{Authorization:`Bearer ${token}`}});const createApiModel=config=>({namespace:'api',state:{token:null,updatingBot:false},reducers:{set:data=>data,updateBotBegin:(data,state)=>_extends({},state,{updatingBot:true}),updateBotEnd:(data,state)=>_extends({},state,{updatingBot:false})},effects:{getCustomer:(data,state,send,done)=>{const url=`${config.apiUrl}/v1/customers`;const options=defaultOptions(state.token);http.post(url,options,(error,response)=>{if(error){console.error(error);return done();}send('customer:set',response.body,done);return send('api:getBot',{botId:response.body.bots[0]},done);});},getBot:(data,state,send,done)=>{const url=`${config.apiUrl}/v1/bots/${data.botId}`;const options=defaultOptions(state.token);http.get(url,options,(error,response)=>{if(error){console.error(error);return done();}if(response.body.facebook){send('ui:enableSection','channels',done);}else{send('ui:disableSection','channels',done);}if(response.body.vtex){send('ui:enableSection','ecommerce',done);}else{send('ui:disableSection','ecommerce',done);}return send('bot:set',response.body,done);});},updateBot:(data,state,send,done)=>{const url=`${config.apiUrl}/v1/bots/${data.botId}`;const options=defaultOptions(state.token);const facebookUpdate=!data.facebookPage?{}:{facebook:{pageAccessToken:data.facebookPage.access_token,pageId:data.facebookPage.id,pageName:data.facebookPage.name}};const vtexUpdate=data.vtex?data:{};const update=_extends({},facebookUpdate,vtexUpdate);send('api:updateBotBegin',null,done);http.put(url,_extends({},options,{json:update}),(error,response)=>{send('api:updateBotEnd',null,done);if(error){console.error(error);return done();}return send('bot:set',response.body,done);});}}});
 
 const signInToggle=(isLogged,loginParams)=>{if(isLogged){window.FB.logout();}else{window.FB.login(loginResponse=>{if(loginResponse.authResponse){console.log('Welcome!',loginResponse.authResponse);}else{console.log('User cancelled login or did not fully authorize.');}},loginParams);}};const createFbSessionModel=config=>({namespace:'fbsession',subscriptions:{init:(send,done)=>{window.fbAsyncInit=()=>{window.FB.init({appId:config.appId,cookie:true,xfbml:true,version:'v2.7'});window.FB.Event.subscribe('auth.statusChange',data=>send('fbsession:statusChange',data,done));window.FB.getLoginStatus();};done();}},effects:{statusChange:(data,state,send,done)=>{if(data.status==='connected'){send('customer:signIn',data.authResponse,done);send('api:set',{token:data.authResponse.accessToken},done);send('fbsession:getPages',null,done);return send('api:getCustomer',null,done);}return send('customer:signOut',data,done);},getPages:(data,state,send,done)=>{console.log('getPages');window.FB.api('/me/accounts','get',{},response=>{console.log('response',response);return send('ui:setFbPages',response.data,done);});},signIn:(data,state,send)=>signInToggle(false,config.loginParams,send),signInToggle:(data,state,send)=>signInToggle(data.isLogged,config.loginParams,send)}});
 
@@ -108,7 +108,14 @@ var main$1=createCommonjsModule(function(module){const html$$1=html;const fontAw
     ${view(state,prev,send)}
 </div>`;});
 
-var ptBr=createCommonjsModule(function(module){module.exports={login:{title:'Entrada',subtitle:'Para acessar a Torre de Controle é necessário identificar-se.',fbSignInButton:'Acessar com Facebook'},sidebar:{home:'Home',channels:'Canais'},footer:{appName:version=>`• Control Tower v${version} •`,viewSource:'ver código-fonte'},signInToggle:{signIn:'Entrar',signOut:'Sair'},channels:{title:'Configurar Canais',facebook:{title:'Facebook Messenger',description:{ecommerce:'Selecione uma página para ser o contato de Facebook Messenger com o qual as pessoas farão consultas de rastreio de pedidos via chat.'},page:'Página',cancel:'Cancelar',submit:'Enviar'}}};});
+var ptBr=createCommonjsModule(function(module){const formLabels={cancelButton:'Cancelar',submitButton:'Enviar'};module.exports={login:{title:'Entrada',subtitle:'Para acessar a Torre de Controle é necessário identificar-se.',fbSignInButton:'Acessar com Facebook'},sidebar:{home:'Home',channels:'Canais',ecommerce:'E-commerce'},footer:{appName:version=>`• Control Tower v${version} •`,viewSource:'ver código-fonte'},signInToggle:{signIn:'Entrar',signOut:'Sair'},channels:{title:'Configurar Canais',facebook:{title:'Facebook Messenger',description:{trackOrder:`
+                    Selecione uma página para ser o contato de
+                    Facebook Messenger com o qual as pessoas farão consultas de
+                    rastreio de pedidos via chat.
+                `},page:'Página',cancel:formLabels.cancelButton,submit:formLabels.submitButton}},ecommerce:{title:'Integração com APIs de E-commerce',vtex:{title:'VTEX Store',description:{trackOrder:`
+                    Informe os dados da VTEX Store a ser usada para consultar o
+                    status de pedidos dos clientes.
+                `},apiToken:'API Token',apiKey:'API Key',apiAccountName:'API Account Name',apiEnvironment:'API Environment',appKey:'App Key',appToken:'App Token',cancel:formLabels.cancelButton,submit:formLabels.submitButton}}};});
 
 const click=(send,action)=>e=>{e.preventDefault();send(action);};var login$2 = ((labels,classes,send)=>html`
 <form>
@@ -180,7 +187,7 @@ var require$$2 = ( sideMenu && sideMenu['default'] ) || sideMenu;
 
 var require$$1$3 = ( footer && footer['default'] ) || footer;
 
-var dashboard$1=createCommonjsModule(function(module){const html$$1=html;const messages=ptBr;const menuComponent=require$$2;const footerComponent=require$$1$3;const css=0;const dashboardCss=(require$$0("._29341f67 .right_col {\n    min-height: 1000px;\n}")||true)&&"_29341f67";const menuClasses={list:'nav side-menu',active:'active',icons:{home:'fa fa-home',channels:'fa fa-weixin'}};module.exports=content=>(state,prev,send)=>html$$1`
+var dashboard$1=createCommonjsModule(function(module){const html$$1=html;const messages=ptBr;const menuComponent=require$$2;const footerComponent=require$$1$3;const css=0;const dashboardCss=(require$$0("._29341f67 .right_col {\n    min-height: 1000px;\n}")||true)&&"_29341f67";const menuClasses={list:'nav side-menu',active:'active',icons:{home:'fa fa-home',channels:'fa fa-weixin',ecommerce:'fa fa-shopping-cart'}};module.exports=content=>(state,prev,send)=>html$$1`
 <div class="nav-sm ${dashboardCss}">
     <div class="container body">
         <div class="main_container">
@@ -217,33 +224,9 @@ var home=createCommonjsModule(function(module){const html$$1=html;module.exports
 </div>
 `;});
 
-var pageList = ((pages,selectedPage,classes,selectId)=>html`
-<div class=${classes.pageList}>
-    <select name=${selectId} class=${classes.select}>
-        ${pages.map(page=>html`
-            <option
-                ${selectedPage.pageId===page.id?'selected':''}
-            >
-                ${page.name}
-            </option>
-        `)}
-    </select>
-</div>`);
-
-var pageList = Object.freeze({
-	default: pageList
-});
-
-var require$$0$3 = ( pageList && pageList['default'] ) || pageList;
-
-var pageListForm=createCommonjsModule(function(module){const html$$1=html;const pageListComponent=require$$0$3;module.exports=(pages,selectedPage,isUpdating,classes,messages,onSubmit)=>html$$1`
+var updateBotForm=createCommonjsModule(function(module){const html$$1=html;module.exports=(fields,isUpdating,classes,messages,onSubmit)=>html$$1`
 <form class=${classes.form} onsubmit=${onSubmit}>
-    <div class=${classes.formGroup}>
-        <label class=${classes.label}>
-            ${messages.page}
-        </label>
-        ${pageListComponent(pages,selectedPage,classes,'select')}
-    </div>
+    ${fields}
     <div class=${classes.separator}></div>
     <div class=${classes.formGroup}>
         <div class=${classes.buttonGroup}>
@@ -257,28 +240,75 @@ var pageListForm=createCommonjsModule(function(module){const html$$1=html;const 
 </form>
 `;});
 
-var channels$1=createCommonjsModule(function(module){const html$$1=html;const pageListFormComponent=pageListForm;const messages=ptBr;const pageListClasses={form:'form-horizontal form-label-left',formGroup:'form-group',label:'control-label col-md-3 col-sm-3 col-xs-12',pageList:'col-md-9 col-sm-9 col-xs-12',select:'form-control',separator:'ln_solid',buttonGroup:'col-md-9 col-sm-9 col-xs-12 col-md-offset-3',cancelButton:'btn btn-primary',submitButton:'btn btn-success'};const createSubmit=(botId,pages,send)=>e=>{e.preventDefault();const newPage=pages[e.target.select.selectedIndex];send('api:updateBot',{botId,page:newPage});return send('bot:setFacebookPage',newPage);};module.exports=(state,send)=>{const pages=state.ui.facebookPages;const currentPage=state.bot.facebook;const isUpdating=state.api.updatingBot;const onSubmit=createSubmit(state.bot.id,pages,send);return html$$1`
+var pageList = ((pages,selectedPage,classes,selectId)=>html`
+<select name=${selectId} class=${classes.input}>
+    ${pages.map(page=>html`
+        <option
+            ${selectedPage.pageId===page.id?'selected':''}
+        >
+            ${page.name}
+        </option>
+    `)}
+</select>`);
+
+var pageList = Object.freeze({
+	default: pageList
+});
+
+var require$$0$4 = ( pageList && pageList['default'] ) || pageList;
+
+var pageListForm=createCommonjsModule(function(module){const html$$1=html;const updateBotFormComponent=updateBotForm;const pageListComponent=require$$0$4;module.exports=(pages,selectedPage,isUpdating,classes,messages,onSubmit)=>{const fields=html$$1`
+        <div class=${classes.formGroup}>
+            <label class=${classes.label}>
+            ${messages.page}
+            </label>
+            <div class=${classes.inputContainer}>
+                ${pageListComponent(pages,selectedPage,classes,'select')}
+            </div>
+        </div>
+    `;return updateBotFormComponent(fields,isUpdating,classes,messages,onSubmit);};});
+
+var botSetup=createCommonjsModule(function(module){const html$$1=html;const formClasses={form:'form-horizontal form-label-left',formGroup:'form-group',label:'control-label col-md-3 col-sm-3 col-xs-12',inputContainer:'col-md-9 col-sm-9 col-xs-12',input:'form-control',separator:'ln_solid',buttonGroup:'col-md-9 col-sm-9 col-xs-12 col-md-offset-3',cancelButton:'btn btn-primary',submitButton:'btn btn-success'};const view=(form,messages)=>html$$1`
 <div>
     <div class="title-left">
-        <h3>${messages.channels.title}</h3>
+        <h3>${messages.title}</h3>
     </div>
     <div class="row">
         <div class="col-md-6">
             <div class="x_panel">
                 <div class="x_title nav">
-                    <h2>${messages.channels.facebook.title}</h2>
+                    <h2>${messages.subtitle}</h2>
                 </div>
                 <div class="x_content">
                     <p>
-                        ${messages.channels.facebook.description.ecommerce}
+                        ${messages.description}
                     </p>
-                    ${pageListFormComponent(pages,currentPage,isUpdating,pageListClasses,messages.channels.facebook,onSubmit)}
+                    ${form}
                 </div>
             </div>
         </div>
     </div>
 </div>
-`;};});
+`;module.exports={formClasses,view};});
 
-const app=choo({history:false,href:false});app.model(appModel);app.model(uiModel);app.model(customerModel);app.model(botModel);app.model(createApiModel(config.calamar));app.model(createFbSessionModel(config.facebook));const defaultAnonView=login;const authWrapper=(loggedView,anonView=defaultAnonView)=>(state,prev,send)=>state.customer.isLogged?loggedView(state,prev,send):anonView(state,prev,send);const viewWrapper=ramda.pipe(authWrapper,main$1);const homeView=dashboard$1(home);const channelsView=dashboard$1(channels$1);app.router([['/',viewWrapper(homeView)],['/controltower',viewWrapper(homeView)],['/channels',viewWrapper(channelsView)]]);const tree=app.start();// facebook javascript sdk script tag
+var channels$1=createCommonjsModule(function(module){const pageListFormComponent=pageListForm;const botSetupPage=botSetup;const messages=ptBr;const createSubmit=(botId,pages,send)=>e=>{e.preventDefault();const newPage=pages[e.target.select.selectedIndex];send('api:updateBot',{botId,facebookPage:newPage});return send('bot:setFacebookPage',newPage);};module.exports=(state,send)=>{const pages=state.ui.facebookPages;const currentPage=state.bot.facebook;const isUpdating=state.api.updatingBot;const onSubmit=createSubmit(state.bot.id,pages,send);const form=pageListFormComponent(pages,currentPage,isUpdating,botSetupPage.formClasses,messages.channels.facebook,onSubmit);return botSetupPage.view(form,{title:messages.channels.title,subtitle:messages.channels.facebook.title,description:messages.channels.facebook.description.trackOrder});};});
+
+var vtexForm=createCommonjsModule(function(module){const html$$1=html;const updateBotFormComponent=updateBotForm;module.exports=(isUpdating,values,classes,messages,onSubmit)=>{const fieldNames=['apiToken','apiKey','apiAccountName','apiEnvironment','appKey','appToken'];const fields=fieldNames.map(name=>html$$1`
+        <div class=${classes.formGroup}>
+            <label class=${classes.label}>
+                ${messages[name]}
+            </label>
+            <div class=${classes.inputContainer}>
+                <input
+                    name=${name}
+                    value=${values[name]||''}
+                    class=${classes.input}
+                >
+            </div>
+        </div>
+    `);return updateBotFormComponent(fields,isUpdating,classes,messages,onSubmit);};});
+
+var ecommerce$1=createCommonjsModule(function(module){const vtexFormComponent=vtexForm;const botSetupPage=botSetup;const messages=ptBr;const createSubmit=(botId,send)=>e=>{e.preventDefault();const fieldNames=['apiToken','apiKey','apiAccountName','apiEnvironment','appKey','appToken'];const update=fieldNames.reduce((prev,name)=>Object.assign(prev,{[name]:e.target[name].value}),{});send('api:updateBot',{botId,vtex:update});return send('bot:setVtexStore',update);};module.exports=(state,send)=>{const isUpdating=state.api.updatingBot;const values=state.bot.vtex;const onSubmit=createSubmit(state.bot.id,send);const form=vtexFormComponent(isUpdating,values,botSetupPage.formClasses,messages.ecommerce.vtex,onSubmit);return botSetupPage.view(form,{title:messages.ecommerce.title,subtitle:messages.ecommerce.vtex.title,description:messages.ecommerce.vtex.description.trackOrder});};});
+
+const app=choo({history:false,href:false});app.model(appModel);app.model(uiModel);app.model(customerModel);app.model(botModel);app.model(createApiModel(config.calamar));app.model(createFbSessionModel(config.facebook));const defaultAnonView=login;const authWrapper=(loggedView,anonView=defaultAnonView)=>(state,prev,send)=>state.customer.isLogged?loggedView(state,prev,send):anonView(state,prev,send);const viewWrapper=ramda.pipe(authWrapper,main$1);const homeView=dashboard$1(home);const channelsView=dashboard$1(channels$1);const ecommerceView=dashboard$1(ecommerce$1);app.router([['/',viewWrapper(homeView)],['/controltower',viewWrapper(homeView)],['/channels',viewWrapper(channelsView)],['/ecommerce',viewWrapper(ecommerceView)]]);const tree=app.start();// facebook javascript sdk script tag
 document.body.appendChild(fbSDK);document.body.appendChild(tree);

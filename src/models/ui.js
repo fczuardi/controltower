@@ -5,7 +5,8 @@ const uiModel = {
         enabledSections: ['home'],
         menu: [
             'home',
-            'channels'
+            'channels',
+            'ecommerce'
         ],
         facebookPages: []
     },

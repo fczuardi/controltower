@@ -13,7 +13,8 @@ const menuClasses = {
     active: 'active',
     icons: {
         home: 'fa fa-home',
-        channels: 'fa fa-weixin'
+        channels: 'fa fa-weixin',
+        ecommerce: 'fa fa-shopping-cart'
     }
 };
 
