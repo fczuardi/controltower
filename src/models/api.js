@@ -50,18 +50,28 @@ const createApiModel = config => ({
                 } else {
                     send('ui:disableSection', 'channels', done);
                 }
+                if (response.body.vtex) {
+                    send('ui:enableSection', 'ecommerce', done);
+                } else {
+                    send('ui:disableSection', 'ecommerce', done);
+                }
                 return send('bot:set', response.body, done);
             });
         },
         updateBot: (data, state, send, done) => {
             const url = `${config.apiUrl}/v1/bots/${data.botId}`;
             const options = defaultOptions(state.token);
-            const update = {
+            const facebookUpdate = !data.facebookPage ? {} : {
                 facebook: {
-                    pageAccessToken: data.page.access_token,
-                    pageId: data.page.id,
-                    pageName: data.page.name
+                    pageAccessToken: data.facebookPage.access_token,
+                    pageId: data.facebookPage.id,
+                    pageName: data.facebookPage.name
                 }
+            };
+            const vtexUpdate = data.vtex ? data : {};
+            const update = {
+                ...facebookUpdate,
+                ...vtexUpdate
             };
             send('api:updateBotBegin', null, done);
             http.put(url, { ...options, json: update }, (error, response) => {
