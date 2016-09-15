@@ -6,7 +6,8 @@ const uiModel = {
         menu: [
             'home',
             'channels'
-        ]
+        ],
+        facebookPages: []
     },
     reducers: {
         enableSection: (name, state) => ({
@@ -20,6 +21,10 @@ const uiModel = {
         selectSection: (name, state) => ({
             ...state,
             selectedSection: name
+        }),
+        setFbPages: (facebookPages, state) => ({
+            ...state,
+            facebookPages
         })
     }
 };

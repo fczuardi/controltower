@@ -12,17 +12,20 @@ module.exports = {
         appName: version => `• Control Tower v${version} •`,
         viewSource: 'ver código-fonte'
     },
-    dashboard: {
-        title: 'Dashboard',
-        botUrl: 'Entre o identificador do seu bot (enviado por email)',
-        load: 'Carregar'
-    },
-    setup: {
-        title: 'Setup',
-        update: 'Atualizar'
-    },
     signInToggle: {
         signIn: 'Entrar',
         signOut: 'Sair'
+    },
+    channels: {
+        title: 'Configurar Canais',
+        facebook: {
+            title: 'Facebook Messenger',
+            description: {
+                ecommerce: 'Selecione uma página para ser o contato de Facebook Messenger com o qual as pessoas farão consultas de rastreio de pedidos via chat.'
+            },
+            page: 'Página',
+            cancel: 'Cancelar',
+            submit: 'Enviar'
+        }
     }
 };

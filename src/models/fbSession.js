@@ -37,9 +37,17 @@ const createFbSessionModel = config => ({
             if (data.status === 'connected') {
                 send('customer:signIn', data.authResponse, done);
                 send('api:set', { token: data.authResponse.accessToken }, done);
+                send('fbsession:getPages', null, done);
                 return send('api:getCustomer', null, done);
             }
             return send('customer:signOut', data, done);
+        },
+        getPages: (data, state, send, done) => {
+            console.log('getPages');
+            window.FB.api('/me/accounts', 'get', {}, response => {
+                console.log('response', response);
+                return send('ui:setFbPages', response.data, done);
+            });
         },
         signIn: (data, state, send) =>
             signInToggle(false, config.loginParams, send),
