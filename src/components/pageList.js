@@ -1,10 +1,12 @@
 import html from 'choo/html';
 
-export default (pages, classes) => html`
+export default (pages, selectedPage, classes, selectId) => html`
 <div class=${classes.pageList}>
-    <select class=${classes.select}>
+    <select name=${selectId} class=${classes.select}>
         ${pages.map(page => html`
-            <option>
+            <option
+                ${(selectedPage.pageId === page.id) ? 'selected' : ''}
+            >
                 ${page.name}
             </option>
         `)}

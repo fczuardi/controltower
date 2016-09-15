@@ -29,7 +29,7 @@ module.exports = content => (state, prev, send) => html`
                 </div>
             </div>
             <div class="right_col">
-                ${content(state)}
+                ${content(state, send)}
             </div>
             <footer>
                 <div class="pull-right">

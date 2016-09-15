@@ -7,7 +7,16 @@ const botModel = {
         users: []
     },
     reducers: {
-        set: data => data
+        set: data => data,
+        setFacebookPage: (page, state) => ({
+            ...state,
+            facebook: {
+                ...state.facebook,
+                pageAccessToken: page.access_token,
+                pageId: page.id,
+                pageName: page.name
+            }
+        })
     }
 };
 
