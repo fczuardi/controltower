@@ -22,7 +22,8 @@ const externalLibs = [
     'choo/html',
     'choo/http',
     'ramda',
-    'insert-css'
+    'insert-css',
+    'querystring'
 ];
 externalLibs.forEach(libName => {
     const outFilename = `${libsPath}${libName.replace('/', '-')}.js`;
