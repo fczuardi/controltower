@@ -20,6 +20,7 @@ import dashboardView from './views/dashboard';
 import homeContent from './views/home';
 import channelsContent from './views/channels';
 import ecommerceContent from './views/ecommerce';
+import mutedChatsContent from './views/mutedChats';
 
 const app = choo({ history: false, href: false });
 app.model(appModel);
@@ -41,12 +42,14 @@ const viewWrapper = pipe(authWrapper, mainView);
 const homeView = dashboardView(homeContent);
 const channelsView = dashboardView(channelsContent);
 const ecommerceView = dashboardView(ecommerceContent);
+const mutedChatsView = dashboardView(mutedChatsContent);
 
 app.router([
     ['/', viewWrapper(homeView)],
     ['/controltower', viewWrapper(homeView)],
     ['/channels', viewWrapper(channelsView)],
-    ['/ecommerce', viewWrapper(ecommerceView)]
+    ['/ecommerce', viewWrapper(ecommerceView)],
+    ['/mutedChats', viewWrapper(mutedChatsView)]
 ]);
 
 const tree = app.start();

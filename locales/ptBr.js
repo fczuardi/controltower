@@ -12,7 +12,8 @@ module.exports = {
     sidebar: {
         home: 'Home',
         channels: 'Canais',
-        ecommerce: 'E-commerce'
+        ecommerce: 'E-commerce',
+        mutedChats: 'Assistentes silenciados'
     },
     footer: {
         appName: version => `• Control Tower v${version} •`,
@@ -57,5 +58,8 @@ module.exports = {
             cancel: formLabels.cancelButton,
             submit: formLabels.submitButton
         }
+    },
+    mutedChats: {
+        title: 'Assistentes silenciados'
     }
 };

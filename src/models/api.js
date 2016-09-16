@@ -1,4 +1,5 @@
 import http from 'choo/http';
+import qs from 'querystring';
 
 const defaultOptions = token => ({
     json: true,
@@ -55,7 +56,30 @@ const createApiModel = config => ({
                 } else {
                     send('ui:disableSection', 'ecommerce', done);
                 }
+                send('api:getMutedChats', response.body, done);
                 return send('bot:set', response.body, done);
+            });
+        },
+        getMutedChats: (bot, state, send, done) => {
+            const query = {
+                botId: bot.id,
+                customerId: bot.customerId,
+                botStatus: 'muted'
+            };
+            const url = `${config.apiUrl}/v1/users/?${qs.stringify(query)}`;
+            const options = defaultOptions(state.token);
+            http.get(url, options, (error, response) => {
+                if (error) {
+                    console.error(error);
+                    return done();
+                }
+                if (response.body.length) {
+                    send('ui:enableSection', 'mutedChats', done);
+                } else {
+                    send('ui:disableSection', 'mutedChats', done);
+                }
+                // TODO create users model to build the muted chats list
+                return done();
             });
         },
         updateBot: (data, state, send, done) => {

@@ -6,7 +6,8 @@ const uiModel = {
         menu: [
             'home',
             'channels',
-            'ecommerce'
+            'ecommerce',
+            'mutedChats'
         ],
         facebookPages: []
     },
