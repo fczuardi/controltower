@@ -60,6 +60,14 @@ module.exports = {
         }
     },
     mutedChats: {
-        title: 'Assistentes silenciados'
+        title: 'Assistentes silenciados',
+        list: {
+            title: 'Conversas',
+            description: `
+                Selecione abaixo as conversas que você deseja
+                reativar o assistente.
+            `,
+            submit: 'Reativar Selecionados'
+        }
     }
 };

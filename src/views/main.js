@@ -13,6 +13,10 @@ const mainCss = css`
     width: 100%;
     height: 100%;
 }
+
+.checkboxRow {
+    width: 20px;
+}
 `;
 
 module.exports = view => (state, prev, send) => html`

@@ -9,6 +9,7 @@ import appModel from './models/app';
 import uiModel from './models/ui';
 import customerModel from './models/customer';
 import botModel from './models/bot';
+import usersModel from './models/users';
 import createApiModel from './models/api';
 import createFbSessionModel from './models/fbSession';
 
@@ -27,6 +28,7 @@ app.model(appModel);
 app.model(uiModel);
 app.model(customerModel);
 app.model(botModel);
+app.model(usersModel);
 app.model(createApiModel(config.calamar));
 app.model(createFbSessionModel(config.facebook));
 

@@ -3,6 +3,9 @@ const html = require('choo/html');
 const formClasses = {
     form: 'form-horizontal form-label-left',
     formGroup: 'form-group',
+    table: 'table table-striped jambo_table',
+    selectedTableRow: 'selected',
+    tableCheckboxRow: 'checkboxRow',
     label: 'control-label col-md-3 col-sm-3 col-xs-12',
     inputContainer: 'col-md-9 col-sm-9 col-xs-12',
     input: 'form-control',

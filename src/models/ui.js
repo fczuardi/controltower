@@ -9,7 +9,8 @@ const uiModel = {
             'ecommerce',
             'mutedChats'
         ],
-        facebookPages: []
+        facebookPages: [],
+        selectedMutedUsers: []
     },
     reducers: {
         enableSection: (name, state) => ({
@@ -27,6 +28,14 @@ const uiModel = {
         setFbPages: (facebookPages, state) => ({
             ...state,
             facebookPages
+        }),
+        selectMutedUser: (index, state) => ({
+            ...state,
+            selectedMutedUsers: state.selectedMutedUsers.concat([index])
+        }),
+        deselectMutedUser: (index, state) => ({
+            ...state,
+            selectedMutedUsers: state.selectedMutedUsers.filter(i => i !== index)
         })
     }
 };

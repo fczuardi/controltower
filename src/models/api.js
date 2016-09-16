@@ -78,8 +78,7 @@ const createApiModel = config => ({
                 } else {
                     send('ui:disableSection', 'mutedChats', done);
                 }
-                // TODO create users model to build the muted chats list
-                return done();
+                return send('users:setMuted', response.body, done);
             });
         },
         updateBot: (data, state, send, done) => {
