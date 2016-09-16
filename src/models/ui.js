@@ -13,10 +13,12 @@ const uiModel = {
         selectedMutedUsers: []
     },
     reducers: {
-        enableSection: (name, state) => ({
-            ...state,
-            enabledSections: state.enabledSections.concat([name])
-        }),
+        enableSection: (name, state) => (
+            state.enabledSections.includes(name) ? state : {
+                ...state,
+                enabledSections: state.enabledSections.concat([name])
+            }
+        ),
         disableSection: (name, state) => ({
             ...state,
             enabledSections: state.enabledSections.filter(item => item !== name)
@@ -36,6 +38,10 @@ const uiModel = {
         deselectMutedUser: (index, state) => ({
             ...state,
             selectedMutedUsers: state.selectedMutedUsers.filter(i => i !== index)
+        }),
+        setSelectedMutedUsers: (data, state) => ({
+            ...state,
+            selectedMutedUsers: data
         })
     }
 };

@@ -41,7 +41,7 @@ export default (
     onRowDeselected,
     onSubmit
 ) => {
-    const isAllSelected = selectedRows.length === dataSet.length;
+    const isAllSelected = selectedRows.length && (selectedRows.length === dataSet.length);
     const selectAll = createSelectAll(isAllSelected, dataSet, onRowSelected, onRowDeselected);
     return html`
 <form class=${classes.form} onsubmit=${onSubmit}>

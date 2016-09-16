@@ -15,7 +15,7 @@ const formClasses = {
     submitButton: 'btn btn-success'
 };
 
-const view = (form, messages) => html`
+const view = (form, messages, navbarRightContent) => html`
 <div>
     <div class="title-left">
         <h3>${messages.title}</h3>
@@ -25,6 +25,9 @@ const view = (form, messages) => html`
             <div class="x_panel">
                 <div class="x_title nav">
                     <h2>${messages.subtitle}</h2>
+                    <div class="navbar-right">
+                        ${navbarRightContent}
+                    </div>
                 </div>
                 <div class="x_content">
                     <p>
