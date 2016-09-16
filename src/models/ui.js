@@ -6,15 +6,19 @@ const uiModel = {
         menu: [
             'home',
             'channels',
-            'ecommerce'
+            'ecommerce',
+            'mutedChats'
         ],
-        facebookPages: []
+        facebookPages: [],
+        selectedMutedUsers: []
     },
     reducers: {
-        enableSection: (name, state) => ({
-            ...state,
-            enabledSections: state.enabledSections.concat([name])
-        }),
+        enableSection: (name, state) => (
+            state.enabledSections.includes(name) ? state : {
+                ...state,
+                enabledSections: state.enabledSections.concat([name])
+            }
+        ),
         disableSection: (name, state) => ({
             ...state,
             enabledSections: state.enabledSections.filter(item => item !== name)
@@ -26,6 +30,18 @@ const uiModel = {
         setFbPages: (facebookPages, state) => ({
             ...state,
             facebookPages
+        }),
+        selectMutedUser: (index, state) => ({
+            ...state,
+            selectedMutedUsers: state.selectedMutedUsers.concat([index])
+        }),
+        deselectMutedUser: (index, state) => ({
+            ...state,
+            selectedMutedUsers: state.selectedMutedUsers.filter(i => i !== index)
+        }),
+        setSelectedMutedUsers: (data, state) => ({
+            ...state,
+            selectedMutedUsers: data
         })
     }
 };

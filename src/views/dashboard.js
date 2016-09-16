@@ -5,7 +5,7 @@ const footerComponent = require('../components/footer');
 const css = require('sheetify');
 const dashboardCss = css`
 .right_col {
-    min-height: 1000px;
+    min-height: 600px;
 }
 `;
 const menuClasses = {
@@ -13,8 +13,9 @@ const menuClasses = {
     active: 'active',
     icons: {
         home: 'fa fa-home',
-        channels: 'fa fa-weixin',
-        ecommerce: 'fa fa-shopping-cart'
+        channels: 'fa fa-whatsapp',
+        ecommerce: 'fa fa-shopping-cart',
+        mutedChats: 'fa fa-user-times'
     }
 };
 

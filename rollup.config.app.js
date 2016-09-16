@@ -13,7 +13,8 @@ export default {
         'choo/html',
         'choo/http',
         'ramda',
-        'insert-css'
+        'insert-css',
+        'querystring'
     ],
     plugins: [
         // css-in-js powered by sheetify

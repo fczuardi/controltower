@@ -12,7 +12,8 @@ module.exports = {
     sidebar: {
         home: 'Home',
         channels: 'Canais',
-        ecommerce: 'E-commerce'
+        ecommerce: 'E-commerce',
+        mutedChats: 'Assistentes silenciados'
     },
     footer: {
         appName: version => `• Control Tower v${version} •`,
@@ -56,6 +57,17 @@ module.exports = {
             appToken: 'App Token',
             cancel: formLabels.cancelButton,
             submit: formLabels.submitButton
+        }
+    },
+    mutedChats: {
+        title: 'Assistentes silenciados',
+        list: {
+            title: 'Conversas',
+            description: `
+                Selecione abaixo as conversas que você deseja
+                reativar o assistente.
+            `,
+            submit: 'Reativar Selecionados'
         }
     }
 };
