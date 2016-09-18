@@ -9,9 +9,9 @@ var qs = _interopDefault(require('querystring'));
 var html = _interopDefault(require('choo/html'));
 var require$$0 = _interopDefault(require('insert-css'));
 
-var config = {calamar:{apiUrl:'https://j3zeml7hyc.execute-api.us-east-1.amazonaws.com/latest'},facebook:{appId:'1701349696856861',loginParams:{scope:'public_profile,email,pages_show_list'},userFields:'id,name,email'}};
+var config = {calamar:{apiUrl:'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'},facebook:{appId:'1691821884476309',loginParams:{scope:'public_profile,email,pages_show_list'},userFields:'id,name,email'}};
 
-var version="0.12.3";var homepage="https://github.com/fczuardi/controltower#readme";
+var version="0.12.4";var homepage="https://github.com/fczuardi/controltower#readme";
 
 const appModel={namespace:'app',state:{version,homepage}};
 
