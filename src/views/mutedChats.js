@@ -1,15 +1,15 @@
-const html = require('choo/html');
-const messages = require('../../locales/ptBr');
-const botSetupPage = require('./botSetup');
-const mutedBotListFormComponent = require('../components/mutedBotListForm');
+import html from 'choo/html';
+import messages from '../../locales/ptBr';
+import { formClasses, view } from '../views/botSetup';
+import mutedBotListFormComponent from '../components/mutedBotListForm';
 
-module.exports = (state, send) => {
+export default (state, send) => {
     const headers = ['Name'];
     const selectedRows = state.ui.selectedMutedUsers;
     const dataSet = state.users.filteredByMutedBot.map(user => ([
         user.name
     ]));
-    const classes = botSetupPage.formClasses;
+    const classes = formClasses;
     const onRowSelected = rowIndex => send('ui:selectMutedUser', rowIndex);
     const onRowDeselected = rowIndex => send('ui:deselectMutedUser', rowIndex);
     const onSubmit = e => {
@@ -49,7 +49,7 @@ module.exports = (state, send) => {
     </button>
 </div>
     `;
-    return botSetupPage.view(content, {
+    return view(content, {
         title: messages.mutedChats.title,
         subtitle: messages.mutedChats.list.title,
         description: messages.channels.facebook.description.trackOrder

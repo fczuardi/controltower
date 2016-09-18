@@ -1,3 +1,4 @@
+// files that uses sheetify MUST use commonjs style modules :(
 const html = require('choo/html');
 const fontAwesome = require('./fontAwesome');
 const css = require('sheetify');

@@ -3,7 +3,7 @@ const formLabels = {
     submitButton: 'Enviar'
 };
 
-module.exports = {
+export default {
     login: {
         title: 'Entrada',
         subtitle: 'Para acessar a Torre de Controle é necessário identificar-se.',

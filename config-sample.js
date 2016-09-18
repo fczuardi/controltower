@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     calamar: {
         apiUrl: 'CONTROL_TOWER_API_URL'
     },

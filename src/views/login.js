@@ -1,3 +1,4 @@
+// files that uses sheetify MUST use commonjs style modules :(
 const html = require('choo/html');
 const messages = require('../../locales/ptBr');
 const loginComponent = require('../components/login');

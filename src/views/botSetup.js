@@ -1,4 +1,4 @@
-const html = require('choo/html');
+import html from 'choo/html';
 
 const formClasses = {
     form: 'form-horizontal form-label-left',
@@ -41,7 +41,7 @@ const view = (form, messages, navbarRightContent) => html`
 </div>
 `;
 
-module.exports = {
+export {
     formClasses,
     view
 };

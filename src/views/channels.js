@@ -1,6 +1,6 @@
-const pageListFormComponent = require('../components/pageListForm');
-const botSetupPage = require('./botSetup');
-const messages = require('../../locales/ptBr');
+import pageListFormComponent from '../components/pageListForm';
+import { formClasses, view } from './botSetup';
+import messages from '../../locales/ptBr';
 
 const createSubmit = (botId, pages, send) => e => {
     e.preventDefault();
@@ -9,7 +9,7 @@ const createSubmit = (botId, pages, send) => e => {
     return send('bot:setFacebookPage', newPage);
 };
 
-module.exports = (state, send) => {
+export default (state, send) => {
     const pages = state.ui.facebookPages;
     const currentPage = state.bot.facebook;
     const isUpdating = state.api.updatingBot;
@@ -18,11 +18,11 @@ module.exports = (state, send) => {
         pages,
         currentPage,
         isUpdating,
-        botSetupPage.formClasses,
+        formClasses,
         messages.channels.facebook,
         onSubmit
     );
-    return botSetupPage.view(form, {
+    return view(form, {
         title: messages.channels.title,
         subtitle: messages.channels.facebook.title,
         description: messages.channels.facebook.description.trackOrder

@@ -1,6 +1,6 @@
-const html = require('choo/html');
+import html from 'choo/html';
 
-module.exports = (fields, isUpdating, classes, messages, onSubmit) => html`
+export default (fields, isUpdating, classes, messages, onSubmit) => html`
 <form class=${classes.form} onsubmit=${onSubmit}>
     ${fields}
     <div class=${classes.separator}></div>
