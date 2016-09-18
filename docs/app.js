@@ -15,7 +15,7 @@ function createCommonjsModule(fn, module) {
 
 var config=createCommonjsModule(function(module){module.exports={calamar:{apiUrl:'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'},facebook:{appId:'1691821884476309',loginParams:{scope:'public_profile,email,pages_show_list'},userFields:'id,name,email'}};});
 
-var version="0.12.0";var homepage="https://github.com/fczuardi/controltower#readme";
+var version="0.12.2";var homepage="https://github.com/fczuardi/controltower#readme";
 
 const appModel={namespace:'app',state:{version,homepage}};
 
@@ -136,11 +136,11 @@ const click=(send,action)=>e=>{e.preventDefault();send(action);};var login$2 = (
 </form>
 `);
 
-var login = Object.freeze({
+var login$3 = Object.freeze({
 	default: login$2
 });
 
-var require$$1$1 = ( login && login['default'] ) || login;
+var require$$1$1 = ( login$3 && login$3['default'] ) || login$3;
 
 var login=createCommonjsModule(function(module){const html$$1=html;const messages=ptBr;const loginComponent=require$$1$1;const css=0;const loginCss=(require$$0("._480c0f06 .login {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n}")||true)&&"_480c0f06";const classes={subtitle:'lead',button:'btn btn-primary'};module.exports=(state,prev,send)=>html$$1`
 <div class=${loginCss}>
@@ -167,7 +167,7 @@ ${uiState.menu.map(key=>!uiState.enabledSections.includes(key)?null:html`
 `)}
 </ul>`);
 
-var sideMenu = Object.freeze({
+var sideMenu$1 = Object.freeze({
 	default: sideMenu
 });
 
@@ -185,13 +185,13 @@ var footer$1 = ((labels,customerState,appState,send)=>html`
     <a href="${appState.homepage}">${labels.viewSource}</a>
 </div>`);
 
-var footer = Object.freeze({
+var footer$2 = Object.freeze({
 	default: footer$1
 });
 
-var require$$2$1 = ( sideMenu && sideMenu['default'] ) || sideMenu;
+var require$$2$1 = ( sideMenu$1 && sideMenu$1['default'] ) || sideMenu$1;
 
-var require$$1$2 = ( footer && footer['default'] ) || footer;
+var require$$1$2 = ( footer$2 && footer$2['default'] ) || footer$2;
 
 var dashboard$1=createCommonjsModule(function(module){const html$$1=html;const messages=ptBr;const menuComponent=require$$2$1;const footerComponent=require$$1$2;const css=0;const dashboardCss=(require$$0("._a7c34925 .right_col {\n    min-height: 600px;\n}")||true)&&"_a7c34925";const menuClasses={list:'nav side-menu',active:'active',icons:{home:'fa fa-home',channels:'fa fa-whatsapp',ecommerce:'fa fa-shopping-cart',mutedChats:'fa fa-user-times'}};module.exports=content=>(state,prev,send)=>html$$1`
 <div class="nav-sm ${dashboardCss}">
@@ -257,11 +257,11 @@ var pageList = ((pages,selectedPage,classes,selectId)=>html`
     `)}
 </select>`);
 
-var pageList = Object.freeze({
+var pageList$1 = Object.freeze({
 	default: pageList
 });
 
-var require$$0$3 = ( pageList && pageList['default'] ) || pageList;
+var require$$0$3 = ( pageList$1 && pageList$1['default'] ) || pageList$1;
 
 var pageListForm=createCommonjsModule(function(module){const html$$1=html;const updateBotFormComponent=updateBotForm;const pageListComponent=require$$0$3;module.exports=(pages,selectedPage,isUpdating,classes,messages,onSubmit)=>{const fields=html$$1`
         <div class=${classes.formGroup}>
@@ -363,11 +363,11 @@ const createRowClickHandler=(index,isSelected,select,deselect)=>e=>{e.preventDef
 </form>
     `;});
 
-var mutedBotListForm = Object.freeze({
+var mutedBotListForm$1 = Object.freeze({
 	default: mutedBotListForm
 });
 
-var require$$0$4 = ( mutedBotListForm && mutedBotListForm['default'] ) || mutedBotListForm;
+var require$$0$4 = ( mutedBotListForm$1 && mutedBotListForm$1['default'] ) || mutedBotListForm$1;
 
 var mutedChats$1=createCommonjsModule(function(module){const html$$1=html;const messages=ptBr;const botSetupPage=botSetup;const mutedBotListFormComponent=require$$0$4;module.exports=(state,send)=>{const headers=['Name'];const selectedRows=state.ui.selectedMutedUsers;const dataSet=state.users.filteredByMutedBot.map(user=>[user.name]);const classes=botSetupPage.formClasses;const onRowSelected=rowIndex=>send('ui:selectMutedUser',rowIndex);const onRowDeselected=rowIndex=>send('ui:deselectMutedUser',rowIndex);const onSubmit=e=>{e.preventDefault();const selectedUsers=state.users.filteredByMutedBot.filter((item,index)=>selectedRows.includes(index));send('api:unMuteChats',{ids:selectedUsers.map(item=>item.id),botId:state.bot.id});};const onRefreshClick=e=>{e.preventDefault();return send('api:getMutedChats',state.bot);};const content=mutedBotListFormComponent(headers,dataSet,selectedRows,state.api.updatingUsers,classes,messages.mutedChats.list,onRowSelected,onRowDeselected,onSubmit);const navbarRightContent=html$$1`
 <div class="navbar_right">
