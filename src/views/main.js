@@ -18,6 +18,10 @@ const mainCss = css`
 .checkboxRow {
     width: 20px;
 }
+
+.toolbarRefreshButton {
+    text-align: right;
+}
 `;
 
 // module.exports = view => (state, prev, send) => html`

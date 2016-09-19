@@ -63,10 +63,16 @@ export default {
         title: 'Assistentes silenciados',
         list: {
             title: 'Conversas',
-            description: `
-                Selecione abaixo as conversas que você deseja
-                reativar o assistente.
-            `,
+            description: {
+                withChats: `
+                    Selecione abaixo as conversas que você deseja
+                    reativar o assistente.
+                `,
+                withoutChats: `
+                    Não existem assistentes silenciados no momento.
+                    Use o botão acima para atualizar a lista.
+                `
+            },
             submit: 'Reativar Selecionados'
         }
     }
