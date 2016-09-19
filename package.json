@@ -68,9 +68,8 @@
     "rollup": "^0.36.0",
     "rollup-plugin-babel": "^2.6.1",
     "rollup-plugin-browserify-transform": "^0.1.0",
-    "rollup-plugin-commonjs": "^4.1.0",
     "rollup-plugin-json": "^2.0.2",
-    "sheetify": "^5.1.0",
+    "sheetify": "github:calamar-io/sheetify",
     "shelljs": "^0.7.4"
   },
   "description": "a customer control center web app",

@@ -1,8 +1,8 @@
-// files that uses sheetify MUST use commonjs style modules :(
-const html = require('choo/html');
-const messages = require('../../locales/ptBr');
-const menuComponent = require('../components/sideMenu');
-const footerComponent = require('../components/footer');
+import html from 'choo/html';
+import messages from '../../locales/ptBr';
+import menuComponent from '../components/sideMenu';
+import footerComponent from '../components/footer';
+
 const css = require('sheetify');
 const dashboardCss = css`
 .right_col {
@@ -20,7 +20,7 @@ const menuClasses = {
     }
 };
 
-module.exports = content => (state, prev, send) => html`
+export default content => (state, prev, send) => html`
 <div class="nav-sm ${dashboardCss}">
     <div class="container body">
         <div class="main_container">

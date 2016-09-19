@@ -1,6 +1,6 @@
-// files that uses sheetify MUST use commonjs style modules :(
-const html = require('choo/html');
-const fontAwesome = require('./fontAwesome');
+import html from 'choo/html';
+import fontAwesome from './fontAwesome';
+
 const css = require('sheetify');
 
 // load bootstrap css in the global scope (keep this comment)
@@ -20,7 +20,8 @@ const mainCss = css`
 }
 `;
 
-module.exports = view => (state, prev, send) => html`
+// module.exports = view => (state, prev, send) => html`
+export default view => (state, prev, send) => html`
 <div class=${mainCss}>
     ${fontAwesome}
     ${view(state, prev, send)}
