@@ -25,7 +25,7 @@ const view = (form, messages, navbarRightContent) => html`
             <div class="x_panel">
                 <div class="x_title nav">
                     <h2>${messages.subtitle}</h2>
-                    <div class="navbar-right">
+                    <div class="navbar-right panel_toolbox">
                         ${navbarRightContent}
                     </div>
                 </div>
