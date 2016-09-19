@@ -10,10 +10,10 @@ var html = _interopDefault(require('choo/html'));
 
 var config = {
     calamar: {
-        apiUrl: 'https://j3zeml7hyc.execute-api.us-east-1.amazonaws.com/latest'
+        apiUrl: 'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'
     },
     facebook: {
-        appId: '1701349696856861',
+        appId: '1691821884476309',
         loginParams: {
             scope: 'public_profile,email,pages_show_list'
         },
@@ -21,7 +21,7 @@ var config = {
     }
 };
 
-var version = "0.12.5";
+var version = "0.12.6";
 
 
 
