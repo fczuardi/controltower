@@ -30,6 +30,32 @@ const tableRow = (row, index, selectedRows, classes, onRowSelected, onRowDeselec
     `;
 };
 
+const createTable = (headers, dataSet, selectedRows, classes, isAllSelected,
+                            selectAll, onRowSelected, onRowDeselected) => html`
+<table
+    cellpadding="0" cellspacing="0" border="0"
+    class=${classes.table}
+>
+    <thead>
+        <tr>
+            <th class=${classes.tableCheckboxRow}>
+                <input
+                    type="checkbox" ${isAllSelected ? 'checked' : ''}
+                    onclick=${selectAll}></input>
+            </th>
+        ${headers.map(name => html`
+            <th>${name}</th>
+        `)}
+        </tr>
+    </thead>
+    <tbody>
+        ${dataSet.map((row, index) =>
+            tableRow(row, index, selectedRows, classes, onRowSelected, onRowDeselected)
+        )}
+    </tbody>
+</table>
+`;
+
 export default (
     headers,
     dataSet,
@@ -46,28 +72,10 @@ export default (
     return html`
 <form class=${classes.form} onsubmit=${onSubmit}>
     <div class=${classes.formGroup}>
-        <table
-            cellpadding="0" cellspacing="0" border="0"
-            class=${classes.table}
-        >
-            <thead>
-                <tr>
-                    <th class=${classes.tableCheckboxRow}>
-                        <input
-                            type="checkbox" ${isAllSelected ? 'checked' : ''}
-                            onclick=${selectAll}></input>
-                    </th>
-                ${headers.map(name => html`
-                    <th>${name}</th>
-                `)}
-                </tr>
-            </thead>
-            <tbody>
-                ${dataSet.map((row, index) =>
-                    tableRow(row, index, selectedRows, classes, onRowSelected, onRowDeselected)
-                )}
-            </tbody>
-        </table>
+        ${!dataSet.length ? null : createTable(
+            headers, dataSet, selectedRows, classes, isAllSelected,
+            selectAll, onRowSelected, onRowDeselected
+        )}
     </div>
     <div class=${classes.separator}></div>
     <div class=${classes.formGroup}>

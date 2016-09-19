@@ -1,7 +1,9 @@
-const html = require('choo/html');
-const messages = require('../../locales/ptBr');
-const loginComponent = require('../components/login');
+import html from 'choo/html';
+import messages from '../../locales/ptBr';
+import loginComponent from '../components/login';
+
 const css = require('sheetify');
+
 const loginCss = css`
 .login {
     position: absolute;
@@ -13,7 +15,7 @@ const classes = {
     subtitle: 'lead',
     button: 'btn btn-primary'
 };
-module.exports = (state, prev, send) => html`
+export default (state, prev, send) => html`
 <div class=${loginCss}>
     <div class="login">
         <div class="login_wrapper">

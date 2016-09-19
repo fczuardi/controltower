@@ -3,7 +3,7 @@ const formLabels = {
     submitButton: 'Enviar'
 };
 
-module.exports = {
+export default {
     login: {
         title: 'Entrada',
         subtitle: 'Para acessar a Torre de Controle é necessário identificar-se.',
@@ -63,10 +63,16 @@ module.exports = {
         title: 'Assistentes silenciados',
         list: {
             title: 'Conversas',
-            description: `
-                Selecione abaixo as conversas que você deseja
-                reativar o assistente.
-            `,
+            description: {
+                withChats: `
+                    Selecione abaixo as conversas que você deseja
+                    reativar o assistente.
+                `,
+                withoutChats: `
+                    Não existem assistentes silenciados no momento.
+                    Use o botão acima para atualizar a lista.
+                `
+            },
             submit: 'Reativar Selecionados'
         }
     }

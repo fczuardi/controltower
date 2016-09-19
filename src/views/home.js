@@ -1,6 +1,6 @@
-const html = require('choo/html');
+import html from 'choo/html';
 
-module.exports = state => html`
+export default state => html`
 <div>
     <h2>${JSON.stringify(state.location)}</h2>
     <h1>Auth</h1>

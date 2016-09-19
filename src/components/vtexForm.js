@@ -1,7 +1,7 @@
-const html = require('choo/html');
-const updateBotFormComponent = require('./updateBotForm');
+import html from 'choo/html';
+import updateBotFormComponent from './updateBotForm';
 
-module.exports = (isUpdating, values, classes, messages, onSubmit) => {
+export default (isUpdating, values, classes, messages, onSubmit) => {
     const fieldNames = [
         'apiToken',
         'apiKey',

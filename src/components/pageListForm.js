@@ -1,8 +1,8 @@
-const html = require('choo/html');
-const updateBotFormComponent = require('./updateBotForm');
-const pageListComponent = require('./pageList');
+import html from 'choo/html';
+import updateBotFormComponent from './updateBotForm';
+import pageListComponent from './pageList';
 
-module.exports = (pages, selectedPage, isUpdating, classes, messages, onSubmit) => {
+export default (pages, selectedPage, isUpdating, classes, messages, onSubmit) => {
     const fields = html`
         <div class=${classes.formGroup}>
             <label class=${classes.label}>

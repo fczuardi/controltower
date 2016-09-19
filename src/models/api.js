@@ -13,7 +13,7 @@ const createApiModel = config => ({
     state: {
         token: null,
         updatingBot: false,
-        updatingUsers: false
+        loadingUsers: false
     },
     reducers: {
         set: data => data,
@@ -25,13 +25,13 @@ const createApiModel = config => ({
             ...state,
             updatingBot: false
         }),
-        updateUsersBegin: (data, state) => ({
+        loadingUsersBegin: (data, state) => ({
             ...state,
-            updatingBot: true
+            loadingUsers: true
         }),
-        updateUsersEnd: (data, state) => ({
+        loadingUsersEnd: (data, state) => ({
             ...state,
-            updatingBot: false
+            loadingUsers: false
         })
     },
     effects: {
@@ -77,9 +77,9 @@ const createApiModel = config => ({
             };
             const url = `${config.apiUrl}/v1/users/?${qs.stringify(query)}`;
             const options = defaultOptions(state.token);
-            send('api:updateUsersBegin', null, done);
+            send('api:loadingUsersBegin', null, done);
             http.get(url, options, (error, response) => {
-                send('api:updateUsersEnd', null, done);
+                send('api:loadingUsersEnd', null, done);
                 if (error) {
                     console.error(error);
                     return done();
@@ -97,9 +97,9 @@ const createApiModel = config => ({
                     botStatus: 'active'
                 }
             };
-            send('api:updateUsersBegin', null, done);
+            send('api:loadingUsersBegin', null, done);
             http.put(url, { ...options, json: body }, (error, response) => {
-                send('api:updateUsersEnd', null, done);
+                send('api:loadingUsersEnd', null, done);
                 if (error) {
                     console.error(error);
                     return done();

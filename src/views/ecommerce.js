@@ -1,6 +1,6 @@
-const vtexFormComponent = require('../components/vtexForm');
-const botSetupPage = require('../views/botSetup');
-const messages = require('../../locales/ptBr');
+import vtexFormComponent from '../components/vtexForm';
+import { formClasses, view } from '../views/botSetup';
+import messages from '../../locales/ptBr';
 
 const createSubmit = (botId, send) => e => {
     e.preventDefault();
@@ -21,18 +21,18 @@ const createSubmit = (botId, send) => e => {
     return send('bot:setVtexStore', update);
 };
 
-module.exports = (state, send) => {
+export default (state, send) => {
     const isUpdating = state.api.updatingBot;
     const values = state.bot.vtex;
     const onSubmit = createSubmit(state.bot.id, send);
     const form = vtexFormComponent(
         isUpdating,
         values,
-        botSetupPage.formClasses,
+        formClasses,
         messages.ecommerce.vtex,
         onSubmit
     );
-    return botSetupPage.view(form, {
+    return view(form, {
         title: messages.ecommerce.title,
         subtitle: messages.ecommerce.vtex.title,
         description: messages.ecommerce.vtex.description.trackOrder
