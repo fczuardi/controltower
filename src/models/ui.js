@@ -7,10 +7,12 @@ const uiModel = {
             'home',
             'channels',
             'ecommerce',
+            'replies',
             'mutedChats'
         ],
         facebookPages: [],
-        selectedMutedUsers: []
+        selectedMutedUsers: [],
+        selectedReply: 'trackOrder'
     },
     reducers: {
         enableSection: (name, state) => (

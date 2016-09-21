@@ -13,6 +13,7 @@ export default {
         home: 'Home',
         channels: 'Canais',
         ecommerce: 'E-commerce',
+        replies: 'Respostas',
         mutedChats: 'Assistentes silenciados'
     },
     footer: {
@@ -55,6 +56,26 @@ export default {
             apiEnvironment: 'API Environment',
             appKey: 'App Key',
             appToken: 'App Token',
+            cancel: formLabels.cancelButton,
+            submit: formLabels.submitButton
+        }
+    },
+    replies: {
+        title: 'Editar Respostas',
+        ecommerce: {
+            title: 'E-commerce',
+            description: `
+                Selecione abaixo uma das respostas para editar seu texto.
+            `,
+            reply: 'Resposta',
+            replyTitles: {
+                main: 'Menu inicial',
+                trackOrder: 'Status do pedido',
+                receipt: 'Nota fiscal',
+                returns: 'Trocas e Devoluções',
+                talkToHuman: 'Falar com um humano',
+                thanks: 'Agradecimento'
+            },
             cancel: formLabels.cancelButton,
             submit: formLabels.submitButton
         }

@@ -65,6 +65,11 @@ const createApiModel = config => ({
                 } else {
                     send('ui:disableSection', 'ecommerce', done);
                 }
+                if (response.body.replies) {
+                    send('ui:enableSection', 'replies', done);
+                } else {
+                    send('ui:disableSection', 'replies', done);
+                }
                 send('api:getMutedChats', response.body, done);
                 return send('bot:set', response.body, done);
             });

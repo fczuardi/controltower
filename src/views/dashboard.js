@@ -16,6 +16,7 @@ const menuClasses = {
         home: 'fa fa-home',
         channels: 'fa fa-whatsapp',
         ecommerce: 'fa fa-shopping-cart',
+        replies: 'fa fa-comments-o',
         mutedChats: 'fa fa-user-times'
     }
 };
