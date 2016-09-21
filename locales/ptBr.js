@@ -69,12 +69,21 @@ export default {
             `,
             reply: 'Resposta',
             replyTitles: {
-                main: 'Menu inicial',
+                start: 'Menu inicial',
                 trackOrder: 'Status do pedido',
                 receipt: 'Nota fiscal',
                 returns: 'Trocas e Devoluções',
                 talkToHuman: 'Falar com um humano',
-                thanks: 'Agradecimento'
+                thanks: 'Agradecimento',
+                buttons: {
+                    title: 'Botões',
+                    printReceiptLink: 'Segunda Via',
+                    backToMenu: 'Voltar ao Menu',
+                    trackOrder: 'Rastrear Pedido',
+                    returnsSubmenu: 'Trocas e Devoluções (submenu)',
+                    returnsLink: 'Trocas e Devoluções (link)',
+                    talkToHuman: 'Falar com um Humano'
+                }
             },
             cancel: formLabels.cancelButton,
             submit: formLabels.submitButton

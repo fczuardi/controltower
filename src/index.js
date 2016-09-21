@@ -9,6 +9,7 @@ import appModel from './models/app';
 import uiModel from './models/ui';
 import customerModel from './models/customer';
 import botModel from './models/bot';
+import repliesModel from './models/replies';
 import usersModel from './models/users';
 import createApiModel from './models/api';
 import createFbSessionModel from './models/fbSession';
@@ -29,6 +30,7 @@ app.model(appModel);
 app.model(uiModel);
 app.model(customerModel);
 app.model(botModel);
+app.model(repliesModel);
 app.model(usersModel);
 app.model(createApiModel(config.calamar));
 app.model(createFbSessionModel(config.facebook));
@@ -49,8 +51,8 @@ const repliesView = dashboardView(repliesContent);
 const mutedChatsView = dashboardView(mutedChatsContent);
 
 app.router([
-    ['/', viewWrapper(homeView)],
-    // ['/', mainView(repliesView)],
+    // ['/', viewWrapper(homeView)],
+    ['/', mainView(repliesView)],
     ['/controltower', viewWrapper(homeView)],
     ['/channels', viewWrapper(channelsView)],
     ['/ecommerce', viewWrapper(ecommerceView)],

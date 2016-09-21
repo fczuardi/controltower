@@ -1,6 +1,26 @@
 import html from 'choo/html';
 import updateBotFormComponent from './updateBotForm';
 
+const buildOptions = (selectedKey, list, keyPrefix) => Object.keys(list).map(key => {
+    if (key === 'title') {
+        return null;
+    }
+    const fullKey = (keyPrefix || '') + key;
+    const isSelected = (fullKey === selectedKey);
+    const value = list[key];
+    const isChildList = typeof value === 'object' && value.title;
+    return isChildList
+        ? html`
+            <optgroup label=${value.title || ''}>
+                ${buildOptions(selectedKey, value, `${key}.`)}
+            </optgroup>`
+        : html`
+        <option ${isSelected ? 'selected' : ''}>
+            ${value}
+        </option>
+    `;
+});
+
 export default (selectedKey, classes, messages, isLoading, onSubmit) => {
     const fields = html`
 <div class=${classes.formGroup}>
@@ -9,14 +29,7 @@ export default (selectedKey, classes, messages, isLoading, onSubmit) => {
     </label>
     <div class=${classes.inputContainer}>
         <select class=${classes.input}>
-            ${Object.keys(messages.replyTitles).map(key => {
-                const isSelected = (key === selectedKey);
-                return html`
-                    <option ${isSelected ? 'selected' : ''}>
-                        ${messages.replyTitles[key]}
-                    </option>
-                `;
-            })}
+            ${buildOptions(selectedKey, messages.replyTitles)}
         </select>
     </div>
     <div>

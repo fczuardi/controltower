@@ -1,4 +1,3 @@
-import html from 'choo/html';
 import { formClasses, view } from '../views/botSetup';
 import messages from '../../locales/ptBr';
 import repliesFormComponent from '../components/replyListForm';
