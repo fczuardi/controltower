@@ -1,5 +1,6 @@
 import html from 'choo/html';
 import updateBotFormComponent from './updateBotForm';
+import { path } from 'ramda';
 
 const buildOptions = (selectedKey, list, keyPrefix) => Object.keys(list).map(key => {
     if (key === 'title') {
@@ -15,25 +16,31 @@ const buildOptions = (selectedKey, list, keyPrefix) => Object.keys(list).map(key
                 ${buildOptions(selectedKey, value, `${key}.`)}
             </optgroup>`
         : html`
-        <option ${isSelected ? 'selected' : ''}>
+        <option
+            ${isSelected ? 'selected' : ''}
+            value=${fullKey}
+        >
             ${value}
         </option>
     `;
 });
 
-export default (selectedKey, classes, messages, isLoading, onSubmit) => {
+export default (selectedKey, replies, classes, messages, isLoading, onChange, onSubmit) => {
+    const selectedReply = path(selectedKey.split('.'), replies);
     const fields = html`
 <div class=${classes.formGroup}>
     <label class=${classes.label}>
         ${messages.reply}
     </label>
     <div class=${classes.inputContainer}>
-        <select class=${classes.input}>
+        <select class=${classes.input} onchange=${onChange}>
             ${buildOptions(selectedKey, messages.replyTitles)}
         </select>
     </div>
     <div>
-        TBD
+        <pre>
+            ${JSON.stringify(selectedReply)}
+        </pre>
     </div>
 </div>
     `;

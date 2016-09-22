@@ -33,6 +33,10 @@ const uiModel = {
             ...state,
             facebookPages
         }),
+        selectReply: (replyKey, state) => ({
+            ...state,
+            selectedReply: replyKey
+        }),
         selectMutedUser: (index, state) => ({
             ...state,
             selectedMutedUsers: state.selectedMutedUsers.concat([index])

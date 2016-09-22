@@ -32,7 +32,7 @@ const repliesModel = {
             sampleQuestion: 'Ok, muito obrigado!',
             text: 'Nós que agradecemos, volte sempre.'
         },
-        buttonTitles: {
+        buttons: {
             printReceiptLink: 'Segunda Via',
             backToMenu: 'Voltar ao Menu',
             trackOrder: 'Rastrear Pedido',

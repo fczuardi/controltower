@@ -13,7 +13,8 @@ const createApiModel = config => ({
     state: {
         token: null,
         updatingBot: false,
-        loadingUsers: false
+        loadingUsers: false,
+        loadingReplies: false
     },
     reducers: {
         set: data => data,
@@ -32,6 +33,14 @@ const createApiModel = config => ({
         loadingUsersEnd: (data, state) => ({
             ...state,
             loadingUsers: false
+        }),
+        loadingRepliesBegin: (data, state) => ({
+            ...state,
+            loadingReplies: true
+        }),
+        loadingRepliesEnd: (data, state) => ({
+            ...state,
+            loadingReplies: false
         })
     },
     effects: {
