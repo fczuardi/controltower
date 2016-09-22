@@ -12,7 +12,7 @@ const uiModel = {
         ],
         facebookPages: [],
         selectedMutedUsers: [],
-        selectedReply: 'buttons.talkToHuman'
+        selectedReply: 'trackOrder'
     },
     reducers: {
         enableSection: (name, state) => (

@@ -4,15 +4,17 @@ const repliesModel = {
         start: {
             template: 'generic',
             text: 'Por favor, selecione uma das opções abaixo ou digite o que deseja.',
-            buttons: ['trackOrder', 'returns', 'talkToHuman']
+            buttons: ['trackOrder', 'returnsSubmenu', 'talkToHuman']
         },
         trackOrder: {
+            sampleQuestion: 'Meu número de pedido é 1234567890',
             template: 'generic',
             title: 'Pedido #{{ orderId }} - Status',
             text: 'Destino: {{ address }}',
-            buttons: ['returns', 'talkToHuman']
+            buttons: ['returnsSubmenu', 'talkToHuman']
         },
         receipt: {
+            sampleQuestion: 'Onde encontro a nota fiscal?',
             template: 'button',
             text: 'A nota fiscal é enviada junto ao pedido. Você pode pedir'
                 + 'uma segunda via clicando no botão abaixo.',
