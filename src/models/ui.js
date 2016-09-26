@@ -7,10 +7,12 @@ const uiModel = {
             'home',
             'channels',
             'ecommerce',
+            'replies',
             'mutedChats'
         ],
         facebookPages: [],
-        selectedMutedUsers: []
+        selectedMutedUsers: [],
+        selectedReply: 'start'
     },
     reducers: {
         enableSection: (name, state) => (
@@ -30,6 +32,10 @@ const uiModel = {
         setFbPages: (facebookPages, state) => ({
             ...state,
             facebookPages
+        }),
+        selectReply: (replyKey, state) => ({
+            ...state,
+            selectedReply: replyKey
         }),
         selectMutedUser: (index, state) => ({
             ...state,
