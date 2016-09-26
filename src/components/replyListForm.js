@@ -1,6 +1,5 @@
 import html from 'choo/html';
 import updateBotFormComponent from './updateBotForm';
-import { path } from 'ramda';
 
 const buildOptions = (selectedKey, list, keyPrefix) => Object.keys(list).map(key => {
     if (key === 'title') {
@@ -48,7 +47,7 @@ const genericTemplate = (selectedReply, replies, classes) => {
         ? html`
         <div class=${classes.footer}>
             ${selectedReply.buttons.map(key => html`
-                <button class=${classes.button}>${replies.buttons[key]}</button>
+                <button disabled class=${classes.button}>${replies.buttons[key]}</button>
             `)}
         </div>`
         : singleButton;
@@ -65,23 +64,11 @@ const genericTemplate = (selectedReply, replies, classes) => {
     `;
 };
 
-const replyClasses = {
-    sampleQuestion: 'user-chat-bubble',
-    title: 'reply-title',
-    text: 'reply-text',
-    body: 'reply-body',
-    footer: 'reply-footer',
-    button: 'reply-button',
-    container: 'reply-container col-md-8 col-sm-8 col-xs-12',
-    template: {
-        button: 'reply-template-button',
-        generic: 'reply-template-generic',
-        none: 'reply-template-text'
-    }
-};
-
-export default (selectedKey, replies, classes, messages, isLoading, onChange, onSubmit) => {
-    const selectedReply = path(selectedKey.split('.'), replies);
+export default (
+    selectedKey, replies, selectedReply,
+    classes, messages, isLoading,
+    onChange, onSubmit
+) => {
     const fields = html`
 <div>
     <div class=${classes.formGroup}>
@@ -96,7 +83,7 @@ export default (selectedKey, replies, classes, messages, isLoading, onChange, on
     </div>
     <div class="ln_solid"></div>
     <div class=${classes.formGroup}>
-        ${genericTemplate(selectedReply, replies, replyClasses)}
+        ${genericTemplate(selectedReply, replies, classes.reply)}
     </div>
 </div>
     `;

@@ -51,8 +51,7 @@ const repliesView = dashboardView(repliesContent);
 const mutedChatsView = dashboardView(mutedChatsContent);
 
 app.router([
-    // ['/', viewWrapper(homeView)],
-    ['/', mainView(repliesView)],
+    ['/', viewWrapper(homeView)],
     ['/controltower', viewWrapper(homeView)],
     ['/channels', viewWrapper(channelsView)],
     ['/ecommerce', viewWrapper(ecommerceView)],

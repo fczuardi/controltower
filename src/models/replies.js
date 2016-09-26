@@ -1,3 +1,4 @@
+import { merge } from 'ramda';
 const repliesModel = {
     namespace: 'replies',
     state: {
@@ -44,7 +45,18 @@ const repliesModel = {
         }
     },
     reducers: {
-        set: data => data
+        set: data => data,
+        setReplyButton: (data, state) => ({
+            ...state,
+            buttons: merge(state.buttons, data)
+        }),
+        setReply: (data, state) => merge(state, data)
+    },
+    effects: {
+        sendReplies: (botId, state, send, done) => send('api:updateBot', {
+            botId,
+            replies: JSON.stringify(state)
+        }, done)
     }
 };
 

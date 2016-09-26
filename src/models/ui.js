@@ -1,8 +1,8 @@
 const uiModel = {
     namespace: 'ui',
     state: {
-        selectedSection: 'replies',
-        enabledSections: ['home', 'replies'],
+        selectedSection: 'home',
+        enabledSections: ['home'],
         menu: [
             'home',
             'channels',
@@ -12,7 +12,7 @@ const uiModel = {
         ],
         facebookPages: [],
         selectedMutedUsers: [],
-        selectedReply: 'trackOrder'
+        selectedReply: 'start'
     },
     reducers: {
         enableSection: (name, state) => (

@@ -59,6 +59,7 @@ const createApiModel = config => ({
         getBot: (data, state, send, done) => {
             const url = `${config.apiUrl}/v1/bots/${data.botId}`;
             const options = defaultOptions(state.token);
+            send('api:loadingRepliesBegin', null, done);
             http.get(url, options, (error, response) => {
                 if (error) {
                     console.error(error);
@@ -76,6 +77,8 @@ const createApiModel = config => ({
                 }
                 if (response.body.replies) {
                     send('ui:enableSection', 'replies', done);
+                    send('replies:set', JSON.parse(response.body.replies), done);
+                    send('api:loadingRepliesEnd', null, done);
                 } else {
                     send('ui:disableSection', 'replies', done);
                 }
@@ -134,9 +137,11 @@ const createApiModel = config => ({
                 }
             };
             const vtexUpdate = data.vtex ? data : {};
+            const repliesUpdate = data.replies ? data : {};
             const update = {
                 ...facebookUpdate,
-                ...vtexUpdate
+                ...vtexUpdate,
+                ...repliesUpdate
             };
             send('api:updateBotBegin', null, done);
             http.put(url, { ...options, json: update }, (error, response) => {
