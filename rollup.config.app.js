@@ -35,6 +35,7 @@ export default {
             compact: false,
             plugins: [
                 'external-helpers',
+                'transform-es2015-destructuring',
                 'transform-object-rest-spread'
             ]
         })
