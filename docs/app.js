@@ -21,7 +21,7 @@ var config = {
     }
 };
 
-var version = "0.13.1";
+var version = "0.13.2";
 
 
 
