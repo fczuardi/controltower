@@ -69,20 +69,41 @@ export default {
             `,
             reply: 'Resposta',
             replyTitles: {
-                start: 'Menu inicial',
-                trackOrder: 'Status do pedido',
-                receipt: 'Nota fiscal',
-                returns: 'Trocas e Devoluções',
-                talkToHuman: 'Falar com um humano',
-                thanks: 'Agradecimento',
+                start: 'Menu Inicial',
+                exchange: 'Trocas',
+                menu: 'Menu',
+                deactivate: 'Transferir para um humano',
+                faqId: 'Dúvida: número do pedido',
+                faqReceipt: 'Dúvida: nota fiscal',
+                faqReturn: 'Dúvida: trocas e devoluções',
+                help: 'Ajuda (Menu SAC)',
+                trackOrder: {
+                    title: 'Rastreamento de Pedidos',
+                    hasNoOrderId: 'Sem número de pedido',
+                    hasOrderId: 'Com número de pedido',
+                    userLoggedWelcome: 'Boas vindas (usuário recorrente)',
+                    localOrders: 'Seleção de pedido',
+                    apiCall: 'Status do pedido'
+                },
+                thankUser: 'Agradecimento',
+                apiHandler: {
+                    title: 'Erros',
+                    wrongNumber: 'Número de pedido inválido',
+                    systemError: 'Sistema fora do ar'
+                },
+                fallback: 'Resposta não compreendida, transferência',
+                askForAMoment: 'Espere um momento',
                 buttons: {
                     title: 'Botões',
-                    printReceiptLink: 'Segunda Via',
-                    backToMenu: 'Voltar ao Menu',
-                    trackOrder: 'Rastrear Pedido',
-                    returnsSubmenu: 'Trocas e Devoluções (submenu)',
-                    returnsLink: 'Trocas e Devoluções (link)',
-                    talkToHuman: 'Falar com um Humano'
+                    trackOrder: 'Rastrear meu pedido',
+                    exchange: 'Política de Trocas (link)',
+                    humanFallback: 'Falar com um humano',
+                    returns: 'Trocas/Devoluções (link)',
+                    receipt: 'Saiba mais, nota fiscal (link)',
+                    menu: 'Voltar ao menu',
+                    deactivate: 'Desativar o assistente (falar com humano)',
+                    select: 'Selecionar',
+                    hasNoOrderId: 'Não sei meu número de pedido'
                 }
             },
             cancel: formLabels.cancelButton,

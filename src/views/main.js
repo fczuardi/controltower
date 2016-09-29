@@ -58,7 +58,7 @@ const mainCss = css`
 }
 
 .reply-title,
-.reply-text {
+.reply-subtitle {
     display: block;
     border: none;
     width: 100%;
@@ -70,8 +70,8 @@ const mainCss = css`
 .reply-title {
     font-weight: 700;
 }
-.reply-template-button .reply-text,
-.reply-template-text .reply-text,
+.reply-template-button .reply-subtitle,
+.reply-template-text .reply-subtitle,
 .chat-bubble {
     border-radius: 1.3em 1.3em 1.3em 0;
     min-height: 35px;
