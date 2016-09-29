@@ -14,12 +14,20 @@ const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
     const text = e.target.text && e.target.text.value ? e.target.text.value : null;
     const buttonTitle = e.target.buttonTitle && e.target.buttonTitle.value
         ? e.target.buttonTitle.value : null;
+    const { logo, url } = e.target;
+    let updates = {};
+    if (logo) {
+        updates = Object.assign(updates, { logo: logo.value });
+    }
+    if (url) {
+        updates = Object.assign(updates, { url: url.value });
+    }
     if (buttonTitle) {
+        updates = Object.assign(updates, { text: buttonTitle });
         send('replies:setReplyButton', {
-            [selectedReplyKey.split('.')[1]]: buttonTitle
+            [selectedReplyKey.split('.')[1]]: updates
         });
     } else {
-        let updates = {};
         if (title) {
             updates = Object.assign(updates, { title });
         }
@@ -35,7 +43,7 @@ const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
 const replyClasses = {
     sampleQuestion: 'user-chat-bubble',
     title: 'reply-title',
-    text: 'reply-text',
+    subtitle: 'reply-subtitle',
     body: 'reply-body',
     footer: 'reply-footer',
     button: 'reply-button',

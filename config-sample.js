@@ -5,7 +5,7 @@ export default {
     facebook: {
         appId: 'FACEBOOK_APP_ID',
         loginParams: {
-            scope: 'public_profile,email,pages_show_list'
+            scope: 'public_profile,email,pages_show_list,manage_pages'
         },
         userFields: 'id,name,email'
     }
