@@ -513,7 +513,7 @@ function dispatcher (hooks) {
           const send = createSend('subscription: ' + (ns ? ns + ':' + key : key))
           cb = wrapHook(cb, subscriptionWraps)
           cb(send, function (err) {
-            applyHook(onErrorHooks, err)
+            applyHook(onErrorHooks, err, _state, createSend)
           })
           return cb
         })
@@ -802,7 +802,7 @@ function belCreateElement (tag, props, children) {
 module.exports = hyperx(belCreateElement)
 module.exports.createElement = belCreateElement
 
-},{"global/document":7,"hyperx":10,"on-load":14}],5:[function(require,module,exports){
+},{"global/document":7,"hyperx":10,"on-load":13}],5:[function(require,module,exports){
 
 },{}],6:[function(require,module,exports){
 // shim for using process in browser
@@ -816,25 +816,40 @@ var process = module.exports = {};
 var cachedSetTimeout;
 var cachedClearTimeout;
 
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
 (function () {
     try {
-        cachedSetTimeout = setTimeout;
-    } catch (e) {
-        cachedSetTimeout = function () {
-            throw new Error('setTimeout is not defined');
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
         }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
     }
     try {
-        cachedClearTimeout = clearTimeout;
-    } catch (e) {
-        cachedClearTimeout = function () {
-            throw new Error('clearTimeout is not defined');
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
         }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
     }
 } ())
 function runTimeout(fun) {
     if (cachedSetTimeout === setTimeout) {
         //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
         return setTimeout(fun, 0);
     }
     try {
@@ -855,6 +870,11 @@ function runTimeout(fun) {
 function runClearTimeout(marker) {
     if (cachedClearTimeout === clearTimeout) {
         //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
         return clearTimeout(marker);
     }
     try {
@@ -1285,31 +1305,6 @@ var closeRE = RegExp('^(' + [
 function selfClosing (tag) { return closeRE.test(tag) }
 
 },{"hyperscript-attribute-to-property":9}],11:[function(require,module,exports){
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    ctor.prototype = Object.create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    var TempCtor = function () {}
-    TempCtor.prototype = superCtor.prototype
-    ctor.prototype = new TempCtor()
-    ctor.prototype.constructor = ctor
-  }
-}
-
-},{}],12:[function(require,module,exports){
 // Create a range object for efficently rendering strings to elements.
 var range;
 
@@ -1892,7 +1887,7 @@ function morphdom(fromNode, toNode, options) {
 
 module.exports = morphdom;
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 const window = require('global/window')
 const assert = require('assert')
 
@@ -1938,7 +1933,7 @@ function nanoraf (render, raf) {
   }
 }
 
-},{"assert":1,"global/window":8}],14:[function(require,module,exports){
+},{"assert":1,"global/window":8}],13:[function(require,module,exports){
 /* global MutationObserver */
 var document = require('global/document')
 var window = require('global/window')
@@ -2027,7 +2022,7 @@ function eachMutation (nodes, fn) {
   }
 }
 
-},{"global/document":7,"global/window":8}],15:[function(require,module,exports){
+},{"global/document":7,"global/window":8}],14:[function(require,module,exports){
 const assert = require('assert')
 
 module.exports = match
@@ -2047,7 +2042,7 @@ function match (route) {
     .replace(/\/$/, '')
 }
 
-},{"assert":1}],16:[function(require,module,exports){
+},{"assert":1}],15:[function(require,module,exports){
 const document = require('global/document')
 const assert = require('assert')
 const xtend = require('xtend')
@@ -2109,7 +2104,7 @@ function createLocation (state, patch) {
   }
 }
 
-},{"assert":1,"global/document":7,"xtend":26}],17:[function(require,module,exports){
+},{"assert":1,"global/document":7,"xtend":26}],16:[function(require,module,exports){
 const document = require('global/document')
 const window = require('global/window')
 const assert = require('assert')
@@ -2126,7 +2121,7 @@ function history (cb) {
   }
 }
 
-},{"assert":1,"global/document":7,"global/window":8}],18:[function(require,module,exports){
+},{"assert":1,"global/document":7,"global/window":8}],17:[function(require,module,exports){
 const window = require('global/window')
 const assert = require('assert')
 
@@ -2164,7 +2159,7 @@ function href (cb) {
   }
 }
 
-},{"assert":1,"global/window":8}],19:[function(require,module,exports){
+},{"assert":1,"global/window":8}],18:[function(require,module,exports){
 const pathname = require('pathname-match')
 const wayfarer = require('wayfarer')
 const assert = require('assert')
@@ -2268,7 +2263,7 @@ function thunkify (cb) {
   }
 }
 
-},{"assert":1,"pathname-match":15,"wayfarer":23}],20:[function(require,module,exports){
+},{"assert":1,"pathname-match":14,"wayfarer":23}],19:[function(require,module,exports){
 const walk = require('wayfarer/walk')
 const assert = require('assert')
 
@@ -2282,7 +2277,32 @@ function walkSheetRouter (router, cb) {
   return walk(router, cb)
 }
 
-},{"assert":1,"wayfarer/walk":25}],21:[function(require,module,exports){
+},{"assert":1,"wayfarer/walk":25}],20:[function(require,module,exports){
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
+
+},{}],21:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
@@ -2879,7 +2899,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":21,"_process":6,"inherits":11}],23:[function(require,module,exports){
+},{"./support/isBuffer":21,"_process":6,"inherits":20}],23:[function(require,module,exports){
 const assert = require('assert')
 const trie = require('./trie')
 
@@ -3166,7 +3186,7 @@ module.exports.update = function (fromNode, toNode, opts) {
   }
 }
 
-},{"./update-events.js":29,"bel":4,"morphdom":12}],29:[function(require,module,exports){
+},{"./update-events.js":29,"bel":4,"morphdom":11}],29:[function(require,module,exports){
 module.exports = [
   // attribute events (can be set with attributes)
   'onclick',
@@ -3383,4 +3403,4 @@ function createLocationModel (opts) {
   }
 }
 
-},{"assert":1,"barracks":3,"nanoraf":13,"sheet-router":19,"sheet-router/create-location":16,"sheet-router/history":17,"sheet-router/href":18,"sheet-router/walk":20,"xtend":26,"xtend/mutable":27,"yo-yo":28}]},{},[]);
+},{"assert":1,"barracks":3,"nanoraf":12,"sheet-router":18,"sheet-router/create-location":15,"sheet-router/history":16,"sheet-router/href":17,"sheet-router/walk":19,"xtend":26,"xtend/mutable":27,"yo-yo":28}]},{},[]);

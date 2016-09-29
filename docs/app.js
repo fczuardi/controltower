@@ -15,13 +15,13 @@ var config = {
     facebook: {
         appId: '1691821884476309',
         loginParams: {
-            scope: 'public_profile,email,pages_show_list'
+            scope: 'public_profile,email,pages_show_list,manage_pages'
         },
         userFields: 'id,name,email'
     }
 };
 
-var version = "0.13.0";
+var version = "0.13.1";
 
 
 
@@ -43,6 +43,133 @@ const appModel = {
         homepage
     }
 };
+
+var asyncGenerator = function () {
+  function AwaitValue(value) {
+    this.value = value;
+  }
+
+  function AsyncGenerator(gen) {
+    var front, back;
+
+    function send(key, arg) {
+      return new Promise(function (resolve, reject) {
+        var request = {
+          key: key,
+          arg: arg,
+          resolve: resolve,
+          reject: reject,
+          next: null
+        };
+
+        if (back) {
+          back = back.next = request;
+        } else {
+          front = back = request;
+          resume(key, arg);
+        }
+      });
+    }
+
+    function resume(key, arg) {
+      try {
+        var result = gen[key](arg);
+        var value = result.value;
+
+        if (value instanceof AwaitValue) {
+          Promise.resolve(value.value).then(function (arg) {
+            resume("next", arg);
+          }, function (arg) {
+            resume("throw", arg);
+          });
+        } else {
+          settle(result.done ? "return" : "normal", result.value);
+        }
+      } catch (err) {
+        settle("throw", err);
+      }
+    }
+
+    function settle(type, value) {
+      switch (type) {
+        case "return":
+          front.resolve({
+            value: value,
+            done: true
+          });
+          break;
+
+        case "throw":
+          front.reject(value);
+          break;
+
+        default:
+          front.resolve({
+            value: value,
+            done: false
+          });
+          break;
+      }
+
+      front = front.next;
+
+      if (front) {
+        resume(front.key, front.arg);
+      } else {
+        back = null;
+      }
+    }
+
+    this._invoke = send;
+
+    if (typeof gen.return !== "function") {
+      this.return = undefined;
+    }
+  }
+
+  if (typeof Symbol === "function" && Symbol.asyncIterator) {
+    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
+      return this;
+    };
+  }
+
+  AsyncGenerator.prototype.next = function (arg) {
+    return this._invoke("next", arg);
+  };
+
+  AsyncGenerator.prototype.throw = function (arg) {
+    return this._invoke("throw", arg);
+  };
+
+  AsyncGenerator.prototype.return = function (arg) {
+    return this._invoke("return", arg);
+  };
+
+  return {
+    wrap: function (fn) {
+      return function () {
+        return new AsyncGenerator(fn.apply(this, arguments));
+      };
+    },
+    await: function (value) {
+      return new AwaitValue(value);
+    }
+  };
+}();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 var _extends = Object.assign || function (target) {
   for (var i = 1; i < arguments.length; i++) {
@@ -237,12 +364,24 @@ const repliesModel = {
             text: 'Nós que agradecemos, volte sempre.'
         },
         buttons: {
-            printReceiptLink: 'Segunda Via',
-            backToMenu: 'Voltar ao Menu',
-            trackOrder: 'Rastrear Pedido',
-            returnsSubmenu: 'Trocas e Devoluções',
-            returnsLink: 'Trocar ou Devolver',
-            talkToHuman: 'Falar com um Humano'
+            printReceiptLink: {
+                text: 'Segunda Via'
+            },
+            backToMenu: {
+                text: 'Voltar ao Menu'
+            },
+            trackOrder: {
+                text: 'Rastrear Pedido'
+            },
+            returnsSubmenu: {
+                text: 'Trocas e Devoluções'
+            },
+            returnsLink: {
+                text: 'Trocar ou Devolver'
+            },
+            talkToHuman: {
+                text: 'Falar com um Humano'
+            }
         }
     },
     reducers: {
@@ -907,14 +1046,15 @@ const buildOptions = (selectedKey, list, keyPrefix) => Object.keys(list).map(key
     `;
 });
 
-const genericTemplate = (selectedReply, replies, classes) => {
+const genericTemplate = (selectedReplyKey, selectedReply, replies, classes) => {
+    const isButton = selectedReplyKey.split('.')[0] === 'buttons';
     const sampleQuestion = !selectedReply.sampleQuestion ? null : html`
     <p class=${ classes.sampleQuestion }>
         ${ selectedReply.sampleQuestion }
     </p>`;
     const title = !selectedReply.title ? null : html`
         <input class=${ classes.title } name="title" value=${ selectedReply.title } />`;
-    const text = !selectedReply.text ? null : html`
+    const text = !selectedReply.text || isButton ? null : html`
         <textarea class=${ classes.text } name="text">${ selectedReply.text }</textarea>`;
     const template = !selectedReply.template ? null : selectedReply.template;
     const answer = template !== 'generic' ? text : html`
@@ -923,11 +1063,18 @@ const genericTemplate = (selectedReply, replies, classes) => {
             ${ text }
         </div>
     `;
-    const singleButton = typeof selectedReply === 'string' ? html`<input class=${ classes.button } name="buttonTitle" value=${ selectedReply }>` : null;
+    const singleButton = !isButton ? null : html`
+        <input
+            class=${ classes.button }
+            name="buttonTitle"
+            value=${ selectedReply.text }
+        />`;
     const buttons = selectedReply.buttons ? html`
         <div class=${ classes.footer }>
             ${ selectedReply.buttons.map(key => html`
-                <button disabled class=${ classes.button }>${ replies.buttons[key] }</button>
+                <button disabled class=${ classes.button }>
+                    ${ replies.buttons[key].text }
+                </button>
             `) }
         </div>` : singleButton;
     return html`
@@ -943,7 +1090,7 @@ const genericTemplate = (selectedReply, replies, classes) => {
     `;
 };
 
-var repliesFormComponent = ((selectedKey, replies, selectedReply, classes, messages, isLoading, onChange, onSubmit) => {
+var repliesFormComponent = ((selectedReplyKey, replies, selectedReply, classes, messages, isLoading, onChange, onSubmit) => {
     const fields = html`
 <div>
     <div class=${ classes.formGroup }>
@@ -952,13 +1099,13 @@ var repliesFormComponent = ((selectedKey, replies, selectedReply, classes, messa
         </label>
         <div class=${ classes.inputContainer }>
             <select class=${ classes.input } onchange=${ onChange }>
-                ${ buildOptions(selectedKey, messages.replyTitles) }
+                ${ buildOptions(selectedReplyKey, messages.replyTitles) }
             </select>
         </div>
     </div>
     <div class="ln_solid"></div>
     <div class=${ classes.formGroup }>
-        ${ genericTemplate(selectedReply, replies, classes.reply) }
+        ${ genericTemplate(selectedReplyKey, selectedReply, replies, classes.reply) }
     </div>
 </div>
     `;
@@ -975,9 +1122,14 @@ const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
     const title = e.target.title && e.target.title.value ? e.target.title.value : null;
     const text = e.target.text && e.target.text.value ? e.target.text.value : null;
     const buttonTitle = e.target.buttonTitle && e.target.buttonTitle.value ? e.target.buttonTitle.value : null;
+    const buttonUrl = e.target.buttonUrl && e.target.buttonUrl.value ? e.target.buttonUrl.value : null;
     if (buttonTitle) {
+        let buttonValues = { text: buttonTitle };
+        if (buttonUrl) {
+            buttonValues = Object.assign({}, buttonValues, { url: buttonUrl });
+        }
         send('replies:setReplyButton', {
-            [selectedReplyKey.split('.')[1]]: buttonTitle
+            [selectedReplyKey.split('.')[1]]: buttonValues
         });
     } else {
         let updates = {};
