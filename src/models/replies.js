@@ -36,12 +36,24 @@ const repliesModel = {
             text: 'Nós que agradecemos, volte sempre.'
         },
         buttons: {
-            printReceiptLink: 'Segunda Via',
-            backToMenu: 'Voltar ao Menu',
-            trackOrder: 'Rastrear Pedido',
-            returnsSubmenu: 'Trocas e Devoluções',
-            returnsLink: 'Trocar ou Devolver',
-            talkToHuman: 'Falar com um Humano'
+            printReceiptLink: {
+                text: 'Segunda Via'
+            },
+            backToMenu: {
+                text: 'Voltar ao Menu'
+            },
+            trackOrder: {
+                text: 'Rastrear Pedido'
+            },
+            returnsSubmenu: {
+                text: 'Trocas e Devoluções'
+            },
+            returnsLink: {
+                text: 'Trocar ou Devolver'
+            },
+            talkToHuman: {
+                text: 'Falar com um Humano'
+            }
         }
     },
     reducers: {

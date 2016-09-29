@@ -14,9 +14,15 @@ const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
     const text = e.target.text && e.target.text.value ? e.target.text.value : null;
     const buttonTitle = e.target.buttonTitle && e.target.buttonTitle.value
         ? e.target.buttonTitle.value : null;
+    const buttonUrl = e.target.buttonUrl && e.target.buttonUrl.value
+        ? e.target.buttonUrl.value : null;
     if (buttonTitle) {
+        let buttonValues = { text: buttonTitle };
+        if (buttonUrl) {
+            buttonValues = Object.assign({}, buttonValues, { url: buttonUrl });
+        }
         send('replies:setReplyButton', {
-            [selectedReplyKey.split('.')[1]]: buttonTitle
+            [selectedReplyKey.split('.')[1]]: buttonValues
         });
     } else {
         let updates = {};
