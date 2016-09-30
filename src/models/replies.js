@@ -11,7 +11,11 @@ const repliesModel = {
         },
         exchange: {
             template: 'button',
-            text: 'A sample_store respeita o direito do consumidor à troca ou à devolução de produtos, seja por defeito ou arrependimento, cumprindo a Lei Federal nº 8.078 de 1990 e o Código de Defesa do Consumidor. Se quiser proseguir, selecione "Trocar ou devolver"',
+            text: 'A sample_store respeita o direito do consumidor à troca ou à '
+                + 'devolução de produtos, seja por defeito ou arrependimento, '
+                + 'cumprindo a Lei Federal nº 8.078 de 1990 e o Código de '
+                + 'Defesa do Consumidor. Se quiser proseguir, selecione '
+                + '"Trocar ou devolver"',
             buttons: ['exchange', 'menu', 'deactivate']
         },
         menu: {
@@ -36,7 +40,8 @@ const repliesModel = {
         },
         faqReturn: {
             template: 'button',
-            text: 'A sample_store respeita o direito do consumidor à troca ou à devolução de produtos.',
+            text: 'A sample_store respeita o direito do consumidor à troca ou à '
+                + 'devolução de produtos.',
             buttons: ['returns', 'menu', 'deactivate']
         },
         help: {
@@ -78,7 +83,8 @@ const repliesModel = {
                 text: 'Por favor, entre com um numero de pedido valido.'
             },
             systemError: {
-                text: 'Sinto muito, mas o sistema da loja esta fora do ar no momento.\n Experimente falar comigo novamente mais tarde.'
+                text: 'Sinto muito, mas o sistema da loja esta fora do ar no'
+                    + ' momento.\n Experimente falar comigo novamente mais tarde.'
             }
         },
         fallback: {
