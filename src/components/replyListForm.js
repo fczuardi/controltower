@@ -26,8 +26,13 @@ const buildOptions = (selectedKey, list, keyPrefix) => Object.keys(list).map(key
 
 const genericTemplate = (selectedReplyKey, selectedReply, replies, classes) => {
     const {
-        sampleQuestion, template = null,
-        title, subtitle, text, buttons, ...other
+        sampleQuestion,
+        template = null,
+        title,
+        subtitle,
+        text,
+        buttons,
+        ...other
     } = selectedReply;
     const isButton = selectedReplyKey.split('.')[0] === 'buttons';
     const sampleQuestionBalloon = !sampleQuestion ? null : html`
@@ -42,7 +47,7 @@ const genericTemplate = (selectedReplyKey, selectedReply, replies, classes) => {
         <textarea class=${classes.subtitle} name="subtitle">
             ${subtitleOrText}
         </textarea>`;
-    const answer = (template !== 'generic') ? subtitle : html`
+    const answer = (template !== 'generic') ? subtitleInput : html`
         <div class=${classes.body}>
             ${titleInput}
             ${subtitleInput}
