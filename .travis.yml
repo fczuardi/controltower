@@ -2,14 +2,16 @@ language: node_js
 
 node_js:
   - "6"
-  - "5"
-  - "4"
+  # - "5"
+  # - "4"
 
 git:
   depth: 3
 
 before_install:
   - npm set progress=false
+  - sudo apt-get -qq update
+  - sudo apt-get install -y tree
 
 before_script:
   - npm run create:config
