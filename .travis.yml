@@ -14,6 +14,8 @@ before_install:
 before_script:
   - npm run create:config
   - npm run lint
+  - npm run build:www
+  - npm run build:npm
 
 # after_success:
 #     - echo "${TRAVIS_NODE_VERSION}"
