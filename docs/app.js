@@ -10,10 +10,10 @@ var html = _interopDefault(require('choo/html'));
 
 var config = {
     calamar: {
-        apiUrl: 'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'
+        apiUrl: 'https://j3zeml7hyc.execute-api.us-east-1.amazonaws.com/latest'
     },
     facebook: {
-        appId: '1691821884476309',
+        appId: '1701349696856861',
         loginParams: {
             scope: 'public_profile,email,pages_show_list,manage_pages'
         },
@@ -21,7 +21,7 @@ var config = {
     }
 };
 
-var version = "0.13.5";
+var version = "0.13.6";
 
 
 
@@ -1168,7 +1168,7 @@ const genericTemplate = (selectedReplyKey, selectedReply, replies, classes) => {
         <textarea class=${ classes.subtitle } name="subtitle">
             ${ subtitleOrText }
         </textarea>`;
-    const answer = template !== 'generic' ? subtitle : html`
+    const answer = template !== 'generic' ? subtitleInput : html`
         <div class=${ classes.body }>
             ${ titleInput }
             ${ subtitleInput }
