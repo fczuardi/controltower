@@ -21,7 +21,7 @@ var config = {
     }
 };
 
-var version = "0.13.10";
+var version = "0.13.12";
 
 
 
@@ -1165,9 +1165,8 @@ const genericTemplate = (selectedReplyKey, selectedReply, replies, classes) => {
         <input class=${ classes.title } name="title" value=${ title } />`;
     const subtitleOrText = subtitle || text;
     const subtitleInput = !subtitleOrText || isButton ? null : html`
-        <textarea class=${ classes.subtitle } name="subtitle">
-            ${ subtitleOrText }
-        </textarea>`;
+        <textarea class=${ classes.subtitle } name="subtitle"
+        >${ subtitleOrText }</textarea>`;
     const answer = template !== 'generic' ? subtitleInput : html`
         <div class=${ classes.body }>
             ${ titleInput }
@@ -1237,32 +1236,19 @@ const createOnChange = send => e => {
 
 const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
     e.preventDefault();
-    const title = e.target.title && e.target.title.value ? e.target.title.value : null;
-    const text = e.target.text && e.target.text.value ? e.target.text.value : null;
-    const buttonTitle = e.target.buttonTitle && e.target.buttonTitle.value ? e.target.buttonTitle.value : null;
-    var _e$target = e.target;
-    const logo = _e$target.logo;
-    const url = _e$target.url;
-
+    const fieldNames = ['title', 'text', 'subtitle', 'buttonTitle', 'logo', 'url'];
     let updates = {};
-    if (logo) {
-        updates = Object.assign(updates, { logo: logo.value });
-    }
-    if (url) {
-        updates = Object.assign(updates, { url: url.value });
-    }
-    if (buttonTitle) {
-        updates = Object.assign(updates, { text: buttonTitle });
+    fieldNames.forEach(fieldName => {
+        if (!e.target[fieldName]) {
+            return null;
+        }
+        return Object.assign(updates, { [fieldName]: e.target[fieldName].value });
+    });
+    if (e.target.buttonTitle) {
         send('replies:setReplyButton', {
             [selectedReplyKey.split('.')[1]]: updates
         });
     } else {
-        if (title) {
-            updates = Object.assign(updates, { title });
-        }
-        if (text) {
-            updates = Object.assign(updates, { text });
-        }
         updates = Object.assign(selectedReply, updates);
         send('replies:setReply', { [selectedReplyKey]: updates });
     }

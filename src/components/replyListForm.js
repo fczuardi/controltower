@@ -44,9 +44,8 @@ const genericTemplate = (selectedReplyKey, selectedReply, replies, classes) => {
     const subtitleOrText = subtitle || text;
     const subtitleInput = (!subtitleOrText || isButton) ? null
         : html`
-        <textarea class=${classes.subtitle} name="subtitle">
-            ${subtitleOrText}
-        </textarea>`;
+        <textarea class=${classes.subtitle} name="subtitle"
+        >${subtitleOrText}</textarea>`;
     const answer = (template !== 'generic') ? subtitleInput : html`
         <div class=${classes.body}>
             ${titleInput}
