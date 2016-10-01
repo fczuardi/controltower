@@ -9,6 +9,7 @@ const uiModel = {
             'ecommerce',
             'replies',
             'mutedChats',
+            'admins',
             'debug'
         ],
         facebookPages: [],

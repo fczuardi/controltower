@@ -65,6 +65,7 @@ const createApiModel = config => ({
                     console.error(error);
                     return done();
                 }
+                send('ui:enableSection', 'admins', done);
                 if (response.body.facebook) {
                     send('ui:enableSection', 'channels', done);
                 } else {

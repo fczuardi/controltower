@@ -24,6 +24,7 @@ import channelsContent from './views/channels';
 import ecommerceContent from './views/ecommerce';
 import repliesContent from './views/replies';
 import mutedChatsContent from './views/mutedChats';
+import adminsContent from './views/admins';
 import debugContent from './views/debug';
 
 const app = choo({ history: false, href: false });
@@ -50,6 +51,7 @@ const channelsView = viewWrapper(channelsContent);
 const ecommerceView = viewWrapper(ecommerceContent);
 const repliesView = viewWrapper(repliesContent);
 const mutedChatsView = viewWrapper(mutedChatsContent);
+const adminsView = viewWrapper(adminsContent);
 const debugView = viewWrapper(debugContent);
 
 const rootView = debugView;
@@ -61,6 +63,7 @@ app.router([
     ['/ecommerce', ecommerceView],
     ['/replies', repliesView],
     ['/mutedChats', mutedChatsView],
+    ['/admins', adminsView],
     ['/debug', debugView]
 ]);
 

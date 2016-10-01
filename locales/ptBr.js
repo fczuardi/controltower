@@ -15,6 +15,7 @@ export default {
         ecommerce: 'Comércio',
         replies: 'Respostas',
         mutedChats: 'Assistentes silenciados',
+        admins: 'Equipe',
         debug: 'Depuração'
     },
     footer: {
@@ -128,7 +129,15 @@ export default {
             submit: 'Reativar Selecionados'
         }
     },
-    developers: {
+    debug: {
         title: 'Depuração'
+    },
+    admins: {
+        title: 'Equipe de admnistração',
+        team: {
+            title: 'Admnistradores',
+            name: 'Nome',
+            email: 'Email'
+        }
     }
 };
