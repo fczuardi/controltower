@@ -10,11 +10,12 @@ export default {
         fbSignInButton: 'Acessar com Facebook'
     },
     sidebar: {
-        home: 'Home',
+        home: 'Início',
         channels: 'Canais',
-        ecommerce: 'E-commerce',
+        ecommerce: 'Comércio',
         replies: 'Respostas',
-        mutedChats: 'Assistentes silenciados'
+        mutedChats: 'Assistentes silenciados',
+        debug: 'Depuração'
     },
     footer: {
         appName: version => `• Control Tower v${version} •`,
@@ -126,5 +127,8 @@ export default {
             },
             submit: 'Reativar Selecionados'
         }
+    },
+    developers: {
+        title: 'Depuração'
     }
 };
