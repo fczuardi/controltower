@@ -21,7 +21,7 @@ var config = {
     }
 };
 
-var version = "0.13.12";
+var version = "0.14.0";
 
 
 
@@ -261,9 +261,9 @@ var set = function set(object, property, value, receiver) {
 const uiModel = {
     namespace: 'ui',
     state: {
-        selectedSection: 'home',
-        enabledSections: ['home'],
-        menu: ['home', 'channels', 'ecommerce', 'replies', 'mutedChats'],
+        selectedSection: 'debug',
+        enabledSections: ['home', 'debug'],
+        menu: ['home', 'channels', 'ecommerce', 'replies', 'mutedChats', 'debug'],
         facebookPages: [],
         selectedMutedUsers: [],
         selectedReply: 'start'
@@ -725,11 +725,10 @@ var fontAwesome = html`
 
 const mainCss = (require('insert-css')("._d64227b3 {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n}\n\n._d64227b3 .checkboxRow {\n    width: 20px;\n}\n\n._d64227b3 .toolbarRefreshButton {\n    text-align: right;\n}\n\n._d64227b3 .user-chat-bubble {\n    border-radius: 1.3em 1.3em 0 1.3em;\n    color: #fff;\n    height: 35px;\n    background-color: #0084ff;\n    width: auto;\n    font-size: 14px;\n    text-align: right;\n    margin: 1px 0;\n    padding: 6px 12px;\n    overflow: hidden;\n    clear: right;\n    float: right;\n    word-wrap: break-word;\n}\n\n._d64227b3 .reply-container {\n    clear: both;\n}\n\n._d64227b3 .reply-body {\n    color: #000;\n    width: auto;\n    font-size: 14px;\n    padding: 6px 12px;\n    word-wrap: break-word;\n    outline: none;\n}\n\n._d64227b3 .reply-template-generic .reply-body {\n    border: 1px solid #cbcbcb;\n    border-bottom: none;\n}\n\n._d64227b3 .reply-title,\n._d64227b3 .reply-subtitle {\n    display: block;\n    border: none;\n    width: 100%;\n    padding-left: 0;\n    outline: none;\n    resize: none;\n}\n\n._d64227b3 .reply-title {\n    font-weight: 700;\n}\n._d64227b3 .reply-template-button .reply-subtitle,\n._d64227b3 .reply-template-text .reply-subtitle,\n._d64227b3 .chat-bubble {\n    border-radius: 1.3em 1.3em 1.3em 0;\n    min-height: 35px;\n    background: none;\n    background-color: #f1f0f0;\n    color: #000;\n    font-size: 14px;\n    margin: 1px 0;\n    padding: 6px 12px;\n    clear: left;\n    float: left;\n    word-wrap: break-word;\n}\n._d64227b3 .reply-footer {\n    clear: both;\n    border: 1px solid #cbcbcb;\n    overflow: hidden;\n}\n\n._d64227b3 .reply-template-button .reply-footer {\n    border-radius: 1.3em;\n}\n\n._d64227b3 .reply-template-generic .reply-footer {\n    border-radius: 0 0 1.3em 1.3em;\n}\n\n._d64227b3 .reply-button {\n    margin-top: -1px;\n    text-align: center;\n    color: blue !important;\n    font-size: 14px;\n    width: 100%;\n    padding: 6px 12px;\n    border: none;\n    border-top: 1px solid #cbcbcb;\n    text-transform: uppercase;\n    background: none;\n}\n\n._d64227b3 .reply-template-text .reply-button {\n    border: 1px solid #cbcbcb;\n}") || true) && "_d64227b3";
 
-// module.exports = view => (state, prev, send) => html`
-var mainView = (view => (state, prev, send) => html`
+var mainView = (() => html`
 <div class=${ mainCss }>
     ${ fontAwesome }
-    ${ view(state, prev, send) }
+    <div id="mainContent"></div>
 </div>`);
 
 const formLabels = {
@@ -744,11 +743,12 @@ var messages = {
         fbSignInButton: 'Acessar com Facebook'
     },
     sidebar: {
-        home: 'Home',
+        home: 'Início',
         channels: 'Canais',
-        ecommerce: 'E-commerce',
+        ecommerce: 'Comércio',
         replies: 'Respostas',
-        mutedChats: 'Assistentes silenciados'
+        mutedChats: 'Assistentes silenciados',
+        debug: 'Depuração'
     },
     footer: {
         appName: version => `• Control Tower v${ version } •`,
@@ -860,6 +860,9 @@ var messages = {
             },
             submit: 'Reativar Selecionados'
         }
+    },
+    developers: {
+        title: 'Depuração'
     }
 };
 
@@ -901,7 +904,7 @@ var loginView = ((state, prev, send) => html`
 
 const click$1 = (send, key) => e => {
     e.preventDefault();
-    const pathname = key === 'home' ? '/' : `/${ key }`;
+    const pathname = `/${ key }`;
     send('ui:selectSection', key);
     send('location:set', { pathname });
 };
@@ -941,7 +944,8 @@ const menuClasses = {
         channels: 'fa fa-whatsapp',
         ecommerce: 'fa fa-shopping-cart',
         replies: 'fa fa-comments-o',
-        mutedChats: 'fa fa-user-times'
+        mutedChats: 'fa fa-user-times',
+        debug: 'fa fa-terminal'
     }
 };
 
@@ -970,15 +974,8 @@ var dashboardView = (content => (state, prev, send) => html`
 </div>
 `);
 
-var homeContent = (state => html`
+var homeContent = (() => html`
 <div>
-    <h2>${ JSON.stringify(state.location) }</h2>
-    <h1>Auth</h1>
-<code><pre>${ JSON.stringify(state.api, ' ', 2) }</pre></code>
-    <h1>Customer</h1>
-<code><pre>${ JSON.stringify(state.customer, ' ', 2) }</pre></code>
-    <h1>Bot</h1>
-<code><pre>${ JSON.stringify(state.bot, ' ', 2) }</pre></code>
 </div>
 `);
 
@@ -1395,6 +1392,21 @@ var mutedChatsContent = ((state, send) => {
     }, navbarRightContent);
 });
 
+var debugContent = (state => html`
+<div>
+    <h1>Auth</h1>
+<code><pre>${ JSON.stringify(state.api, ' ', 2) }</pre></code>
+    <h1>Customer</h1>
+<code><pre>${ JSON.stringify(state.customer, ' ', 2) }</pre></code>
+    <h1>Bot</h1>
+<code><pre>${ JSON.stringify(state.bot, ' ', 2) }</pre></code>
+    <h1>Users</h1>
+<code><pre>${ JSON.stringify(state.users, ' ', 2) }</pre></code>
+    <h1>Replies</h1>
+<code><pre>${ JSON.stringify(state.replies, ' ', 2) }</pre></code>
+</div>
+`);
+
 // config
 // models
 // views
@@ -1411,17 +1423,21 @@ app.model(createFbSessionModel(config.facebook));
 const defaultAnonView = loginView;
 const authWrapper = (loggedView, anonView = defaultAnonView) => (state, prev, send) => state.customer.isLogged ? loggedView(state, prev, send) : anonView(state, prev, send);
 
-const viewWrapper = ramda.pipe(authWrapper, mainView);
-const homeView = dashboardView(homeContent);
-const channelsView = dashboardView(channelsContent);
-const ecommerceView = dashboardView(ecommerceContent);
-const repliesView = dashboardView(repliesContent);
-const mutedChatsView = dashboardView(mutedChatsContent);
+const viewWrapper = ramda.pipe(authWrapper, dashboardView);
+const homeView = viewWrapper(homeContent);
+const channelsView = viewWrapper(channelsContent);
+const ecommerceView = viewWrapper(ecommerceContent);
+const repliesView = viewWrapper(repliesContent);
+const mutedChatsView = viewWrapper(mutedChatsContent);
+const debugView = viewWrapper(debugContent);
 
-app.router([['/', viewWrapper(homeView)], ['/controltower', viewWrapper(homeView)], ['/channels', viewWrapper(channelsView)], ['/ecommerce', viewWrapper(ecommerceView)], ['/replies', viewWrapper(repliesView)], ['/mutedChats', viewWrapper(mutedChatsView)]]);
+const rootView = debugView;
+app.router([['/', rootView], ['/controltower', rootView], ['/home', homeView], ['/channels', channelsView], ['/ecommerce', ecommerceView], ['/replies', repliesView], ['/mutedChats', mutedChatsView], ['/debug', debugView]]);
 
 const tree = app.start();
 
 // facebook javascript sdk script tag
 document.body.appendChild(fbSDK);
-document.body.appendChild(tree);
+document.body.appendChild(mainView());
+const mainWrapper = document.getElementById('mainContent');
+mainWrapper.appendChild(tree);
