@@ -17,7 +17,8 @@ const menuClasses = {
         channels: 'fa fa-whatsapp',
         ecommerce: 'fa fa-shopping-cart',
         replies: 'fa fa-comments-o',
-        mutedChats: 'fa fa-user-times'
+        mutedChats: 'fa fa-user-times',
+        debug: 'fa fa-terminal'
     }
 };
 

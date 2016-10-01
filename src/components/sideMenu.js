@@ -3,7 +3,7 @@ import messages from '../../locales/ptBr';
 
 const click = (send, key) => e => {
     e.preventDefault();
-    const pathname = key === 'home' ? '/' : `/${key}`;
+    const pathname = `/${key}`;
     send('ui:selectSection', key);
     send('location:set', { pathname });
 };

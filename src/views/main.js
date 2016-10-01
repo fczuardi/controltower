@@ -117,9 +117,8 @@ const mainCss = css`
 }
 `;
 
-// module.exports = view => (state, prev, send) => html`
-export default view => (state, prev, send) => html`
+export default () => html`
 <div class=${mainCss}>
     ${fontAwesome}
-    ${view(state, prev, send)}
+    <div id="mainContent"></div>
 </div>`;

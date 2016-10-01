@@ -24,6 +24,7 @@ import channelsContent from './views/channels';
 import ecommerceContent from './views/ecommerce';
 import repliesContent from './views/replies';
 import mutedChatsContent from './views/mutedChats';
+import debugContent from './views/debug';
 
 const app = choo({ history: false, href: false });
 app.model(appModel);
@@ -43,24 +44,30 @@ const authWrapper =
             : anonView(state, prev, send)
 );
 
-const viewWrapper = pipe(authWrapper, mainView);
-const homeView = dashboardView(homeContent);
-const channelsView = dashboardView(channelsContent);
-const ecommerceView = dashboardView(ecommerceContent);
-const repliesView = dashboardView(repliesContent);
-const mutedChatsView = dashboardView(mutedChatsContent);
+const viewWrapper = pipe(authWrapper, dashboardView);
+const homeView = viewWrapper(homeContent);
+const channelsView = viewWrapper(channelsContent);
+const ecommerceView = viewWrapper(ecommerceContent);
+const repliesView = viewWrapper(repliesContent);
+const mutedChatsView = viewWrapper(mutedChatsContent);
+const debugView = viewWrapper(debugContent);
 
+const rootView = debugView;
 app.router([
-    ['/', viewWrapper(homeView)],
-    ['/controltower', viewWrapper(homeView)],
-    ['/channels', viewWrapper(channelsView)],
-    ['/ecommerce', viewWrapper(ecommerceView)],
-    ['/replies', viewWrapper(repliesView)],
-    ['/mutedChats', viewWrapper(mutedChatsView)]
+    ['/', rootView],
+    ['/controltower', rootView],
+    ['/home', homeView],
+    ['/channels', channelsView],
+    ['/ecommerce', ecommerceView],
+    ['/replies', repliesView],
+    ['/mutedChats', mutedChatsView],
+    ['/debug', debugView]
 ]);
 
 const tree = app.start();
 
 // facebook javascript sdk script tag
 document.body.appendChild(fbSDK);
-document.body.appendChild(tree);
+document.body.appendChild(mainView());
+const mainWrapper = document.getElementById('mainContent');
+mainWrapper.appendChild(tree);
