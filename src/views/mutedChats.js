@@ -1,6 +1,6 @@
 import html from 'choo/html';
 import messages from '../../locales/ptBr';
-import { formClasses, view } from '../views/botSetup';
+import { formClasses, panel, view } from '../views/botSetup';
 import mutedBotListFormComponent from '../components/mutedBotListForm';
 
 const toolbarRight = (isLoading, onRefreshClick) => html`
@@ -53,9 +53,11 @@ export default (state, send) => {
         onRowDeselected,
         onSubmit
     );
-    return view(content, {
-        title: messages.mutedChats.title,
-        subtitle: messages.mutedChats.list.title,
-        description
-    }, navbarRightContent);
+    const panels = [panel(
+        content,
+        messages.mutedChats.list.title,
+        description,
+        navbarRightContent
+    )];
+    return view(messages.mutedChats.title, panels);
 };

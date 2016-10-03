@@ -14,7 +14,7 @@ export default {
         channels: 'Canais',
         ecommerce: 'Comércio',
         replies: 'Respostas',
-        mutedChats: 'Assistentes silenciados',
+        mutedChats: 'Assistentes silenciadas',
         admins: 'Equipe',
         debug: 'Depuração'
     },
@@ -49,7 +49,7 @@ export default {
             description: {
                 trackOrder: `
                     Informe os dados da VTEX Store a ser usada para consultar o
-                    status de pedidos dos clientes.
+                    status de pedidos.
                 `
             },
             apiToken: 'API Token',
@@ -113,20 +113,21 @@ export default {
         }
     },
     mutedChats: {
-        title: 'Assistentes silenciados',
+        title: 'Assistentes silenciadas',
         list: {
             title: 'Conversas',
             description: {
                 withChats: `
-                    Selecione abaixo as conversas que você deseja
-                    reativar o assistente.
+                A lista abaixo é de conversas onde a função assistente
+                não conseguiu resolver a tarefa sozinha e foi silenciada
+                para que uma pessoa pudesse intervir.
                 `,
                 withoutChats: `
-                    Não existem assistentes silenciados no momento.
+                    Não existem assistentes silenciadas no momento.
                     Use o botão acima para atualizar a lista.
                 `
             },
-            submit: 'Reativar Selecionados'
+            submit: 'Reativar Selecionadas'
         }
     },
     debug: {
@@ -135,9 +136,21 @@ export default {
     admins: {
         title: 'Equipe de admnistração',
         team: {
-            title: 'Admnistradores',
+            title: 'Integrantes',
             name: 'Nome',
             email: 'Email'
+        },
+        invite: {
+            title: 'Aumentar a equipe',
+            instructions: [
+                'Para convidar uma nova pessoa para a equipe de '
+                + 'admnistração, compartilhe o endereço do convite '
+                + 'e o código com ela.',
+                'Para invalidar um convite clique no botão "Gerar nova chave".'
+            ],
+            url: 'Endereço',
+            inviteCode: 'Código do convite',
+            newKey: 'Gerar nova chave'
         }
     }
 };

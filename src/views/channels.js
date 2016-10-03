@@ -1,5 +1,5 @@
 import pageListFormComponent from '../components/pageListForm';
-import { formClasses, view } from './botSetup';
+import { formClasses, panel, view } from './botSetup';
 import messages from '../../locales/ptBr';
 
 const createSubmit = (botId, pages, send) => e => {
@@ -22,9 +22,10 @@ export default (state, send) => {
         messages.channels.facebook,
         onSubmit
     );
-    return view(form, {
-        title: messages.channels.title,
-        subtitle: messages.channels.facebook.title,
-        description: messages.channels.facebook.description.trackOrder
-    });
+    const panels = [panel(
+        form,
+        messages.channels.facebook.title,
+        messages.channels.facebook.description.trackOrder
+    )];
+    return view(messages.channels.title, panels);
 };

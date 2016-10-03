@@ -1,5 +1,5 @@
 import vtexFormComponent from '../components/vtexForm';
-import { formClasses, view } from '../views/botSetup';
+import { formClasses, panel, view } from '../views/botSetup';
 import messages from '../../locales/ptBr';
 
 const createSubmit = (botId, send) => e => {
@@ -32,9 +32,10 @@ export default (state, send) => {
         messages.ecommerce.vtex,
         onSubmit
     );
-    return view(form, {
-        title: messages.ecommerce.title,
-        subtitle: messages.ecommerce.vtex.title,
-        description: messages.ecommerce.vtex.description.trackOrder
-    });
+    const panels = [panel(
+        form,
+        messages.ecommerce.vtex.title,
+        messages.ecommerce.vtex.description.trackOrder
+    )];
+    return view(messages.ecommerce.title, panels);
 };

@@ -1,5 +1,5 @@
 import { path } from 'ramda';
-import { formClasses, view } from '../views/botSetup';
+import { formClasses, panel, view } from '../views/botSetup';
 import messages from '../../locales/ptBr';
 import repliesFormComponent from '../components/replyListForm';
 
@@ -60,12 +60,10 @@ export default (state, send) => {
         onChange,
         onSubmit
     );
-    return view(
+    const panels = [panel(
         content,
-        {
-            title: messages.replies.title,
-            subtitle: messages.replies.ecommerce.title,
-            description: messages.replies.ecommerce.description
-        }
-    );
+        messages.replies.ecommerce.title,
+        messages.replies.ecommerce.description
+    )];
+    return view(messages.replies.title, panels);
 };

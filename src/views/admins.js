@@ -1,9 +1,9 @@
 import html from 'choo/html';
-import { formClasses, view } from '../views/botSetup';
+import { formClasses, panel, view } from '../views/botSetup';
 import messages from '../../locales/ptBr';
 
 export default state => {
-    const content = html`<div>
+    const adminList = html`<div>
         <table class=${formClasses.table}>
             <thead>
                 <tr>
@@ -19,8 +19,42 @@ export default state => {
             </tbody>
         </table>
     </div>`;
-    return view(content, {
-        title: messages.admins.title,
-        subtitle: messages.admins.team.title
-    });
-}
+    const formValues = {
+        url: '',
+        inviteCode: ''
+    };
+    const inviteFields = Object.keys(formValues).map(name => html`
+        <div class=${formClasses.formGroup}>
+            <label class=${formClasses.label}>
+                ${messages.admins.invite[name]}
+            </label>
+            <div class=${formClasses.inputContainer}>
+                <input
+                    name=${name}
+                    value=${formValues[name] || ''}
+                    class=${formClasses.input}
+                >
+            </div>
+        </div>
+    `);
+    const inviteAdmin = html`
+    <form class=${formClasses.form}>
+        ${messages.admins.invite.instructions.map(instruction => html`
+            <p>${instruction}</p>
+        `)}
+        ${inviteFields}
+        <div class=${formClasses.separator}></div>
+        <div class=${formClasses.formGroup}>
+            <div class=${formClasses.buttonGroup}>
+                <button type="submit" class=${formClasses.submitButton}
+                >${messages.admins.invite.newKey}</button>
+            </div>
+        </div>
+    </form>
+    `;
+    const panels = [
+        panel(adminList, messages.admins.team.title),
+        panel(inviteAdmin, messages.admins.invite.title)
+    ];
+    return view(messages.admins.title, panels);
+};
