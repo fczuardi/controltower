@@ -65,6 +65,7 @@ app.router([
     ['/ecommerce', ecommerceView],
     ['/replies', repliesView],
     ['/mutedChats', mutedChatsView],
+    ['/admins', adminsView],
     ['/debug', debugView]
 ]);
 
