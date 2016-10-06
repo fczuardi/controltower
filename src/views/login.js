@@ -15,7 +15,7 @@ const classes = {
     subtitle: 'lead',
     button: 'btn btn-primary'
 };
-export default (state, prev, send) => html`
+export default (state, send) => html`
 <div class=${loginCss}>
     <div class="login">
         <div class="login_wrapper">
