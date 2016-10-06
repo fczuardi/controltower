@@ -2,7 +2,7 @@ const uiModel = {
     namespace: 'ui',
     state: {
         selectedSection: 'debug',
-        enabledSections: ['home', 'debug', 'sage'],
+        enabledSections: ['home', 'debug'],
         menu: [
             'home',
             'channels',
@@ -10,8 +10,7 @@ const uiModel = {
             'replies',
             'mutedChats',
             'admins',
-            'debug',
-            'sage'
+            'debug'
         ],
         facebookPages: [],
         selectedMutedUsers: [],

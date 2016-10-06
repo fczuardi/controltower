@@ -27,7 +27,6 @@ import repliesContent from './views/replies';
 import mutedChatsContent from './views/mutedChats';
 import adminsContent from './views/admins';
 import debugContent from './views/debug';
-import sageDebugContent from './views/sageDebug';
 
 const app = choo({ history: false, href: false });
 app.model(appModel);
@@ -36,8 +35,8 @@ app.model(customerModel);
 app.model(botModel);
 app.model(repliesModel);
 app.model(usersModel);
-app.model(createApiModel(config.calamar));
-app.model(createSageModel(config.calamar));
+app.model(createApiModel(config.controltower));
+app.model(createSageModel(config.sage));
 app.model(createFbSessionModel(config.facebook));
 
 const defaultAnonView = loginView;
@@ -56,7 +55,6 @@ const repliesView = viewWrapper(repliesContent);
 const mutedChatsView = viewWrapper(mutedChatsContent);
 const adminsView = viewWrapper(adminsContent);
 const debugView = viewWrapper(debugContent);
-const sageDebugView = viewWrapper(sageDebugContent);
 
 const rootView = debugView;
 app.router([
@@ -67,8 +65,7 @@ app.router([
     ['/ecommerce', ecommerceView],
     ['/replies', repliesView],
     ['/mutedChats', mutedChatsView],
-    ['/debug', debugView],
-    ['/sage', sageDebugView]
+    ['/debug', debugView]
 ]);
 
 const tree = app.start();

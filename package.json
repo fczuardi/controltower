@@ -1,6 +1,6 @@
 {
   "name": "controltower",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "main": "./src/index.js",
   "license": "AGPL-3.0",
   "scripts-info": {
@@ -60,9 +60,10 @@
     "babelify": "^7.3.0",
     "bankai": "^3.3.1",
     "bootstrap": "^3.3.7",
-    "eslint": "^3.7.0",
+    "eslint": "^3.7.1",
     "eslint-config-calamar": "^2.1.1",
     "eslint-plugin-babel": "^3.3.0",
+    "eslint-plugin-import": "^2.0.0",
     "gentelella": "^1.3.0",
     "http-server": "^0.9.0",
     "npm-scripts-info": "^0.3.6",

@@ -45,7 +45,7 @@ const createSageModel = config => ({
     effects: {
         // Creates a new spell
         createSpell: (data, state, send, done) => {
-            const url = `${config.sageUrl}/bots`;
+            const url = `${config.apiUrl}/bots`;
             const body = {
                 name: data.name,
                 desc: data.description
@@ -68,7 +68,7 @@ const createSageModel = config => ({
         },
         getSpell: (data, state, send, done) => {
             const field = data.field ? data.field : 'all';
-            const url = `${config.sageUrl}/bots/${field}`;
+            const url = `${config.apiUrl}/bots/${field}`;
             const options = defaultOptions(state.spellId);
             http.get(url, options, (error, response) => {
                 if (error) {
@@ -101,7 +101,7 @@ const createSageModel = config => ({
         /* All request below will return a status 200 if ok,
            else 40X or 50X with an success/error message*/
         createIntent: (data, state, send, done) => {
-            const url = `${config.sageUrl}/bots/intents`;
+            const url = `${config.apiUrl}/bots/intents`;
             const options = defaultOptions(state.spellId);
             const body = {
                 name: data.intent,
@@ -118,7 +118,7 @@ const createSageModel = config => ({
             });
         },
         deleteIntent: (data, state, send, done) => {
-            const url = `${config.sageUrl}/bots/intents/${data.intent}`;
+            const url = `${config.apiUrl}/bots/intents/${data.intent}`;
             const options = defaultOptions(state.spellId);
             http.delete(url, options, (error, response) => {
                 if (error) {
@@ -132,7 +132,7 @@ const createSageModel = config => ({
             });
         },
         createUtterance: (data, state, send, done) => {
-            const url = `${config.sageUrl}/bots/utterances`;
+            const url = `${config.apiUrl}/bots/utterances`;
             const options = defaultOptions(state.spellId);
             const body = [
                 {
@@ -152,7 +152,7 @@ const createSageModel = config => ({
             });
         },
         updateUtterance: (data, state, send, done) => {
-            const url = `${config.sageUrl}/bots/utteraces/${data.utterance}`;
+            const url = `${config.apiUrl}/bots/utteraces/${data.utterance}`;
             const options = defaultOptions(state.spellId);
             const body = { intent: data.intent };
             http.put(url, { ...options, json: body }, (error, response) => {
