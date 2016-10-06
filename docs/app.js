@@ -9,12 +9,14 @@ var qs = _interopDefault(require('querystring'));
 var html = _interopDefault(require('choo/html'));
 
 var config = {
-    calamar: {
-        apiUrl: 'https://ss87qaxto0.execute-api.us-east-1.amazonaws.com/latest',
-        sageUrl: 'https://idxpyugwsa.execute-api.us-east-1.amazonaws.com/dev'
+    controltower: {
+        apiUrl: 'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'
+    },
+    sage: {
+        apiUrl: 'https://idxpyugwsa.execute-api.us-east-1.amazonaws.com/dev'
     },
     facebook: {
-        appId: '649834335170782',
+        appId: '1691821884476309',
         loginParams: {
             scope: 'public_profile,email,pages_show_list,manage_pages'
         },
@@ -22,7 +24,7 @@ var config = {
     }
 };
 
-var version = "0.14.0";
+var version = "0.14.1";
 
 
 
@@ -263,8 +265,8 @@ const uiModel = {
     namespace: 'ui',
     state: {
         selectedSection: 'debug',
-        enabledSections: ['home', 'debug', 'sage'],
-        menu: ['home', 'channels', 'ecommerce', 'replies', 'mutedChats', 'debug', 'sage'],
+        enabledSections: ['home', 'debug'],
+        menu: ['home', 'channels', 'ecommerce', 'replies', 'mutedChats', 'debug'],
         facebookPages: [],
         selectedMutedUsers: [],
         selectedReply: 'start'
@@ -738,41 +740,65 @@ const createSageModel = config => ({
         })
     },
     effects: {
+        // Creates a new spell
+        createSpell: (data, state, send, done) => {
+            const url = `${ config.apiUrl }/bots`;
+            const body = {
+                name: data.name,
+                desc: data.description
+            };
+            http.post(url, { json: body }, (error, response) => {
+                if (error) {
+                    console.error(error);
+                    return done();
+                }
+                /*
+                EXAMPLE RESPONSE
+                {
+                    "bot_status": 0, // ignore here
+                    "bot_id": "ebbb9cd6-91d0-49f1-bc5f-ead1689db222" // used in every request
+                }
+                */
+                console.log(response.body);
+                return done();
+            });
+        },
         getSpell: (data, state, send, done) => {
             const field = data.field ? data.field : 'all';
-            const url = `${ config.sageUrl }/bots/${ field }`;
+            const url = `${ config.apiUrl }/bots/${ field }`;
             const options = defaultOptions$1(state.spellId);
             http.get(url, options, (error, response) => {
                 if (error) {
                     console.error(error);
                     return done();
                 }
-                // FIXME
-                // return send('api:getBot', { botId: response.body.bots[0] }, done);
+                /* EXAMPLE RESPONSE (field = utterances)
+                [
+                  {
+                    "text": "none",
+                    "intent": "none",
+                    "context": "",
+                    "entities": []
+                  },
+                  ...
+                ]
+                EXAMPLE RESPONSE (field = intents)
+                [
+                  {
+                    "name": "none",
+                    "children": []
+                  },
+                  ...
+                ]
+                */
                 console.log(response.body);
                 return done();
             });
         },
-        createSpell: (data, state, send, done) => {
-            const url = `${ config.sageUrl }/bots`;
-            const options = defaultOptions$1(state.spellId);
-            const body = {
-                name: data.name,
-                desc: data.description
-            };
-            http.post(url, _extends({}, options, { json: body }), (error, response) => {
-                if (error) {
-                    console.error(error);
-                    return done();
-                }
-                // FIXME
-                // return send('spell:set', { id: response.body.bot_id }, done);
-                console.log(response.body);
-                return done();
-            });
-        },
+        /* All request below will return a status 200 if ok,
+           else 40X or 50X with an success/error message*/
         createIntent: (data, state, send, done) => {
-            const url = `${ config.sageUrl }/bots/intents`;
+            const url = `${ config.apiUrl }/bots/intents`;
             const options = defaultOptions$1(state.spellId);
             const body = {
                 name: data.intent,
@@ -784,13 +810,12 @@ const createSageModel = config => ({
                     return done();
                 }
                 // FIXME
-                // return send('spell:set', { id: response.body.bot_id }, done);
                 console.log(response.body);
                 return done();
             });
         },
         deleteIntent: (data, state, send, done) => {
-            const url = `${ config.sageUrl }/bots/intents/${ data.intent }`;
+            const url = `${ config.apiUrl }/bots/intents/${ data.intent }`;
             const options = defaultOptions$1(state.spellId);
             http.delete(url, options, (error, response) => {
                 if (error) {
@@ -804,7 +829,7 @@ const createSageModel = config => ({
             });
         },
         createUtterance: (data, state, send, done) => {
-            const url = `${ config.sageUrl }/bots/utterances`;
+            const url = `${ config.apiUrl }/bots/utterances`;
             const options = defaultOptions$1(state.spellId);
             const body = [{
                 text: data.utterance,
@@ -817,14 +842,13 @@ const createSageModel = config => ({
                     console.error(error);
                     return done();
                 }
-                // FIXME Set spell id
-                // return send('spell:set', { id: response.body.bot_id }, done);
+                // FIXME
                 console.log(response.body);
                 return done();
             });
         },
         updateUtterance: (data, state, send, done) => {
-            const url = `${ config.sageUrl }/bots/utteraces/${ data.utterance }`;
+            const url = `${ config.apiUrl }/bots/utteraces/${ data.utterance }`;
             const options = defaultOptions$1(state.spellId);
             const body = { intent: data.intent };
             http.put(url, _extends({}, options, { json: body }), (error, response) => {
@@ -832,8 +856,7 @@ const createSageModel = config => ({
                     console.error(error);
                     return done();
                 }
-                // FIXME Set spell id
-                // return send('spell:set', { id: response.body.bot_id }, done);
+                // FIXME
                 console.log(response.body);
                 return done();
             });
@@ -1535,23 +1558,10 @@ var mutedChatsContent = ((state, send) => {
 
 var debugContent = (state => html`
 <div>
-    <h1>Auth</h1>
+    <h1>Controltower API</h1>
 <code><pre>${ JSON.stringify(state.api, ' ', 2) }</pre></code>
-    <h1>Customer</h1>
-<code><pre>${ JSON.stringify(state.customer, ' ', 2) }</pre></code>
-    <h1>Bot</h1>
-<code><pre>${ JSON.stringify(state.bot, ' ', 2) }</pre></code>
-    <h1>Users</h1>
-<code><pre>${ JSON.stringify(state.users, ' ', 2) }</pre></code>
-    <h1>Replies</h1>
-<code><pre>${ JSON.stringify(state.replies, ' ', 2) }</pre></code>
-</div>
-`);
-
-var sageDebugContent = (state => html`
-<div>
-    <h1>Auth</h1>
-<code><pre>${ JSON.stringify(state.api, ' ', 2) }</pre></code>
+    <h1>Sage API</h1>
+<code><pre>${ JSON.stringify(state.sage, ' ', 2) }</pre></code>
     <h1>Customer</h1>
 <code><pre>${ JSON.stringify(state.customer, ' ', 2) }</pre></code>
     <h1>Bot</h1>
@@ -1573,8 +1583,8 @@ app.model(customerModel);
 app.model(botModel);
 app.model(repliesModel);
 app.model(usersModel);
-app.model(createApiModel(config.calamar));
-app.model(createSageModel(config.calamar));
+app.model(createApiModel(config.controltower));
+app.model(createSageModel(config.sage));
 app.model(createFbSessionModel(config.facebook));
 
 const defaultAnonView = loginView;
@@ -1587,10 +1597,9 @@ const ecommerceView = viewWrapper(ecommerceContent);
 const repliesView = viewWrapper(repliesContent);
 const mutedChatsView = viewWrapper(mutedChatsContent);
 const debugView = viewWrapper(debugContent);
-const sageDebugView = viewWrapper(sageDebugContent);
 
 const rootView = debugView;
-app.router([['/', rootView], ['/controltower', rootView], ['/home', homeView], ['/channels', channelsView], ['/ecommerce', ecommerceView], ['/replies', repliesView], ['/mutedChats', mutedChatsView], ['/debug', debugView], ['/sage', sageDebugView]]);
+app.router([['/', rootView], ['/controltower', rootView], ['/home', homeView], ['/channels', channelsView], ['/ecommerce', ecommerceView], ['/replies', repliesView], ['/mutedChats', mutedChatsView], ['/debug', debugView]]);
 
 const tree = app.start();
 
