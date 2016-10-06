@@ -1,6 +1,7 @@
 export default {
     calamar: {
-        apiUrl: 'CONTROL_TOWER_API_URL'
+        apiUrl: 'CONTROL_TOWER_API_URL',
+        sageUrl: 'SAGE_API_URL'
     },
     facebook: {
         appId: 'FACEBOOK_APP_ID',

@@ -10,10 +10,11 @@ var html = _interopDefault(require('choo/html'));
 
 var config = {
     calamar: {
-        apiUrl: 'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'
+        apiUrl: 'https://ss87qaxto0.execute-api.us-east-1.amazonaws.com/latest',
+        sageUrl: 'https://idxpyugwsa.execute-api.us-east-1.amazonaws.com/dev'
     },
     facebook: {
-        appId: '1691821884476309',
+        appId: '649834335170782',
         loginParams: {
             scope: 'public_profile,email,pages_show_list,manage_pages'
         },
@@ -262,8 +263,8 @@ const uiModel = {
     namespace: 'ui',
     state: {
         selectedSection: 'debug',
-        enabledSections: ['home', 'debug'],
-        menu: ['home', 'channels', 'ecommerce', 'replies', 'mutedChats', 'debug'],
+        enabledSections: ['home', 'debug', 'sage'],
+        menu: ['home', 'channels', 'ecommerce', 'replies', 'mutedChats', 'debug', 'sage'],
         facebookPages: [],
         selectedMutedUsers: [],
         selectedReply: 'start'
@@ -697,6 +698,146 @@ const createFbSessionModel = config => ({
         },
         signIn: (data, state, send) => signInToggle(false, config.loginParams, send),
         signInToggle: (data, state, send) => signInToggle(data.isLogged, config.loginParams, send)
+    }
+});
+
+const defaultOptions$1 = spellId => ({
+    json: true,
+    headers: {
+        'BOT-ID': spellId
+    }
+});
+
+const createSageModel = config => ({
+    namespace: 'sage',
+    state: {
+        spellId: null,
+        updatingSpell: false,
+        loadingUtterances: false,
+        loadingIntents: false
+    },
+    reducers: {
+        set: data => data,
+        updatingSpellBegin: (data, state) => _extends({}, state, {
+            updatingSpell: true
+        }),
+        updatingSpellEnd: (data, state) => _extends({}, state, {
+            updatingSpell: false
+        }),
+        loadingUtterancesBegin: (data, state) => _extends({}, state, {
+            loadingUtterances: true
+        }),
+        loadingUtterancesEnd: (data, state) => _extends({}, state, {
+            loadingUtterances: false
+        }),
+        loadingIntentsBegin: (data, state) => _extends({}, state, {
+            loadingIntents: true
+        }),
+        loadingIntentsEnd: (data, state) => _extends({}, state, {
+            loadingIntents: false
+        })
+    },
+    effects: {
+        getSpell: (data, state, send, done) => {
+            const field = data.field ? data.field : 'all';
+            const url = `${ config.sageUrl }/bots/${ field }`;
+            const options = defaultOptions$1(state.spellId);
+            http.get(url, options, (error, response) => {
+                if (error) {
+                    console.error(error);
+                    return done();
+                }
+                // FIXME
+                // return send('api:getBot', { botId: response.body.bots[0] }, done);
+                console.log(response.body);
+                return done();
+            });
+        },
+        createSpell: (data, state, send, done) => {
+            const url = `${ config.sageUrl }/bots`;
+            const options = defaultOptions$1(state.spellId);
+            const body = {
+                name: data.name,
+                desc: data.description
+            };
+            http.post(url, _extends({}, options, { json: body }), (error, response) => {
+                if (error) {
+                    console.error(error);
+                    return done();
+                }
+                // FIXME
+                // return send('spell:set', { id: response.body.bot_id }, done);
+                console.log(response.body);
+                return done();
+            });
+        },
+        createIntent: (data, state, send, done) => {
+            const url = `${ config.sageUrl }/bots/intents`;
+            const options = defaultOptions$1(state.spellId);
+            const body = {
+                name: data.intent,
+                children: []
+            };
+            http.post(url, _extends({}, options, { json: body }), (error, response) => {
+                if (error) {
+                    console.error(error);
+                    return done();
+                }
+                // FIXME
+                // return send('spell:set', { id: response.body.bot_id }, done);
+                console.log(response.body);
+                return done();
+            });
+        },
+        deleteIntent: (data, state, send, done) => {
+            const url = `${ config.sageUrl }/bots/intents/${ data.intent }`;
+            const options = defaultOptions$1(state.spellId);
+            http.delete(url, options, (error, response) => {
+                if (error) {
+                    console.error(error);
+                    return done();
+                }
+                // FIXME
+                // return send('api:getBot', { botId: response.body.bots[0] }, done);
+                console.log(response.body);
+                return done();
+            });
+        },
+        createUtterance: (data, state, send, done) => {
+            const url = `${ config.sageUrl }/bots/utterances`;
+            const options = defaultOptions$1(state.spellId);
+            const body = [{
+                text: data.utterance,
+                intent: data.intent,
+                entities: [],
+                context: ''
+            }];
+            http.post(url, _extends({}, options, { json: body }), (error, response) => {
+                if (error) {
+                    console.error(error);
+                    return done();
+                }
+                // FIXME Set spell id
+                // return send('spell:set', { id: response.body.bot_id }, done);
+                console.log(response.body);
+                return done();
+            });
+        },
+        updateUtterance: (data, state, send, done) => {
+            const url = `${ config.sageUrl }/bots/utteraces/${ data.utterance }`;
+            const options = defaultOptions$1(state.spellId);
+            const body = { intent: data.intent };
+            http.put(url, _extends({}, options, { json: body }), (error, response) => {
+                if (error) {
+                    console.error(error);
+                    return done();
+                }
+                // FIXME Set spell id
+                // return send('spell:set', { id: response.body.bot_id }, done);
+                console.log(response.body);
+                return done();
+            });
+        }
     }
 });
 
@@ -1407,6 +1548,21 @@ var debugContent = (state => html`
 </div>
 `);
 
+var sageDebugContent = (state => html`
+<div>
+    <h1>Auth</h1>
+<code><pre>${ JSON.stringify(state.api, ' ', 2) }</pre></code>
+    <h1>Customer</h1>
+<code><pre>${ JSON.stringify(state.customer, ' ', 2) }</pre></code>
+    <h1>Bot</h1>
+<code><pre>${ JSON.stringify(state.bot, ' ', 2) }</pre></code>
+    <h1>Users</h1>
+<code><pre>${ JSON.stringify(state.users, ' ', 2) }</pre></code>
+    <h1>Replies</h1>
+<code><pre>${ JSON.stringify(state.replies, ' ', 2) }</pre></code>
+</div>
+`);
+
 // config
 // models
 // views
@@ -1418,6 +1574,7 @@ app.model(botModel);
 app.model(repliesModel);
 app.model(usersModel);
 app.model(createApiModel(config.calamar));
+app.model(createSageModel(config.calamar));
 app.model(createFbSessionModel(config.facebook));
 
 const defaultAnonView = loginView;
@@ -1430,9 +1587,10 @@ const ecommerceView = viewWrapper(ecommerceContent);
 const repliesView = viewWrapper(repliesContent);
 const mutedChatsView = viewWrapper(mutedChatsContent);
 const debugView = viewWrapper(debugContent);
+const sageDebugView = viewWrapper(sageDebugContent);
 
 const rootView = debugView;
-app.router([['/', rootView], ['/controltower', rootView], ['/home', homeView], ['/channels', channelsView], ['/ecommerce', ecommerceView], ['/replies', repliesView], ['/mutedChats', mutedChatsView], ['/debug', debugView]]);
+app.router([['/', rootView], ['/controltower', rootView], ['/home', homeView], ['/channels', channelsView], ['/ecommerce', ecommerceView], ['/replies', repliesView], ['/mutedChats', mutedChatsView], ['/debug', debugView], ['/sage', sageDebugView]]);
 
 const tree = app.start();
 
