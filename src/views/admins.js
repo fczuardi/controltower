@@ -20,8 +20,8 @@ export default state => {
         </table>
     </div>`;
     const formValues = {
-        url: '',
-        inviteCode: ''
+        url: `${window.location.href}?botId=${state.bot.id}`,
+        inviteCode: state.bot.inviteCode
     };
     const inviteFields = Object.keys(formValues).map(name => html`
         <div class=${formClasses.formGroup}>
@@ -33,6 +33,7 @@ export default state => {
                     name=${name}
                     value=${formValues[name] || ''}
                     class=${formClasses.input}
+                    readonly
                 >
             </div>
         </div>
