@@ -2,7 +2,7 @@ import html from 'choo/html';
 import { formClasses, panel, view } from '../views/botSetup';
 import messages from '../../locales/ptBr';
 
-export default state => {
+export default (state, send) => {
     const adminList = html`<div>
         <table class=${formClasses.table}>
             <thead>
@@ -38,8 +38,12 @@ export default state => {
             </div>
         </div>
     `);
+    const onSubmit = e => {
+        e.preventDefault();
+        send('api:updateBot', { botId: state.bot.id, inviteCode: 'new' });
+    };
     const inviteAdmin = html`
-    <form class=${formClasses.form}>
+    <form class=${formClasses.form} onsubmit=${onSubmit}>
         ${messages.admins.invite.instructions.map(instruction => html`
             <p>${instruction}</p>
         `)}
@@ -47,7 +51,10 @@ export default state => {
         <div class=${formClasses.separator}></div>
         <div class=${formClasses.formGroup}>
             <div class=${formClasses.buttonGroup}>
-                <button type="submit" class=${formClasses.submitButton}
+                <button
+                    type="submit"
+                    class=${formClasses.submitButton}
+                    disabled=${state.api.updatingBot}
                 >${messages.admins.invite.newKey}</button>
             </div>
         </div>
