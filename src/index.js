@@ -34,8 +34,8 @@ app.model(customerModel);
 app.model(botModel);
 app.model(repliesModel);
 app.model(usersModel);
-app.model(createApiModel(config.calamar));
-app.model(createSageModel(config.calamar));
+app.model(createApiModel(config.controltower));
+app.model(createSageModel(config.sage));
 app.model(createFbSessionModel(config.facebook));
 
 const defaultAnonView = loginView;
