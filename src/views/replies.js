@@ -45,7 +45,7 @@ const replyClasses = {
 };
 
 const classes = Object.assign({}, formClasses, { reply: replyClasses });
-export default (state, send) => {
+export default (state, prev, send) => {
     const selectedReplyKey = state.ui.selectedReply;
     const selectedReply = path(state.ui.selectedReply.split('.'), state.replies);
     const onChange = createOnChange(send);
