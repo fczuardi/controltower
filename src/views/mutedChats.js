@@ -17,7 +17,7 @@ const toolbarRight = (isLoading, onRefreshClick) => html`
 
 const preventDefaultWrap = cb => e => { e.preventDefault(); return cb(); };
 
-export default (state, send) => {
+export default (state, prev, send) => {
     const headers = ['Name'];
     const selectedRows = state.ui.selectedMutedUsers;
     const dataSet = state.users.filteredByMutedBot.map(user => ([user.name]));

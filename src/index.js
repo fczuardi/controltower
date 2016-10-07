@@ -41,10 +41,10 @@ app.model(createFbSessionModel(config.facebook));
 
 const defaultAnonView = loginView;
 const authWrapper =
-    (loggedView, anonView = defaultAnonView) => (state, send) => (
+    (loggedView, anonView = defaultAnonView) => (state, prev, send) => (
         state.customer.isLogged
-            ? loggedView(state, send)
-            : anonView(state, send)
+            ? loggedView(state, prev, send)
+            : anonView(state, prev, send)
 );
 
 const viewWrapper = pipe(authWrapper, dashboardView);

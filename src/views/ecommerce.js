@@ -21,7 +21,7 @@ const createSubmit = (botId, send) => e => {
     return send('bot:setVtexStore', update);
 };
 
-export default (state, send) => {
+export default (state, prev, send) => {
     const isUpdating = state.api.updatingBot;
     const values = state.bot.vtex;
     const onSubmit = createSubmit(state.bot.id, send);

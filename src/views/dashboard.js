@@ -23,7 +23,11 @@ const menuClasses = {
     }
 };
 
-export default content => (state, send) => html`
+export default content => (state, prev, send) => {
+    if (!state.customer.isLogged) {
+        return content(state, prev, send);
+    }
+    return html`
 <div class="nav-sm ${dashboardCss}">
     <div class="container body">
         <div class="main_container">
@@ -35,7 +39,7 @@ export default content => (state, send) => html`
                 </div>
             </div>
             <div class="right_col">
-                ${content(state, send)}
+                ${content(state, prev, send)}
             </div>
             <footer>
                 <div class="pull-right">
@@ -47,3 +51,4 @@ export default content => (state, send) => html`
     </div>
 </div>
 `;
+};
