@@ -10,7 +10,7 @@ const createOnChange = send => e => {
 
 const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
     e.preventDefault();
-    const fieldNames = ['title', 'text', 'subtitle', 'buttonTitle', 'logo', 'url'];
+    const fieldNames = ['title', 'text', 'subtitle', 'logo', 'url'];
     let updates = {};
     fieldNames.forEach(fieldName => {
         if (!e.target[fieldName]) {
@@ -18,14 +18,8 @@ const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
         }
         return Object.assign(updates, { [fieldName]: e.target[fieldName].value });
     });
-    if (e.target.buttonTitle) {
-        send('replies:setReplyButton', {
-            [selectedReplyKey.split('.')[1]]: updates
-        });
-    } else {
-        updates = Object.assign(selectedReply, updates);
-        send('replies:setReply', { [selectedReplyKey]: updates });
-    }
+    updates = Object.assign(selectedReply, updates);
+    send('replies:setReply', { [selectedReplyKey]: updates });
     return send('replies:sendReplies', botId);
 };
 
