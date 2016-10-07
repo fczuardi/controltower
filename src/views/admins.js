@@ -2,7 +2,7 @@ import html from 'choo/html';
 import { formClasses, panel, view } from '../views/botSetup';
 import messages from '../../locales/ptBr';
 
-export default (state, send) => {
+export default (state, prev, send) => {
     const adminList = html`<div>
         <table class=${formClasses.table}>
             <thead>
