@@ -8,9 +8,7 @@ const createSubmit = (botId, send) => e => {
         'apiToken',
         'apiKey',
         'apiAccountName',
-        'apiEnvironment',
-        'appKey',
-        'appToken'
+        'apiEnvironment'
     ];
     const update = fieldNames.reduce((prev, name) =>
         Object.assign(prev, {
