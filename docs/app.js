@@ -24,7 +24,7 @@ var config = {
     }
 };
 
-var version = "0.14.1";
+var version = "0.14.2";
 
 
 
@@ -1053,7 +1053,7 @@ const classes = {
     subtitle: 'lead',
     button: 'btn btn-primary'
 };
-var loginView = ((state, prev, send) => html`
+var loginView = ((state, send) => html`
 <div class=${ loginCss }>
     <div class="login">
         <div class="login_wrapper">
@@ -1113,7 +1113,7 @@ const menuClasses = {
     }
 };
 
-var dashboardView = (content => (state, prev, send) => html`
+var dashboardView = (content => (state, send) => html`
 <div class="nav-sm ${ dashboardCss }">
     <div class="container body">
         <div class="main_container">
@@ -1588,7 +1588,7 @@ app.model(createSageModel(config.sage));
 app.model(createFbSessionModel(config.facebook));
 
 const defaultAnonView = loginView;
-const authWrapper = (loggedView, anonView = defaultAnonView) => (state, prev, send) => state.customer.isLogged ? loggedView(state, prev, send) : anonView(state, prev, send);
+const authWrapper = (loggedView, anonView = defaultAnonView) => (state, send) => state.customer.isLogged ? loggedView(state, send) : anonView(state, send);
 
 const viewWrapper = ramda.pipe(authWrapper, dashboardView);
 const homeView = viewWrapper(homeContent);
