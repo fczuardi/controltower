@@ -24,7 +24,7 @@ var config = {
     }
 };
 
-var version = "0.14.3";
+var version = "0.14.4";
 
 
 
@@ -1251,7 +1251,7 @@ var channelsContent = ((state, prev, send) => {
 });
 
 var vtexFormComponent = ((isUpdating, values, classes, messages, onSubmit) => {
-    const fieldNames = ['apiToken', 'apiKey', 'apiAccountName', 'apiEnvironment', 'appKey', 'appToken'];
+    const fieldNames = ['apiToken', 'apiKey', 'apiAccountName', 'apiEnvironment'];
     const fields = fieldNames.map(name => html`
         <div class=${ classes.formGroup }>
             <label class=${ classes.label }>
@@ -1271,7 +1271,7 @@ var vtexFormComponent = ((isUpdating, values, classes, messages, onSubmit) => {
 
 const createSubmit$1 = (botId, send) => e => {
     e.preventDefault();
-    const fieldNames = ['apiToken', 'apiKey', 'apiAccountName', 'apiEnvironment', 'appKey', 'appToken'];
+    const fieldNames = ['apiToken', 'apiKey', 'apiAccountName', 'apiEnvironment'];
     const update = fieldNames.reduce((prev, name) => Object.assign(prev, {
         [name]: e.target[name].value
     }), {});
