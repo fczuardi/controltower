@@ -6,9 +6,7 @@ export default (isUpdating, values, classes, messages, onSubmit) => {
         'apiToken',
         'apiKey',
         'apiAccountName',
-        'apiEnvironment',
-        'appKey',
-        'appToken'
+        'apiEnvironment'
     ];
     const fields = fieldNames.map(name => html`
         <div class=${classes.formGroup}>
