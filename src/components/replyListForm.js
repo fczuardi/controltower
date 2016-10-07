@@ -55,7 +55,7 @@ const genericTemplate = (selectedReplyKey, selectedReply, replies, classes) => {
     const singleButton = !isButton ? null : html`
         <input
             class=${classes.button}
-            name="buttonTitle"
+            name="text"
             value=${subtitleOrText}
         />`;
     const buttonsList = buttons
