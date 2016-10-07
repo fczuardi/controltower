@@ -24,7 +24,7 @@ var config = {
     }
 };
 
-var version = "0.14.2";
+var version = "0.14.3";
 
 
 
@@ -1053,7 +1053,7 @@ const classes = {
     subtitle: 'lead',
     button: 'btn btn-primary'
 };
-var loginView = ((state, send) => html`
+var loginView = ((state, prev, send) => html`
 <div class=${ loginCss }>
     <div class="login">
         <div class="login_wrapper">
@@ -1113,7 +1113,11 @@ const menuClasses = {
     }
 };
 
-var dashboardView = (content => (state, send) => html`
+var dashboardView = (content => (state, prev, send) => {
+    if (!state.customer.isLogged) {
+        return content(state, prev, send);
+    }
+    return html`
 <div class="nav-sm ${ dashboardCss }">
     <div class="container body">
         <div class="main_container">
@@ -1125,7 +1129,7 @@ var dashboardView = (content => (state, send) => html`
                 </div>
             </div>
             <div class="right_col">
-                ${ content(state, send) }
+                ${ content(state, prev, send) }
             </div>
             <footer>
                 <div class="pull-right">
@@ -1136,7 +1140,8 @@ var dashboardView = (content => (state, send) => html`
         </div>
     </div>
 </div>
-`);
+`;
+});
 
 var homeContent = (() => html`
 <div>
@@ -1232,7 +1237,7 @@ const createSubmit = (botId, pages, send) => e => {
     return send('bot:setFacebookPage', newPage);
 };
 
-var channelsContent = ((state, send) => {
+var channelsContent = ((state, prev, send) => {
     const pages = state.ui.facebookPages;
     const currentPage = state.bot.facebook;
     const isUpdating = state.api.updatingBot;
@@ -1274,7 +1279,7 @@ const createSubmit$1 = (botId, send) => e => {
     return send('bot:setVtexStore', update);
 };
 
-var ecommerceContent = ((state, send) => {
+var ecommerceContent = ((state, prev, send) => {
     const isUpdating = state.api.updatingBot;
     const values = state.bot.vtex;
     const onSubmit = createSubmit$1(state.bot.id, send);
@@ -1432,7 +1437,7 @@ const replyClasses = {
 };
 
 const classes$1 = Object.assign({}, formClasses, { reply: replyClasses });
-var repliesContent = ((state, send) => {
+var repliesContent = ((state, prev, send) => {
     const selectedReplyKey = state.ui.selectedReply;
     const selectedReply = ramda.path(state.ui.selectedReply.split('.'), state.replies);
     const onChange = createOnChange(send);
@@ -1531,7 +1536,7 @@ const preventDefaultWrap = cb => e => {
     e.preventDefault();return cb();
 };
 
-var mutedChatsContent = ((state, send) => {
+var mutedChatsContent = ((state, prev, send) => {
     const headers = ['Name'];
     const selectedRows = state.ui.selectedMutedUsers;
     const dataSet = state.users.filteredByMutedBot.map(user => [user.name]);
@@ -1588,7 +1593,7 @@ app.model(createSageModel(config.sage));
 app.model(createFbSessionModel(config.facebook));
 
 const defaultAnonView = loginView;
-const authWrapper = (loggedView, anonView = defaultAnonView) => (state, send) => state.customer.isLogged ? loggedView(state, send) : anonView(state, send);
+const authWrapper = (loggedView, anonView = defaultAnonView) => (state, prev, send) => state.customer.isLogged ? loggedView(state, prev, send) : anonView(state, prev, send);
 
 const viewWrapper = ramda.pipe(authWrapper, dashboardView);
 const homeView = viewWrapper(homeContent);

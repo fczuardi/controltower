@@ -9,7 +9,7 @@ const createSubmit = (botId, pages, send) => e => {
     return send('bot:setFacebookPage', newPage);
 };
 
-export default (state, send) => {
+export default (state, prev, send) => {
     const pages = state.ui.facebookPages;
     const currentPage = state.bot.facebook;
     const isUpdating = state.api.updatingBot;
