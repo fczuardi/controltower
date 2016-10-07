@@ -24,7 +24,7 @@ var config = {
     }
 };
 
-var version = "0.14.5";
+var version = "0.14.7";
 
 
 
@@ -468,9 +468,6 @@ const repliesModel = {
     },
     reducers: {
         set: data => data,
-        setReplyButton: (data, state) => _extends({}, state, {
-            buttons: ramda.merge(state.buttons, data)
-        }),
         setReply: (data, state) => ramda.merge(state, data)
     },
     effects: {
@@ -1342,7 +1339,7 @@ const genericTemplate = (selectedReplyKey, selectedReply, replies, classes) => {
     const singleButton = !isButton ? null : html`
         <input
             class=${ classes.button }
-            name="buttonTitle"
+            name="text"
             value=${ subtitleOrText }
         />`;
     const buttonsList = buttons ? html`
@@ -1402,7 +1399,7 @@ const createOnChange = send => e => {
 
 const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
     e.preventDefault();
-    const fieldNames = ['title', 'text', 'subtitle', 'buttonTitle', 'logo', 'url'];
+    const fieldNames = ['title', 'text', 'subtitle', 'logo', 'url'];
     let updates = {};
     fieldNames.forEach(fieldName => {
         if (!e.target[fieldName]) {
@@ -1410,14 +1407,8 @@ const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
         }
         return Object.assign(updates, { [fieldName]: e.target[fieldName].value });
     });
-    if (e.target.buttonTitle) {
-        send('replies:setReplyButton', {
-            [selectedReplyKey.split('.')[1]]: updates
-        });
-    } else {
-        updates = Object.assign(selectedReply, updates);
-        send('replies:setReply', { [selectedReplyKey]: updates });
-    }
+    updates = Object.assign(selectedReply, updates);
+    send('replies:setReply', { [selectedReplyKey]: updates });
     return send('replies:sendReplies', botId);
 };
 
