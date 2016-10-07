@@ -22,7 +22,7 @@ const menuClasses = {
     }
 };
 
-export default content => (state, prev, send) => html`
+export default content => (state, send) => html`
 <div class="nav-sm ${dashboardCss}">
     <div class="container body">
         <div class="main_container">
