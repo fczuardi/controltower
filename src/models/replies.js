@@ -131,10 +131,6 @@ const repliesModel = {
     },
     reducers: {
         set: data => data,
-        setReplyButton: (data, state) => ({
-            ...state,
-            buttons: merge(state.buttons, data)
-        }),
         setReply: (data, state) => merge(state, data)
     },
     effects: {
