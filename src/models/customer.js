@@ -1,3 +1,4 @@
+import qs from 'sheet-router/qs';
 const customerModel = ({
     namespace: 'customer',
     state: {

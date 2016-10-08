@@ -36,6 +36,7 @@ const createFbSessionModel = config => ({
         statusChange: (data, state, send, done) => {
             if (data.status === 'connected') {
                 send('customer:signIn', data.authResponse, done);
+                send('invite:check', window.location.href, done);
                 send('api:set', { token: data.authResponse.accessToken }, done);
                 send('fbsession:getPages', null, done);
                 return send('api:getCustomer', null, done);
