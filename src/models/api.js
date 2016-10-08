@@ -90,7 +90,6 @@ const createApiModel = config => ({
         getMutedChats: (bot, state, send, done) => {
             const query = {
                 botId: bot.id,
-                customerId: bot.customerId,
                 botStatus: 'muted'
             };
             const url = `${config.apiUrl}/v1/users/?${qs.stringify(query)}`;
