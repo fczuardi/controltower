@@ -1,8 +1,8 @@
 import vtexFormComponent from '../components/vtexForm';
-import { formClasses, view } from '../views/botSetup';
+import { formClasses, panel, view } from '../views/botSetup';
 import messages from '../../locales/ptBr';
 
-const createSubmit = (botId, send) => e => {
+const createSubmit = (bot, send) => e => {
     e.preventDefault();
     const fieldNames = [
         'apiToken',
@@ -15,14 +15,18 @@ const createSubmit = (botId, send) => e => {
             [name]: e.target[name].value
         })
     , {});
-    send('api:updateBot', { botId, vtex: update });
+    send('api:updateBot', {
+        botId: bot.id,
+        ownerId: bot.customerId,
+        vtex: update
+    });
     return send('bot:setVtexStore', update);
 };
 
 export default (state, prev, send) => {
     const isUpdating = state.api.updatingBot;
     const values = state.bot.vtex;
-    const onSubmit = createSubmit(state.bot.id, send);
+    const onSubmit = createSubmit(state.bot, send);
     const form = vtexFormComponent(
         isUpdating,
         values,
@@ -30,9 +34,10 @@ export default (state, prev, send) => {
         messages.ecommerce.vtex,
         onSubmit
     );
-    return view(form, {
-        title: messages.ecommerce.title,
-        subtitle: messages.ecommerce.vtex.title,
-        description: messages.ecommerce.vtex.description.trackOrder
-    });
+    const panels = [panel(
+        form,
+        messages.ecommerce.vtex.title,
+        messages.ecommerce.vtex.description.trackOrder
+    )];
+    return view(messages.ecommerce.title, panels);
 };

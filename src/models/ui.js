@@ -1,7 +1,8 @@
 const uiModel = {
     namespace: 'ui',
     state: {
-        selectedSection: 'debug',
+        selectedSection: 'home',
+        selectedBot: null,
         enabledSections: ['home', 'debug'],
         menu: [
             'home',
@@ -9,6 +10,7 @@ const uiModel = {
             'ecommerce',
             'replies',
             'mutedChats',
+            'admins',
             'debug'
         ],
         facebookPages: [],
@@ -33,6 +35,10 @@ const uiModel = {
         setFbPages: (facebookPages, state) => ({
             ...state,
             facebookPages
+        }),
+        selectBot: (botId, state) => ({
+            ...state,
+            selectedBot: botId
         }),
         selectReply: (replyKey, state) => ({
             ...state,

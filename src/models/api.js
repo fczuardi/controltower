@@ -65,6 +65,7 @@ const createApiModel = config => ({
                     console.error(error);
                     return done();
                 }
+                send('ui:enableSection', 'admins', done);
                 if (response.body.facebook) {
                     send('ui:enableSection', 'channels', done);
                 } else {
@@ -89,7 +90,6 @@ const createApiModel = config => ({
         getMutedChats: (bot, state, send, done) => {
             const query = {
                 botId: bot.id,
-                customerId: bot.customerId,
                 botStatus: 'muted'
             };
             const url = `${config.apiUrl}/v1/users/?${qs.stringify(query)}`;
@@ -136,12 +136,16 @@ const createApiModel = config => ({
                     pageName: data.facebookPage.name
                 }
             };
+            const ownerId = data.ownerId ? { ownerId: data.ownerId } : {};
             const vtexUpdate = data.vtex ? data : {};
             const repliesUpdate = data.replies ? data : {};
+            const inviteCodeUpdate = data.inviteCode ? data : {};
             const update = {
+                ...ownerId,
                 ...facebookUpdate,
                 ...vtexUpdate,
-                ...repliesUpdate
+                ...repliesUpdate,
+                ...inviteCodeUpdate
             };
             send('api:updateBotBegin', null, done);
             http.put(url, { ...options, json: update }, (error, response) => {

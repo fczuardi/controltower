@@ -18,6 +18,7 @@ const menuClasses = {
         ecommerce: 'fa fa-shopping-cart',
         replies: 'fa fa-comments-o',
         mutedChats: 'fa fa-user-times',
+        admins: 'fa fa-key',
         debug: 'fa fa-terminal'
     }
 };

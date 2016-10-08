@@ -1,5 +1,5 @@
 import { path } from 'ramda';
-import { formClasses, view } from '../views/botSetup';
+import { formClasses, panel, view } from '../views/botSetup';
 import messages from '../../locales/ptBr';
 import repliesFormComponent from '../components/replyListForm';
 
@@ -8,7 +8,7 @@ const createOnChange = send => e => {
     return send('ui:selectReply', e.target.value);
 };
 
-const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
+const createOnSubmit = (selectedReplyKey, selectedReply, bot, send) => e => {
     e.preventDefault();
     const fieldNames = ['title', 'text', 'subtitle', 'logo', 'url'];
     let updates = {};
@@ -20,7 +20,7 @@ const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
     });
     updates = Object.assign(selectedReply, updates);
     send('replies:setReply', { [selectedReplyKey]: updates });
-    return send('replies:sendReplies', botId);
+    return send('replies:sendReplies', bot);
 };
 
 const replyClasses = {
@@ -43,7 +43,7 @@ export default (state, prev, send) => {
     const selectedReplyKey = state.ui.selectedReply;
     const selectedReply = path(state.ui.selectedReply.split('.'), state.replies);
     const onChange = createOnChange(send);
-    const onSubmit = createOnSubmit(selectedReplyKey, selectedReply, state.bot.id, send);
+    const onSubmit = createOnSubmit(selectedReplyKey, selectedReply, state.bot, send);
     const content = repliesFormComponent(
         selectedReplyKey,
         state.replies,
@@ -54,12 +54,10 @@ export default (state, prev, send) => {
         onChange,
         onSubmit
     );
-    return view(
+    const panels = [panel(
         content,
-        {
-            title: messages.replies.title,
-            subtitle: messages.replies.ecommerce.title,
-            description: messages.replies.ecommerce.description
-        }
-    );
+        messages.replies.ecommerce.title,
+        messages.replies.ecommerce.description
+    )];
+    return view(messages.replies.title, panels);
 };
