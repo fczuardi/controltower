@@ -20,7 +20,7 @@ export default (state, prev, send) => {
         </table>
     </div>`;
     const formValues = {
-        url: `${window.location.href}?botId=${state.bot.id}`,
+        url: `${window.location.href}?joinTeam=${state.bot.id}`,
         inviteCode: state.bot.inviteCode
     };
     const inviteFields = Object.keys(formValues).map(name => html`
