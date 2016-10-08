@@ -15,33 +15,39 @@ const formClasses = {
     submitButton: 'btn btn-success'
 };
 
-const view = (form, messages, navbarRightContent) => html`
-<div>
-    <div class="title-left">
-        <h3>${messages.title}</h3>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="x_panel">
-                <div class="x_title nav">
-                    <h2>${messages.subtitle}</h2>
-                    <div class="navbar-right panel_toolbox">
-                        ${navbarRightContent}
-                    </div>
-                </div>
-                <div class="x_content">
-                    <p>
-                        ${messages.description}
-                    </p>
-                    ${form}
+const panel = (form, title, description, navbarRightContent) => html`
+    <div class="col-md-6">
+        <div class="x_panel">
+            <div class="x_title nav">
+                <h2>${title}</h2>
+                <div class="navbar-right panel_toolbox">
+                    ${navbarRightContent}
                 </div>
             </div>
+            <div class="x_content">
+                <p>
+                    ${description}
+                </p>
+                ${form}
+            </div>
         </div>
+    </div>
+`;
+
+// const view = (form, messages, navbarRightContent) => html`
+const view = (title, panels) => html`
+<div>
+    <div class="title-left">
+        <h3>${title}</h3>
+    </div>
+    <div class="row">
+        ${panels}
     </div>
 </div>
 `;
 
 export {
     formClasses,
-    view
+    view,
+    panel
 };

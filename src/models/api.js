@@ -65,6 +65,7 @@ const createApiModel = config => ({
                     console.error(error);
                     return done();
                 }
+                send('ui:enableSection', 'admins', done);
                 if (response.body.facebook) {
                     send('ui:enableSection', 'channels', done);
                 } else {
@@ -138,10 +139,12 @@ const createApiModel = config => ({
             };
             const vtexUpdate = data.vtex ? data : {};
             const repliesUpdate = data.replies ? data : {};
+            const inviteCodeUpdate = data.inviteCode ? data : {};
             const update = {
                 ...facebookUpdate,
                 ...vtexUpdate,
-                ...repliesUpdate
+                ...repliesUpdate,
+                ...inviteCodeUpdate
             };
             send('api:updateBotBegin', null, done);
             http.put(url, { ...options, json: update }, (error, response) => {
