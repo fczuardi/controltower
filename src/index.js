@@ -56,7 +56,7 @@ const mutedChatsView = viewWrapper(mutedChatsContent);
 const adminsView = viewWrapper(adminsContent);
 const debugView = viewWrapper(debugContent);
 
-const rootView = debugView;
+const rootView = homeView;
 app.router([
     ['/', rootView],
     ['/controltower', rootView],
