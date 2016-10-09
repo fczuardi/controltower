@@ -60,7 +60,7 @@ const adminsView = viewWrapper(adminsContent);
 const invitationView = invitationContent;
 const debugView = viewWrapper(debugContent);
 
-const rootView = debugView;
+const rootView = homeView;
 app.router([
     ['/', rootView],
     ['/controltower', rootView],

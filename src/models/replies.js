@@ -134,8 +134,9 @@ const repliesModel = {
         setReply: (data, state) => merge(state, data)
     },
     effects: {
-        sendReplies: (botId, state, send, done) => send('api:updateBot', {
-            botId,
+        sendReplies: (bot, state, send, done) => send('api:updateBot', {
+            botId: bot.id,
+            ownerId: bot.customerId,
             replies: JSON.stringify(state)
         }, done)
     }

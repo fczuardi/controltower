@@ -8,7 +8,7 @@ const createOnChange = send => e => {
     return send('ui:selectReply', e.target.value);
 };
 
-const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
+const createOnSubmit = (selectedReplyKey, selectedReply, bot, send) => e => {
     e.preventDefault();
     const fieldNames = ['title', 'text', 'subtitle', 'logo', 'url'];
     let updates = {};
@@ -20,7 +20,7 @@ const createOnSubmit = (selectedReplyKey, selectedReply, botId, send) => e => {
     });
     updates = Object.assign(selectedReply, updates);
     send('replies:setReply', { [selectedReplyKey]: updates });
-    return send('replies:sendReplies', botId);
+    return send('replies:sendReplies', bot);
 };
 
 const replyClasses = {
@@ -43,7 +43,7 @@ export default (state, prev, send) => {
     const selectedReplyKey = state.ui.selectedReply;
     const selectedReply = path(state.ui.selectedReply.split('.'), state.replies);
     const onChange = createOnChange(send);
-    const onSubmit = createOnSubmit(selectedReplyKey, selectedReply, state.bot.id, send);
+    const onSubmit = createOnSubmit(selectedReplyKey, selectedReply, state.bot, send);
     const content = repliesFormComponent(
         selectedReplyKey,
         state.replies,

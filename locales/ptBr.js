@@ -26,6 +26,10 @@ export default {
         signIn: 'Entrar',
         signOut: 'Sair'
     },
+    home: {
+        title: 'Início',
+        description: 'Escolha qual assistente configurar'
+    },
     channels: {
         title: 'Configurar Canais',
         facebook: {

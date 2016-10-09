@@ -136,10 +136,12 @@ const createApiModel = config => ({
                     pageName: data.facebookPage.name
                 }
             };
+            const ownerId = data.ownerId ? { ownerId: data.ownerId } : {};
             const vtexUpdate = data.vtex ? data : {};
             const repliesUpdate = data.replies ? data : {};
             const inviteCodeUpdate = data.inviteCode ? data : {};
             const update = {
+                ...ownerId,
                 ...facebookUpdate,
                 ...vtexUpdate,
                 ...repliesUpdate,
