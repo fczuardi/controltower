@@ -50,7 +50,7 @@ export default (state, prev, send) => {
         selectedReply,
         classes,
         messages.replies.ecommerce,
-        state.api.loadingReplies || state.api.updatingBot,
+        state.api.loadingBot || state.api.updatingBot,
         onChange,
         onSubmit
     );
