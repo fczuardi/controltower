@@ -13,8 +13,8 @@ const createApiModel = config => ({
     state: {
         token: null,
         updatingBot: false,
-        loadingUsers: false,
-        loadingReplies: false
+        loadingBot: false,
+        loadingUsers: false
     },
     reducers: {
         set: data => data,
@@ -34,13 +34,13 @@ const createApiModel = config => ({
             ...state,
             loadingUsers: false
         }),
-        loadingRepliesBegin: (data, state) => ({
+        loadingBotBegin: (data, state) => ({
             ...state,
-            loadingReplies: true
+            loadingBot: true
         }),
-        loadingRepliesEnd: (data, state) => ({
+        loadingBotEnd: (data, state) => ({
             ...state,
-            loadingReplies: false
+            loadingBot: false
         })
     },
     effects: {
@@ -59,32 +59,34 @@ const createApiModel = config => ({
         getBot: (data, state, send, done) => {
             const url = `${config.apiUrl}/v1/bots/${data.botId}`;
             const options = defaultOptions(state.token);
-            send('api:loadingRepliesBegin', null, done);
+            send('api:loadingBotBegin', null, done);
             http.get(url, options, (error, response) => {
                 if (error) {
                     console.error(error);
                     return done();
                 }
+                const bot = response.body;
+                send('ui:selectBot', bot.id, done);
                 send('ui:enableSection', 'admins', done);
-                if (response.body.facebook) {
+                if (bot.facebook) {
                     send('ui:enableSection', 'channels', done);
                 } else {
                     send('ui:disableSection', 'channels', done);
                 }
-                if (response.body.vtex) {
+                if (bot.vtex) {
                     send('ui:enableSection', 'ecommerce', done);
                 } else {
                     send('ui:disableSection', 'ecommerce', done);
                 }
-                if (response.body.replies) {
+                if (bot.replies) {
                     send('ui:enableSection', 'replies', done);
-                    send('replies:set', JSON.parse(response.body.replies), done);
-                    send('api:loadingRepliesEnd', null, done);
+                    send('replies:set', JSON.parse(bot.replies), done);
+                    send('api:loadingBotEnd', null, done);
                 } else {
                     send('ui:disableSection', 'replies', done);
                 }
-                send('api:getMutedChats', response.body, done);
-                return send('bot:set', response.body, done);
+                send('api:getMutedChats', bot, done);
+                return send('bot:set', bot, done);
             });
         },
         getMutedChats: (bot, state, send, done) => {
@@ -155,6 +157,26 @@ const createApiModel = config => ({
                     return done();
                 }
                 return send('bot:set', response.body, done);
+            });
+        },
+        acceptInvite: (data, state, send, done) => {
+            const url = `${config.apiUrl}/v1/bots/${data.botId}`;
+            const options = defaultOptions(state.token);
+            const update = {
+                admins: 'me',
+                customerId: data.ownerId,
+                inviteCode: data.inviteCode
+            };
+            send('api:updateBotBegin', null, done);
+            http.put(url, { ...options, json: update }, (error, response) => {
+                send('api:updateBotEnd', null, done);
+                if (error || response.body.error) {
+                    console.error(error || response.body.error);
+                    send('invite:setError', (error || response.body.error), done);
+                    return done();
+                }
+                window.location.search = '';
+                return done();
             });
         }
     }

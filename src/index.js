@@ -11,6 +11,7 @@ import customerModel from './models/customer';
 import botModel from './models/bot';
 import repliesModel from './models/replies';
 import usersModel from './models/users';
+import inviteModel from './models/invite';
 import createApiModel from './models/api';
 import createFbSessionModel from './models/fbSession';
 import createSageModel from './models/sage';
@@ -26,6 +27,7 @@ import ecommerceContent from './views/ecommerce';
 import repliesContent from './views/replies';
 import mutedChatsContent from './views/mutedChats';
 import adminsContent from './views/admins';
+import invitationContent from './views/invitation';
 import debugContent from './views/debug';
 
 const app = choo({ history: false, href: false });
@@ -35,6 +37,7 @@ app.model(customerModel);
 app.model(botModel);
 app.model(repliesModel);
 app.model(usersModel);
+app.model(inviteModel);
 app.model(createApiModel(config.controltower));
 app.model(createSageModel(config.sage));
 app.model(createFbSessionModel(config.facebook));
@@ -54,6 +57,7 @@ const ecommerceView = viewWrapper(ecommerceContent);
 const repliesView = viewWrapper(repliesContent);
 const mutedChatsView = viewWrapper(mutedChatsContent);
 const adminsView = viewWrapper(adminsContent);
+const invitationView = invitationContent;
 const debugView = viewWrapper(debugContent);
 
 const rootView = homeView;
@@ -66,6 +70,7 @@ app.router([
     ['/replies', repliesView],
     ['/mutedChats', mutedChatsView],
     ['/admins', adminsView],
+    ['/invite', invitationView],
     ['/debug', debugView]
 ]);
 

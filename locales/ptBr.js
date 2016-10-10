@@ -156,5 +156,12 @@ export default {
             inviteCode: 'Código do convite',
             newKey: 'Gerar nova chave'
         }
+    },
+    invite: {
+        title: 'Você foi convidado',
+        subtitle: id => `para admnistrar o assistente ${id}`,
+        description: 'Digite o código de convite abaixo para aceitar',
+        submitButton: 'Aceitar',
+        ignoreButton: 'Ignorar'
     }
 };
