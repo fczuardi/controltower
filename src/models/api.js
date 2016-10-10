@@ -158,6 +158,26 @@ const createApiModel = config => ({
                 }
                 return send('bot:set', response.body, done);
             });
+        },
+        acceptInvite: (data, state, send, done) => {
+            const url = `${config.apiUrl}/v1/bots/${data.botId}`;
+            const options = defaultOptions(state.token);
+            const update = {
+                admins: 'me',
+                customerId: data.ownerId,
+                inviteCode: data.inviteCode
+            };
+            send('api:updateBotBegin', null, done);
+            http.put(url, { ...options, json: update }, (error, response) => {
+                send('api:updateBotEnd', null, done);
+                if (error || response.body.error) {
+                    console.error(error || response.body.error);
+                    send('invite:setError', (error || response.body.error), done);
+                    return done();
+                }
+                window.location.search = '';
+                return done();
+            });
         }
     }
 });
