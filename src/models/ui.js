@@ -8,6 +8,7 @@ const uiModel = {
             'home',
             'channels',
             'ecommerce',
+            'intents',
             'replies',
             'mutedChats',
             'admins',

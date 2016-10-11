@@ -17,6 +17,10 @@ const createSageModel = config => ({
     },
     reducers: {
         set: data => data,
+        setId: (spellId, state) => ({
+            ...state,
+            spellId
+        }),
         updatingSpellBegin: (data, state) => ({
             ...state,
             updatingSpell: true
@@ -70,6 +74,7 @@ const createSageModel = config => ({
             const field = data.field ? data.field : 'all';
             const url = `${config.apiUrl}/bots/${field}`;
             const options = defaultOptions(state.spellId);
+            console.log('getSpell options', options);
             http.get(url, options, (error, response) => {
                 if (error) {
                     console.error(error);

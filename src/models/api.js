@@ -53,7 +53,10 @@ const createApiModel = config => ({
                     return done();
                 }
                 send('customer:set', response.body, done);
-                return send('api:getBot', { botId: response.body.bots[0] }, done);
+                if (response.body.bots.length === 1) {
+                    return send('api:getBot', { botId: response.body.bots[0] }, done);
+                }
+                return done();
             });
         },
         getBot: (data, state, send, done) => {
@@ -61,7 +64,9 @@ const createApiModel = config => ({
             const options = defaultOptions(state.token);
             send('api:loadingBotBegin', null, done);
             http.get(url, options, (error, response) => {
+                console.log(response);
                 if (error) {
+                    console.log('response', response.body);
                     console.error(error);
                     return done();
                 }
@@ -84,6 +89,13 @@ const createApiModel = config => ({
                     send('api:loadingBotEnd', null, done);
                 } else {
                     send('ui:disableSection', 'replies', done);
+                }
+                if (bot.sage && bot.sage.spellId) {
+                    send('ui:enableSection', 'intents', done);
+                    send('sage:setId', bot.sage.spellId, done);
+                    send('sage:getSpell', { field: 'intents' }, done);
+                } else {
+                    send('ui:disableSection', 'intents', done);
                 }
                 send('api:getMutedChats', bot, done);
                 return send('bot:set', bot, done);
