@@ -10,15 +10,15 @@ const customerModel = ({
         isLogged: null
     },
     reducers: {
-        signIn: (data, state) => ({
+        set: (state, data) => data,
+        signIn: state => ({
             ...state,
             isLogged: true
         }),
-        signOut: (data, state) => ({
+        signOut: state => ({
             ...state,
             isLogged: false
-        }),
-        set: data => data
+        })
     }
 });
 

@@ -17,34 +17,34 @@ const createApiModel = config => ({
         loadingUsers: false
     },
     reducers: {
-        set: data => data,
-        updateBotBegin: (data, state) => ({
+        set: (state, data) => data,
+        updateBotBegin: state => ({
             ...state,
             updatingBot: true
         }),
-        updateBotEnd: (data, state) => ({
+        updateBotEnd: state => ({
             ...state,
             updatingBot: false
         }),
-        loadingUsersBegin: (data, state) => ({
+        loadingUsersBegin: state => ({
             ...state,
             loadingUsers: true
         }),
-        loadingUsersEnd: (data, state) => ({
+        loadingUsersEnd: state => ({
             ...state,
             loadingUsers: false
         }),
-        loadingBotBegin: (data, state) => ({
+        loadingBotBegin: state => ({
             ...state,
             loadingBot: true
         }),
-        loadingBotEnd: (data, state) => ({
+        loadingBotEnd: state => ({
             ...state,
             loadingBot: false
         })
     },
     effects: {
-        getCustomer: (data, state, send, done) => {
+        getCustomer: (state, data, send, done) => {
             const url = `${config.apiUrl}/v1/customers`;
             const options = defaultOptions(state.token);
             http.post(url, options, (error, response) => {
@@ -59,7 +59,7 @@ const createApiModel = config => ({
                 return done();
             });
         },
-        getBot: (data, state, send, done) => {
+        getBot: (state, data, send, done) => {
             const url = `${config.apiUrl}/v1/bots/${data.botId}`;
             const options = defaultOptions(state.token);
             send('api:loadingBotBegin', null, done);
@@ -101,7 +101,7 @@ const createApiModel = config => ({
                 return send('bot:set', bot, done);
             });
         },
-        getMutedChats: (bot, state, send, done) => {
+        getMutedChats: (state, bot, send, done) => {
             const query = {
                 botId: bot.id,
                 botStatus: 'muted'
@@ -119,7 +119,7 @@ const createApiModel = config => ({
                 return send('users:setMuted', response.body, done);
             });
         },
-        unMuteChats: (data, state, send, done) => {
+        unMuteChats: (state, data, send, done) => {
             const url = `${config.apiUrl}/v1/users`;
             const options = defaultOptions(state.token);
             const body = {
@@ -140,7 +140,7 @@ const createApiModel = config => ({
                     response.body.map(item => item.id), done);
             });
         },
-        updateBot: (data, state, send, done) => {
+        updateBot: (state, data, send, done) => {
             const url = `${config.apiUrl}/v1/bots/${data.botId}`;
             const options = defaultOptions(state.token);
             const facebookUpdate = !data.facebookPage ? {} : {
@@ -171,7 +171,7 @@ const createApiModel = config => ({
                 return send('bot:set', response.body, done);
             });
         },
-        acceptInvite: (data, state, send, done) => {
+        acceptInvite: (state, data, send, done) => {
             const url = `${config.apiUrl}/v1/bots/${data.botId}`;
             const options = defaultOptions(state.token);
             const update = {

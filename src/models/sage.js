@@ -16,39 +16,39 @@ const createSageModel = config => ({
         loadingIntents: false
     },
     reducers: {
-        set: data => data,
-        setId: (spellId, state) => ({
+        set: (state, data) => data,
+        setId: (state, spellId) => ({
             ...state,
             spellId
         }),
-        updatingSpellBegin: (data, state) => ({
+        updatingSpellBegin: state => ({
             ...state,
             updatingSpell: true
         }),
-        updatingSpellEnd: (data, state) => ({
+        updatingSpellEnd: state => ({
             ...state,
             updatingSpell: false
         }),
-        loadingUtterancesBegin: (data, state) => ({
+        loadingUtterancesBegin: state => ({
             ...state,
             loadingUtterances: true
         }),
-        loadingUtterancesEnd: (data, state) => ({
+        loadingUtterancesEnd: state => ({
             ...state,
             loadingUtterances: false
         }),
-        loadingIntentsBegin: (data, state) => ({
+        loadingIntentsBegin: state => ({
             ...state,
             loadingIntents: true
         }),
-        loadingIntentsEnd: (data, state) => ({
+        loadingIntentsEnd: state => ({
             ...state,
             loadingIntents: false
         })
     },
     effects: {
         // Creates a new spell
-        createSpell: (data, state, send, done) => {
+        createSpell: (state, data, send, done) => {
             const url = `${config.apiUrl}/bots`;
             const body = {
                 name: data.name,
@@ -70,7 +70,7 @@ const createSageModel = config => ({
                 return done();
             });
         },
-        getSpell: (data, state, send, done) => {
+        getSpell: (state, data, send, done) => {
             const field = data.field ? data.field : 'all';
             const url = `${config.apiUrl}/bots/${field}`;
             const options = defaultOptions(state.spellId);
@@ -105,7 +105,7 @@ const createSageModel = config => ({
         },
         /* All request below will return a status 200 if ok,
            else 40X or 50X with an success/error message*/
-        createIntent: (intentName, state, send, done) => {
+        createIntent: (state, intentName, send, done) => {
             console.log('Sage Create Intent', intentName);
             const url = `${config.apiUrl}/bots/intents`;
             const options = defaultOptions(state.spellId);
@@ -129,7 +129,7 @@ const createSageModel = config => ({
                 return done();
             });
         },
-        deleteIntent: (data, state, send, done) => {
+        deleteIntent: (state, data, send, done) => {
             const url = `${config.apiUrl}/bots/intents/${data.intent}`;
             const options = defaultOptions(state.spellId);
             http.delete(url, options, (error, response) => {
@@ -143,7 +143,7 @@ const createSageModel = config => ({
                 return done();
             });
         },
-        createUtterance: (data, state, send, done) => {
+        createUtterance: (state, data, send, done) => {
             const url = `${config.apiUrl}/bots/utterances`;
             const options = defaultOptions(state.spellId);
             const body = [
@@ -163,7 +163,7 @@ const createSageModel = config => ({
                 return done();
             });
         },
-        updateUtterance: (data, state, send, done) => {
+        updateUtterance: (state, data, send, done) => {
             const url = `${config.apiUrl}/bots/utteraces/${data.utterance}`;
             const options = defaultOptions(state.spellId);
             const body = { intent: data.intent };

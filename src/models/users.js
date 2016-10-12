@@ -4,14 +4,14 @@ const usersModel = ({
         filteredByMutedBot: []
     },
     reducers: {
-        setMuted: (data, state) => {
+        setMuted: (state, data) => {
             console.log('setMuted', data);
             return {
                 ...state,
                 filteredByMutedBot: data
             };
         },
-        unMuteUsers: (data, state) => {
+        unMuteUsers: (state, data) => {
             console.log('unMuteUsers', data);
             return {
                 ...state,

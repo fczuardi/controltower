@@ -6,14 +6,14 @@ const inviteModel = ({
         ownerId: null
     },
     reducers: {
-        set: data => data,
-        setError: (error, state) => ({
+        set: (state, data) => data,
+        setError: (state, error) => ({
             ...state,
             error
         })
     },
     effects: {
-        check: (data, state, send, done) => {
+        check: (state, data, send, done) => {
             const qsData = qs(data);
             const botId = qsData.bot;
             const ownerId = qsData.owner;
@@ -24,7 +24,7 @@ const inviteModel = ({
             send('location:set', { pathname: '/invite' }, done);
             return done();
         },
-        ignore: (data, state, send, done) => {
+        ignore: (state, data, send, done) => {
             send('invite:set', { botId: null }, done);
             window.location.search = '';
             return done();
