@@ -1,8 +1,11 @@
 import html from 'choo/html';
 import updateBotFormComponent from './updateBotForm';
 
-export default (state, send, classes, messages, isUpdating = false, onSubmit = null) => {
-    const nonDefaultIntents = state.intents.names.filter(name => (name !== 'none'));
+export default (state, send, classes,
+        messages, isUpdating = false, onSubmit = null) => {
+    const nonDefaultIntents = state.intents.names.filter(
+        name => (name !== 'none')
+    );
     const selectedIntent = state.intents.selectedIntent;
     const utterances = state.intents.utterances[selectedIntent] || [];
     const onIntentSelected = e => {
@@ -18,15 +21,28 @@ export default (state, send, classes, messages, isUpdating = false, onSubmit = n
             </option>
             <optgroup label=${messages.existingIntents}>
                 ${nonDefaultIntents.map(intentName => html`
-                    <option>${intentName}</option>
+                    <option
+                        selected=${selectedIntent === intentName}
+                    >${intentName}</option>
                 `)}
             </optgroup>
         </select>
     `;
+    const intentNameField = selectedIntent === 'none'
+		? html`
+            <div class=${classes.formGroup}>
+                <label class=${classes.label}>
+					${messages.intentName}
+				</label>
+                <div class=${classes.inputContainer}>
+					<input name="intentName">
+                </div>
+            </div>`
+		: null;
     const newUtterance = html`
 		<div>
 			<h4>${messages.newUterranceTitle}</h4>
-            <input class=${classes.input}>
+            <input name="newUtterance" class=${classes.input}>
 		</div>
 	`;
     const intentForm = !utterances.length ? null : html`
@@ -50,17 +66,6 @@ export default (state, send, classes, messages, isUpdating = false, onSubmit = n
                 </div>
             </div>
         </div>`;
-    const intentNameField = selectedIntent === 'none'
-		? html`
-            <div class=${classes.formGroup}>
-                <label class=${classes.label}>
-					${messages.intentName}
-				</label>
-                <div class=${classes.inputContainer}>
-					<input name="intentName">
-                </div>
-            </div>`
-		: null;
     const fields = html`
         <div>
             <div class=${classes.formGroup}>

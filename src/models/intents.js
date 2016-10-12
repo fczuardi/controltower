@@ -23,6 +23,18 @@ const intentsModel = {
         selectIntent: (intentName, state) => ({
             ...state,
             selectedIntent: intentName
+        }),
+        addIntent: (intentName, state) => ({
+            ...state,
+            selectedIntent: intentName,
+            names: [
+                ...state.names,
+                intentName
+            ],
+            utterances: {
+                ...state.utterances,
+                [intentName]: {}
+            }
         })
     },
     effects: {

@@ -3,9 +3,24 @@ import messages from '../../locales/ptBr';
 import { formClasses, panel, view } from '../views/botSetup';
 
 export default (state, prev, send) => {
-    const content = intentsFormComponent(state, send, formClasses, messages.intents.faq);
+    const onSubmit = e => {
+        e.preventDefault();
+        console.log('new intent or new utterance', e.target);
+        if (e.target.intentName && e.target.intentName.value) {
+            // new intent
+            send('sage:createIntent', e.target.intentName.value);
+        }
+        if (e.target.newUtterance && e.target.newUtterance.value) {
+            console.log(e.target.newUtterance.value);
+            // new utterance
+            // send();
+        }
+    };
+    const content = intentsFormComponent(state, send, formClasses,
+                                messages.intents.faq, false, onSubmit);
     const panels = [
-        panel(content, messages.intents.faq.title, messages.intents.faq.description)
+        panel(content, messages.intents.faq.title,
+                    messages.intents.faq.description)
     ];
     return view(messages.intents.title, panels);
 };

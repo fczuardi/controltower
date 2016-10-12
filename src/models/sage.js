@@ -105,20 +105,27 @@ const createSageModel = config => ({
         },
         /* All request below will return a status 200 if ok,
            else 40X or 50X with an success/error message*/
-        createIntent: (data, state, send, done) => {
+        createIntent: (intentName, state, send, done) => {
+            console.log('Sage Create Intent', intentName);
             const url = `${config.apiUrl}/bots/intents`;
             const options = defaultOptions(state.spellId);
-            const body = {
-                name: data.intent,
+            const body = [{
+                name: intentName,
                 children: []
-            };
-            http.post(url, { ...options, json: body }, (error, response) => {
+            }];
+            http.post(url, { ...options, json: body }, (err, response) => {
+                const error = (err || response.body.error ||
+                    (typeof response.body === 'string' && response.body.indexOf('error') !== -1)
+                );
                 if (error) {
                     console.error(error);
                     return done();
                 }
                 // FIXME
                 console.log(response.body);
+                // example of success return:
+                // "Success:intents updated (0:skipped)"
+                send('intents:addIntent', intentName, done);
                 return done();
             });
         },
