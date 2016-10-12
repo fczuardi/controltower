@@ -1,11 +1,11 @@
 import html from 'choo/html';
 import updateBotFormComponent from './updateBotForm';
 
-export default (state, classes, messages, isUpdating = false, onSubmit = null) => {
+export default (state, send, classes, messages, isUpdating = false, onSubmit = null) => {
     const nonDefaultIntents = state.intents.names.filter(name => (name !== 'none'));
     const utterances = state.intents.utterances[state.intents.selectedIntent] || [];
     const onIntentSelected = e => {
-        console.log('intent selected', e.target.value);
+        send('intents:selectIntent', e.target.value);
     };
     const intentOptions = html`
         <optgroup label=${messages.existingIntents}>
@@ -39,6 +39,11 @@ export default (state, classes, messages, isUpdating = false, onSubmit = null) =
             )}
         </div>
     `;
+    const newIntentOption = html`
+        <option value="none">
+            ${messages.addIntentOption}
+        </option>
+    `;
     const fields = html`
         <div>
             <div class=${classes.formGroup}>
@@ -50,7 +55,7 @@ export default (state, classes, messages, isUpdating = false, onSubmit = null) =
                         class=${classes.input}
                         onchange=${onIntentSelected}
                     >
-                        <option>${messages.addIntentOption}</option>
+                        ${newIntentOption}
                         ${intentOptions}
                     </select>
                 </div>
