@@ -1,4 +1,4 @@
-import http from 'choo/http';
+import http from 'xhr';
 
 const defaultOptions = spellId => ({
     json: true,

@@ -1,4 +1,4 @@
-import http from 'choo/http';
+import http from 'xhr';
 import qs from 'querystring';
 
 const defaultOptions = token => ({
