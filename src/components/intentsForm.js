@@ -3,47 +3,64 @@ import updateBotFormComponent from './updateBotForm';
 
 export default (state, send, classes, messages, isUpdating = false, onSubmit = null) => {
     const nonDefaultIntents = state.intents.names.filter(name => (name !== 'none'));
-    const utterances = state.intents.utterances[state.intents.selectedIntent] || [];
+    const selectedIntent = state.intents.selectedIntent;
+    const utterances = state.intents.utterances[selectedIntent] || [];
     const onIntentSelected = e => {
         send('intents:selectIntent', e.target.value);
     };
     const intentOptions = html`
-        <optgroup label=${messages.existingIntents}>
-            ${nonDefaultIntents.map(intentName => html`
-                <option>${intentName}</option>
-            `)}
-        </optgroup>
+        <select
+            class=${classes.input}
+            onchange=${onIntentSelected}
+        >
+            <option value="none">
+                ${messages.addIntentOption}
+            </option>
+            <optgroup label=${messages.existingIntents}>
+                ${nonDefaultIntents.map(intentName => html`
+                    <option>${intentName}</option>
+                `)}
+            </optgroup>
+        </select>
     `;
-    const utteranceField = (value, isMain = false) => html`
-        <div class=${classes.formGroup}>
-            ${isMain ? html`
-            <label class=${classes.label}>
-                ${messages.mainUtterance}
-            </label>
-            ` : null}
-            <div class=${classes.inputContainer}>
-                <input
-                    class=${classes.input}
-                    value=${value || ''}
-                />
-            </div>
-        </div>
-    `;
-    const editUterrances = !utterances.length ? null : html`
+    const newUtterance = html`
+		<div>
+			<h4>${messages.newUterranceTitle}</h4>
+            <input class=${classes.input}>
+		</div>
+	`;
+    const intentForm = !utterances.length ? null : html`
         <div>
-            ${utteranceField(utterances[0], true)}
             <div class=${classes.separator}></div>
-            <h4>${messages.otherUtterances}</h4>
-            ${utterances.slice(1).map(value =>
-                utteranceField(value)
-            )}
-        </div>
-    `;
-    const newIntentOption = html`
-        <option value="none">
-            ${messages.addIntentOption}
-        </option>
-    `;
+            ${newUtterance}
+            <div>
+                <h4>${messages.utterances}</h4>
+                <div>
+                    ${utterances.map(value => html`
+                        <div class=${classes.formGroup}>
+                            <div class=${classes.inputContainer}>
+                                <input
+                                    class=${classes.input}
+                                    value=${value}
+                                    readonly
+                                />
+                            </div>
+                        </div>`
+                    )}
+                </div>
+            </div>
+        </div>`;
+    const intentNameField = selectedIntent === 'none'
+		? html`
+            <div class=${classes.formGroup}>
+                <label class=${classes.label}>
+					${messages.intentName}
+				</label>
+                <div class=${classes.inputContainer}>
+					<input name="intentName">
+                </div>
+            </div>`
+		: null;
     const fields = html`
         <div>
             <div class=${classes.formGroup}>
@@ -51,16 +68,11 @@ export default (state, send, classes, messages, isUpdating = false, onSubmit = n
                     ${messages.intentList}
                 </label>
                 <div class=${classes.inputContainer}>
-                    <select
-                        class=${classes.input}
-                        onchange=${onIntentSelected}
-                    >
-                        ${newIntentOption}
-                        ${intentOptions}
-                    </select>
+                    ${intentOptions}
                 </div>
-                ${editUterrances}
-            </div>
+			</div>
+			${intentNameField}
+			${intentForm}
         </div>
     `;
     return updateBotFormComponent(

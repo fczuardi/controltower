@@ -72,16 +72,17 @@ export default {
         faq: {
             title: 'Perguntas Frequentes',
             description: `
-                Cadastre abaixo algumas perguntas que sua assistente pode
-                responder por você. Caso mais de uma pergunta possua a mesma
-                resposta, cadastre as outras perguntas como uma possível variação.
+                Cadastre abaixo alguns temas de perguntas que sua assistente pode
+                responder por você. Um tema é um conjunto de perguntas cuja resposta
+				é a mesma. 
             `,
-            intentList: 'Perguntas',
-            addIntentOption: 'Nova pergunta',
-            existingIntents: 'Perguntas cadastradas',
-            mainUtterance: 'Pergunta',
-            otherUtterances: 'Variações Possíveis',
-            addUtteranceButton: 'Novo Enunciado',
+            intentList: 'Temas',
+            addIntentOption: 'Novo tema',
+            existingIntents: 'Temas cadastrados',
+            intentName: 'Tema',
+            newUterranceTitle: 'Nova Pergunta',
+            addUtteranceButton: 'Adicionar Pergunta',
+            utterances: 'Perguntas',
             cancel: formLabels.cancelButton,
             submit: formLabels.submitButton
         }
