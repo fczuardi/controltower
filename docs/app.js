@@ -25,7 +25,7 @@ var config = {
     }
 };
 
-var version = "0.15.0";
+var version = "0.15.1";
 
 
 
