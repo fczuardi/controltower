@@ -1,5 +1,5 @@
 import http from 'xhr';
-import qs from 'querystring';
+import { stringify as qsStringify } from 'querystring';
 
 const defaultOptions = token => ({
     json: true,
@@ -106,7 +106,7 @@ const createApiModel = config => ({
                 botId: bot.id,
                 botStatus: 'muted'
             };
-            const url = `${config.apiUrl}/v1/users/?${qs.stringify(query)}`;
+            const url = `${config.apiUrl}/v1/users/?${qsStringify(query)}`;
             const options = defaultOptions(state.token);
             send('api:loadingUsersBegin', null, done);
             http.get(url, options, (error, response) => {
