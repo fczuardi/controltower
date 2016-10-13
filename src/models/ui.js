@@ -16,7 +16,7 @@ const uiModel = {
         ],
         facebookPages: [],
         selectedMutedUsers: [],
-        selectedReply: 'start'
+        selectedReply: null
     },
     reducers: {
         enableSection: (state, name) => (

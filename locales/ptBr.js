@@ -95,6 +95,7 @@ export default {
                 Selecione abaixo uma das respostas para editar seu texto.
             `,
             reply: 'Resposta',
+            selectAReply: 'Selecione uma resposta',
             replyTitles: {
                 start: 'Menu Inicial',
                 exchange: 'Trocas',
