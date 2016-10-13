@@ -68,6 +68,7 @@ const rootView = homeView;
 app.router([
     ['/', rootView],
     ['/controltower', rootView],
+    ['/controltower/', rootView],
     ['/home', homeView],
     ['/channels', channelsView],
     ['/ecommerce', ecommerceView],
