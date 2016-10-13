@@ -11,13 +11,13 @@ var html = _interopDefault(require('choo/html'));
 
 var config = {
     controltower: {
-        apiUrl: 'https://j3zeml7hyc.execute-api.us-east-1.amazonaws.com/latest'
+        apiUrl: 'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'
     },
     sage: {
         apiUrl: 'https://idxpyugwsa.execute-api.us-east-1.amazonaws.com/dev'
     },
     facebook: {
-        appId: '1701349696856861',
+        appId: '1691821884476309',
         loginParams: {
             scope: 'public_profile,email,pages_show_list,manage_pages'
         },
@@ -25,7 +25,7 @@ var config = {
     }
 };
 
-var version = "0.15.5";
+var version = "0.15.6";
 
 
 
