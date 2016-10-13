@@ -5,19 +5,32 @@ node_js:
   # - "5"
   # - "4"
 
+# some stuff to help yarn, based on https://github.com/javascriptair/site/blob/master/.travis.yml
+cache:
+  directories:
+    - $HOME/.yarn-cache
+    - node_modules
+
 git:
   depth: 3
 
 before_install:
-  - npm set progress=false
   - sudo apt-get -qq update
   - sudo apt-get install -y tree
+  - npm set progress=false
+  - npm i -g yarn
+
+instal:
+  - yarn
 
 before_script:
-  - npm run create:config
-  - npm run lint
-  - npm run build:www
-  - npm run build:npm
+  - yarn run create:config
+  - yarn  yarn run lint
+  - yarn  yarn run build:www
+  - yarn  yarn run build:npm
+
+script:
+  - yarn test
 
 # after_success:
 #     - echo "${TRAVIS_NODE_VERSION}"
