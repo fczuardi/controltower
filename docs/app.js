@@ -25,7 +25,7 @@ var config = {
     }
 };
 
-var version = "0.15.3";
+var version = "0.15.4";
 
 
 
@@ -1911,7 +1911,7 @@ const invitationView = invitationContent;
 const debugView = viewWrapper(debugContent);
 
 const rootView = homeView;
-app.router([['/', rootView], ['/controltower', rootView], ['/home', homeView], ['/channels', channelsView], ['/ecommerce', ecommerceView], ['/intents', intentsView], ['/replies', repliesView], ['/mutedChats', mutedChatsView], ['/admins', adminsView], ['/invite', invitationView], ['/debug', debugView]]);
+app.router([['/', rootView], ['/controltower', rootView], ['/controltower/', rootView], ['/home', homeView], ['/channels', channelsView], ['/ecommerce', ecommerceView], ['/intents', intentsView], ['/replies', repliesView], ['/mutedChats', mutedChatsView], ['/admins', adminsView], ['/invite', invitationView], ['/debug', debugView]]);
 
 const tree = app.start();
 
