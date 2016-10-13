@@ -90,7 +90,12 @@ const createSageModel = config => ({
                   },
                   ...
                 ]
-                EXAMPLE RESPONSE (field = intents)
+                */
+                if (data.field === 'intents') {
+                    const intentNames = response.body.map(intentObj => intentObj.name);
+                    return send('intents:setNames', intentNames, done);
+                }
+                /* EXAMPLE RESPONSE (field = intents)
                 [
                   {
                     "name": "none",
@@ -99,7 +104,11 @@ const createSageModel = config => ({
                   ...
                 ]
                 */
-                console.log(response.body);
+                if (data.field === 'utterances') {
+                    console.log('TBD, get utterances', response.body);
+                    return done();
+                }
+                console.log('data.field', data.field);
                 return done();
             });
         },

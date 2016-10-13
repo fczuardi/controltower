@@ -20,6 +20,10 @@ const intentsModel = {
         }
     },
     reducers: {
+        setNames: (state, names) => ({
+            ...state,
+            names
+        }),
         selectIntent: (state, intentName) => ({
             ...state,
             selectedIntent: intentName

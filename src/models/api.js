@@ -94,6 +94,7 @@ const createApiModel = config => ({
                     send('ui:enableSection', 'intents', done);
                     send('sage:setId', bot.sage.spellId, done);
                     send('sage:getSpell', { field: 'intents' }, done);
+                    send('sage:getSpell', { field: 'utterances' }, done);
                 } else {
                     send('ui:disableSection', 'intents', done);
                 }
