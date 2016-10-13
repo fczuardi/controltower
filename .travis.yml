@@ -17,10 +17,9 @@ git:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y tree
-  - curl -o- -L https://yarnpkg.com/install.sh | bash
+  - npm i -g yarn
   - yarn --version
 #  - npm set progress=false
-#  - npm i -g yarn
 
 install: 
   - yarn
