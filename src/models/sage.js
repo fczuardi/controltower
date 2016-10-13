@@ -80,6 +80,19 @@ const createSageModel = config => ({
                     console.error(error);
                     return done();
                 }
+                /* EXAMPLE RESPONSE (field = intents)
+                [
+                  {
+                    "name": "none",
+                    "children": []
+                  },
+                  ...
+                ]
+                */
+                if (data.field === 'intents') {
+                    const intentNames = response.body.map(intentObj => intentObj.name);
+                    return send('intents:setNames', intentNames, done);
+                }
                 /* EXAMPLE RESPONSE (field = utterances)
                 [
                   {
@@ -91,22 +104,15 @@ const createSageModel = config => ({
                   ...
                 ]
                 */
-                if (data.field === 'intents') {
-                    const intentNames = response.body.map(intentObj => intentObj.name);
-                    return send('intents:setNames', intentNames, done);
-                }
-                /* EXAMPLE RESPONSE (field = intents)
-                [
-                  {
-                    "name": "none",
-                    "children": []
-                  },
-                  ...
-                ]
-                */
                 if (data.field === 'utterances') {
-                    console.log('TBD, get utterances', response.body);
-                    return done();
+                    const utterances = response.body.reduce((prev, utterance) => {
+                        const intentName = utterance.intent;
+                        const utteranceText = utterance.text;
+                        const oldIntentUtterances = prev[intentName] || [];
+                        const intentUtterances = oldIntentUtterances.concat([utteranceText]);
+                        return Object.assign(prev, { [intentName]: intentUtterances });
+                    }, {});
+                    return send('intents:setUtterances', utterances, done);
                 }
                 console.log('data.field', data.field);
                 return done();
