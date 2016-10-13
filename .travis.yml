@@ -17,20 +17,22 @@ git:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y tree
-  - npm set progress=false
-  - npm i -g yarn
+  - curl -o- -L https://yarnpkg.com/install.sh | bash
+  - yarn --version
+#  - npm set progress=false
+#  - npm i -g yarn
 
-instal: true
+install: 
+  - yarn
 
 before_script:
-  - yarn
   - yarn run create:config
   - yarn run lint
   - yarn run build:www
   - yarn run build:npm
 
 script:
-  - yarn test
+  - yarn run test
 
 # after_success:
 #     - echo "${TRAVIS_NODE_VERSION}"
