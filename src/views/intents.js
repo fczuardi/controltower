@@ -17,6 +17,10 @@ export default (state, prev, send) => {
                 utterance: e.target.newUtterance.value,
                 intent: e.target.intentSelect.value
             });
+            send('replies:setSampleQuestion', {
+                utterance: e.target.newUtterance.value,
+                intent: e.target.intentSelect.value
+            });
         }
     };
     const content = intentsFormComponent(state, send, formClasses,
