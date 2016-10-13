@@ -130,11 +130,11 @@ const repliesModel = {
         }
     },
     reducers: {
-        set: data => data,
-        setReply: (data, state) => merge(state, data)
+        set: (state, data) => data,
+        setReply: (state, data) => merge(state, data)
     },
     effects: {
-        sendReplies: (bot, state, send, done) => send('api:updateBot', {
+        sendReplies: (state, bot, send, done) => send('api:updateBot', {
             botId: bot.id,
             ownerId: bot.customerId,
             replies: JSON.stringify(state)

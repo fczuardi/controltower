@@ -13,6 +13,7 @@ export default {
         home: 'Início',
         channels: 'Canais',
         ecommerce: 'Comércio',
+        intents: 'Frases',
         replies: 'Respostas',
         mutedChats: 'Assistentes silenciadas',
         admins: 'Equipe',
@@ -66,6 +67,26 @@ export default {
             submit: formLabels.submitButton
         }
     },
+    intents: {
+        title: 'Reconhecimento de Frases',
+        faq: {
+            title: 'Perguntas Frequentes',
+            description: `
+                Cadastre abaixo alguns temas de perguntas que sua assistente pode
+                responder por você. Um tema é um conjunto de perguntas cuja resposta
+				é a mesma. 
+            `,
+            intentList: 'Temas',
+            addIntentOption: 'Novo tema',
+            existingIntents: 'Temas cadastrados',
+            intentName: 'Tema',
+            newUterranceTitle: 'Nova Pergunta',
+            addUtteranceButton: 'Adicionar Pergunta',
+            utterances: 'Perguntas',
+            cancel: formLabels.cancelButton,
+            submit: formLabels.submitButton
+        }
+    },
     replies: {
         title: 'Editar Respostas',
         ecommerce: {
@@ -107,7 +128,7 @@ export default {
                     returns: 'Trocas/Devoluções (link)',
                     receipt: 'Saiba mais, nota fiscal (link)',
                     menu: 'Voltar ao menu',
-                    deactivate: 'Desativar o assistente (falar com humano)',
+                    deactivate: 'Desativar a assistente (falar com humano)',
                     select: 'Selecionar',
                     hasNoOrderId: 'Não sei meu número de pedido'
                 }
