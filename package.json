@@ -1,6 +1,6 @@
 {
   "name": "controltower",
-  "version": "0.15.5",
+  "version": "0.15.6",
   "main": "./src/index.js",
   "license": "AGPL-3.0",
   "scripts-info": {
