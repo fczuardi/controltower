@@ -168,7 +168,12 @@ const createSageModel = config => ({
                     return done();
                 }
                 // FIXME
-                console.log(response.body);
+                // example of sucess response:
+                // "Success:[{'text': u'foo and chill?'}]"
+                console.log('Create utterance response', response.body);
+                send('intents:addUtterance', {
+                    intent: data.intent, utterance: data.utterance
+                }, done);
                 return done();
             });
         },

@@ -13,7 +13,10 @@ export default (state, prev, send) => {
         if (e.target.newUtterance && e.target.newUtterance.value) {
             console.log(e.target.newUtterance.value);
             // new utterance
-            // send();
+            send('sage:createUtterance', {
+                utterance: e.target.newUtterance.value,
+                intent: e.target.intentSelect.value
+            });
         }
     };
     const content = intentsFormComponent(state, send, formClasses,

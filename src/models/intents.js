@@ -37,7 +37,18 @@ const intentsModel = {
             ],
             utterances: {
                 ...state.utterances,
-                [intentName]: {}
+                [intentName]: []
+            }
+        }),
+        addUtterance: (state, data) => ({
+            ...state,
+            utterances: {
+                ...state.utterances,
+                [data.intent]: (
+                    state.utterances[data.intent]
+                        ? state.utterances[data.intent].concat([data.utterance])
+                        : [data.utterance]
+                )
             }
         })
     },

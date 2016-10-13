@@ -13,6 +13,8 @@ export default (state, send, classes,
     };
     const intentOptions = html`
         <select
+            name="intentSelect"
+            value=${selectedIntent}
             class=${classes.input}
             onchange=${onIntentSelected}
         >
@@ -45,26 +47,29 @@ export default (state, send, classes,
             <input name="newUtterance" class=${classes.input}>
 		</div>
 	`;
-    const intentForm = !utterances.length ? null : html`
+    const existingUtterances = html`
+        <div>
+            <h4>${messages.utterances}</h4>
+            <div>
+                ${utterances.map(value => html`
+                    <div class=${classes.formGroup}>
+                        <div class=${classes.inputContainer}>
+                            <input
+                                class=${classes.input}
+                                value=${value}
+                                readonly
+                            />
+                        </div>
+                    </div>`
+                )}
+            </div>
+        </div>
+    `;
+    const intentForm = selectedIntent === 'none' ? null : html`
         <div>
             <div class=${classes.separator}></div>
             ${newUtterance}
-            <div>
-                <h4>${messages.utterances}</h4>
-                <div>
-                    ${utterances.map(value => html`
-                        <div class=${classes.formGroup}>
-                            <div class=${classes.inputContainer}>
-                                <input
-                                    class=${classes.input}
-                                    value=${value}
-                                    readonly
-                                />
-                            </div>
-                        </div>`
-                    )}
-                </div>
-            </div>
+            ${utterances.length ? existingUtterances : null}
         </div>`;
     const fields = html`
         <div>
