@@ -25,13 +25,13 @@ install:
   - yarn
 
 before_script:
-  - yarn run create:config
-  - yarn run lint
-  - yarn run build:www
-  - yarn run build:npm
+  - npm run create:config
+  - npm run lint
+  - npm run build:www
+  - npm run build:npm
 
 script:
-  - yarn run test
+  - npm run test
 
 # after_success:
 #     - echo "${TRAVIS_NODE_VERSION}"
