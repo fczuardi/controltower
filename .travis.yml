@@ -20,14 +20,14 @@ before_install:
   - npm set progress=false
   - npm i -g yarn
 
-instal:
-  - yarn
+instal: true
 
 before_script:
+  - yarn
   - yarn run create:config
-  - yarn  yarn run lint
-  - yarn  yarn run build:www
-  - yarn  yarn run build:npm
+  - yarn run lint
+  - yarn run build:www
+  - yarn run build:npm
 
 script:
   - yarn test
