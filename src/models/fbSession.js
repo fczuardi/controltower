@@ -33,25 +33,26 @@ const createFbSessionModel = config => ({
         }
     },
     effects: {
-        statusChange: (data, state, send, done) => {
+        statusChange: (state, data, send, done) => {
             if (data.status === 'connected') {
                 send('customer:signIn', data.authResponse, done);
+                send('invite:check', window.location.href, done);
                 send('api:set', { token: data.authResponse.accessToken }, done);
                 send('fbsession:getPages', null, done);
                 return send('api:getCustomer', null, done);
             }
             return send('customer:signOut', data, done);
         },
-        getPages: (data, state, send, done) => {
+        getPages: (state, data, send, done) => {
             console.log('getPages');
             window.FB.api('/me/accounts', 'get', {}, response => {
                 console.log('response', response);
                 return send('ui:setFbPages', response.data, done);
             });
         },
-        signIn: (data, state, send) =>
+        signIn: (state, data, send) =>
             signInToggle(false, config.loginParams, send),
-        signInToggle: (data, state, send) =>
+        signInToggle: (state, data, send) =>
             signInToggle(data.isLogged, config.loginParams, send)
     }
 });

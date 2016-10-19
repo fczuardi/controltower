@@ -24,7 +24,13 @@ const buildOptions = (selectedKey, list, keyPrefix) => Object.keys(list).map(key
     `;
 });
 
-const genericTemplate = (selectedReplyKey, selectedReply, replies, classes) => {
+const genericTemplate = (
+    selectedReplyKey,
+    selectedReply = { text: '' },
+    replies,
+    utterances,
+    classes
+) => {
     const {
         sampleQuestion,
         template = null,
@@ -35,16 +41,21 @@ const genericTemplate = (selectedReplyKey, selectedReply, replies, classes) => {
         ...other
     } = selectedReply;
     const isButton = selectedReplyKey.split('.')[0] === 'buttons';
-    const sampleQuestionBalloon = !sampleQuestion ? null : html`
+    const sampleQuestionBalloon = !sampleQuestion && !utterances[selectedReplyKey] ? null : html`
     <p class=${classes.sampleQuestion}>
-        ${sampleQuestion}
+        ${sampleQuestion || utterances[selectedReplyKey][0]}
     </p>`;
     const titleInput = !title ? null : html`
         <input class=${classes.title} name="title" value=${title} />`;
     const subtitleOrText = subtitle || text;
+    const subtitleFieldName = template === 'generic' ? 'subtitle' : 'text';
     const subtitleInput = (!subtitleOrText || isButton) ? null
         : html`
-        <textarea class=${classes.subtitle} name="subtitle"
+        <textarea 
+            class=${classes.subtitle} 
+            name=${subtitleFieldName}
+            key=${selectedReplyKey}
+            value=${subtitleOrText}
         >${subtitleOrText}</textarea>`;
     const answer = (template !== 'generic') ? subtitleInput : html`
         <div class=${classes.body}>
@@ -88,10 +99,19 @@ const genericTemplate = (selectedReplyKey, selectedReply, replies, classes) => {
     `;
 };
 
+// const replyTitles = messages.replyTitles;
+
 export default (
-    selectedReplyKey, replies, selectedReply,
-    classes, messages, isLoading,
-    onChange, onSubmit
+    replyTitles,
+    selectedReplyKey,
+    replies,
+    selectedReply,
+    utterances,
+    classes,
+    messages,
+    isLoading,
+    onChange,
+    onSubmit
 ) => {
     const fields = html`
 <div>
@@ -100,14 +120,21 @@ export default (
             ${messages.reply}
         </label>
         <div class=${classes.inputContainer}>
-            <select class=${classes.input} onchange=${onChange}>
+            <select
+                value=${selectedReplyKey}
+                class=${classes.input}
+                onchange=${onChange}
+            >
                 ${buildOptions(selectedReplyKey, messages.replyTitles)}
             </select>
         </div>
     </div>
     <div class="ln_solid"></div>
-    <div class=${classes.formGroup}>
-        ${genericTemplate(selectedReplyKey, selectedReply, replies, classes.reply)}
+    <div class=${classes.formGroup} data-replyKey=${selectedReplyKey}>
+        ${selectedReplyKey
+            ? genericTemplate(selectedReplyKey, selectedReply, replies, utterances, classes.reply)
+            : null
+        }
     </div>
 </div>
     `;

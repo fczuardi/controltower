@@ -1,4 +1,4 @@
-import http from 'choo/http';
+import http from 'xhr';
 
 const defaultOptions = spellId => ({
     json: true,
@@ -16,35 +16,39 @@ const createSageModel = config => ({
         loadingIntents: false
     },
     reducers: {
-        set: data => data,
-        updatingSpellBegin: (data, state) => ({
+        set: (state, data) => data,
+        setId: (state, spellId) => ({
+            ...state,
+            spellId
+        }),
+        updatingSpellBegin: state => ({
             ...state,
             updatingSpell: true
         }),
-        updatingSpellEnd: (data, state) => ({
+        updatingSpellEnd: state => ({
             ...state,
             updatingSpell: false
         }),
-        loadingUtterancesBegin: (data, state) => ({
+        loadingUtterancesBegin: state => ({
             ...state,
             loadingUtterances: true
         }),
-        loadingUtterancesEnd: (data, state) => ({
+        loadingUtterancesEnd: state => ({
             ...state,
             loadingUtterances: false
         }),
-        loadingIntentsBegin: (data, state) => ({
+        loadingIntentsBegin: state => ({
             ...state,
             loadingIntents: true
         }),
-        loadingIntentsEnd: (data, state) => ({
+        loadingIntentsEnd: state => ({
             ...state,
             loadingIntents: false
         })
     },
     effects: {
         // Creates a new spell
-        createSpell: (data, state, send, done) => {
+        createSpell: (state, data, send, done) => {
             const url = `${config.apiUrl}/bots`;
             const body = {
                 name: data.name,
@@ -66,14 +70,28 @@ const createSageModel = config => ({
                 return done();
             });
         },
-        getSpell: (data, state, send, done) => {
+        getSpell: (state, data, send, done) => {
             const field = data.field ? data.field : 'all';
             const url = `${config.apiUrl}/bots/${field}`;
             const options = defaultOptions(state.spellId);
+            console.log('getSpell options', options);
             http.get(url, options, (error, response) => {
                 if (error) {
                     console.error(error);
                     return done();
+                }
+                /* EXAMPLE RESPONSE (field = intents)
+                [
+                  {
+                    "name": "none",
+                    "children": []
+                  },
+                  ...
+                ]
+                */
+                if (data.field === 'intents') {
+                    const intentNames = response.body.map(intentObj => intentObj.name);
+                    return send('intents:setNames', intentNames, done);
                 }
                 /* EXAMPLE RESPONSE (field = utterances)
                 [
@@ -85,39 +103,48 @@ const createSageModel = config => ({
                   },
                   ...
                 ]
-                EXAMPLE RESPONSE (field = intents)
-                [
-                  {
-                    "name": "none",
-                    "children": []
-                  },
-                  ...
-                ]
                 */
-                console.log(response.body);
+                if (data.field === 'utterances') {
+                    const utterances = response.body.reduce((prev, utterance) => {
+                        const intentName = utterance.intent;
+                        const utteranceText = utterance.text;
+                        const oldIntentUtterances = prev[intentName] || [];
+                        const intentUtterances = oldIntentUtterances.concat([utteranceText]);
+                        return Object.assign(prev, { [intentName]: intentUtterances });
+                    }, {});
+                    return send('intents:setUtterances', utterances, done);
+                }
+                console.log('data.field', data.field);
                 return done();
             });
         },
         /* All request below will return a status 200 if ok,
            else 40X or 50X with an success/error message*/
-        createIntent: (data, state, send, done) => {
+        createIntent: (state, intentName, send, done) => {
+            console.log('Sage Create Intent', intentName);
             const url = `${config.apiUrl}/bots/intents`;
             const options = defaultOptions(state.spellId);
-            const body = {
-                name: data.intent,
+            const body = [{
+                name: intentName,
                 children: []
-            };
-            http.post(url, { ...options, json: body }, (error, response) => {
+            }];
+            http.post(url, { ...options, json: body }, (err, response) => {
+                const error = (err || response.body.error ||
+                    (typeof response.body === 'string' && response.body.indexOf('error') !== -1)
+                );
                 if (error) {
                     console.error(error);
                     return done();
                 }
                 // FIXME
                 console.log(response.body);
+                // example of success return:
+                // "Success:intents updated (0:skipped)"
+                send('intents:addIntent', intentName, done);
                 return done();
             });
         },
-        deleteIntent: (data, state, send, done) => {
+        deleteIntent: (state, data, send, done) => {
             const url = `${config.apiUrl}/bots/intents/${data.intent}`;
             const options = defaultOptions(state.spellId);
             http.delete(url, options, (error, response) => {
@@ -131,7 +158,7 @@ const createSageModel = config => ({
                 return done();
             });
         },
-        createUtterance: (data, state, send, done) => {
+        createUtterance: (state, data, send, done) => {
             const url = `${config.apiUrl}/bots/utterances`;
             const options = defaultOptions(state.spellId);
             const body = [
@@ -147,11 +174,16 @@ const createSageModel = config => ({
                     return done();
                 }
                 // FIXME
-                console.log(response.body);
+                // example of sucess response:
+                // "Success:[{'text': u'foo and chill?'}]"
+                console.log('Create utterance response', response.body);
+                send('intents:addUtterance', {
+                    intent: data.intent, utterance: data.utterance
+                }, done);
                 return done();
             });
         },
-        updateUtterance: (data, state, send, done) => {
+        updateUtterance: (state, data, send, done) => {
             const url = `${config.apiUrl}/bots/utteraces/${data.utterance}`;
             const options = defaultOptions(state.spellId);
             const body = { intent: data.intent };

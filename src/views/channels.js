@@ -4,7 +4,7 @@ import messages from '../../locales/ptBr';
 
 const createSubmit = (bot, pages, send) => e => {
     e.preventDefault();
-    const newPage = pages[e.target.select.selectedIndex];
+    const newPage = pages[e.target.select.selectedIndex - 1];
     send('api:updateBot', {
         botId: bot.id,
         ownerId: bot.customerId,

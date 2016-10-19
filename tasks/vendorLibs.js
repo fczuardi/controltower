@@ -20,9 +20,10 @@ console.log(`buildExternalHelpers > ${libsPath}babel_external-helpers.js`);
 const externalLibs = [
     'choo',
     'choo/html',
-    'choo/http',
+    'xhr',
     'ramda',
     'insert-css',
+    'sheet-router/qs',
     'querystring'
 ];
 externalLibs.forEach(libName => {
