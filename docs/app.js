@@ -25,7 +25,7 @@ var config = {
     }
 };
 
-var version = "0.15.4";
+var version = "0.15.6";
 
 
 
@@ -1869,6 +1869,8 @@ var debugContent = (state => html`
 <code><pre>${ JSON.stringify(state.api, ' ', 2) }</pre></code>
     <h1>Sage API</h1>
 <code><pre>${ JSON.stringify(state.sage, ' ', 2) }</pre></code>
+    <h1>Intents</h1>
+<code><pre>${ JSON.stringify(state.intents, ' ', 2) }</pre></code>
     <h1>Customer</h1>
 <code><pre>${ JSON.stringify(state.customer, ' ', 2) }</pre></code>
     <h1>Bot</h1>

@@ -84,8 +84,12 @@ const createApiModel = config => ({
                     send('ui:disableSection', 'ecommerce', done);
                 }
                 if (bot.replies) {
+                    const selectedReply = bot.type === 'ecommerce'
+                        ? 'start'
+                        : null;
                     send('ui:enableSection', 'replies', done);
                     send('replies:set', JSON.parse(bot.replies), done);
+                    send('ui:selectReply', selectedReply, done);
                     send('api:loadingBotEnd', null, done);
                 } else {
                     send('ui:disableSection', 'replies', done);

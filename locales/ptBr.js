@@ -43,6 +43,7 @@ export default {
                 `
             },
             page: 'Página',
+            selectAPage: 'Selecione uma',
             cancel: formLabels.cancelButton,
             submit: formLabels.submitButton
         }
@@ -72,9 +73,9 @@ export default {
         faq: {
             title: 'Perguntas Frequentes',
             description: `
-                Cadastre abaixo alguns temas de perguntas que sua assistente pode
-                responder por você. Um tema é um conjunto de perguntas cuja resposta
-				é a mesma. 
+                Cadastre abaixo alguns temas de perguntas que sua
+                assistente pode responder por você. Um tema é um
+                conjunto de perguntas cuja resposta é a mesma. 
             `,
             intentList: 'Temas',
             addIntentOption: 'Novo tema',
