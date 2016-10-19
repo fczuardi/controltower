@@ -25,7 +25,7 @@ var config = {
     }
 };
 
-var version = "0.15.6";
+var version = "0.15.7";
 
 
 
@@ -537,8 +537,10 @@ const createApiModel = config => ({
                     send('ui:disableSection', 'ecommerce', done);
                 }
                 if (bot.replies) {
+                    const selectedReply = bot.type === 'ecommerce' ? 'start' : null;
                     send('ui:enableSection', 'replies', done);
                     send('replies:set', JSON.parse(bot.replies), done);
+                    send('ui:selectReply', selectedReply, done);
                     send('api:loadingBotEnd', null, done);
                 } else {
                     send('ui:disableSection', 'replies', done);
@@ -960,6 +962,7 @@ var messages = {
                 `
             },
             page: 'Página',
+            selectAPage: 'Selecione uma',
             cancel: formLabels.cancelButton,
             submit: formLabels.submitButton
         }
@@ -989,9 +992,9 @@ var messages = {
         faq: {
             title: 'Perguntas Frequentes',
             description: `
-                Cadastre abaixo alguns temas de perguntas que sua assistente pode
-                responder por você. Um tema é um conjunto de perguntas cuja resposta
-				é a mesma. 
+                Cadastre abaixo alguns temas de perguntas que sua
+                assistente pode responder por você. Um tema é um
+                conjunto de perguntas cuja resposta é a mesma. 
             `,
             intentList: 'Temas',
             addIntentOption: 'Novo tema',
@@ -1256,9 +1259,17 @@ var updateBotFormComponent = ((fields, isUpdating, classes, messages, onSubmit) 
 `);
 
 var pageListComponent = ((pages, selectedPage, classes, selectId) => html`
-<select name=${ selectId } class=${ classes.input }>
+<select 
+    value=${ selectedPage.pageId }
+    name=${ selectId } 
+    class=${ classes.input }
+>
+    <option>
+        ${ messages.channels.facebook.selectAPage }
+    </option>
     ${ pages.map(page => html`
         <option
+            value=${ page.id }
             ${ selectedPage.pageId === page.id ? 'selected' : '' }
         >
             ${ page.name }
@@ -1328,7 +1339,7 @@ const view = (title, panels) => html`
 
 const createSubmit = (bot, pages, send) => e => {
     e.preventDefault();
-    const newPage = pages[e.target.select.selectedIndex];
+    const newPage = pages[e.target.select.selectedIndex - 1];
     send('api:updateBot', {
         botId: bot.id,
         ownerId: bot.customerId,
@@ -1535,9 +1546,14 @@ const genericTemplate = (selectedReplyKey, selectedReply = { text: '' }, replies
     const titleInput = !title ? null : html`
         <input class=${ classes.title } name="title" value=${ title } />`;
     const subtitleOrText = subtitle || text;
-    const subtitleInput = subtitleOrText === undefined || isButton ? null : html`
-        <textarea class=${ classes.subtitle } name="subtitle" key=${ selectedReplyKey }
-        value=${ subtitleOrText }>${ subtitleOrText }</textarea>`;
+    const subtitleFieldName = template === 'generic' ? 'subtitle' : 'text';
+    const subtitleInput = !subtitleOrText || isButton ? null : html`
+        <textarea 
+            class=${ classes.subtitle } 
+            name=${ subtitleFieldName }
+            key=${ selectedReplyKey }
+            value=${ subtitleOrText }
+        >${ subtitleOrText }</textarea>`;
     const answer = template !== 'generic' ? subtitleInput : html`
         <div class=${ classes.body }>
             ${ titleInput }
@@ -1588,14 +1604,17 @@ var repliesFormComponent = ((replyTitles, selectedReplyKey, replies, selectedRep
             ${ messages.reply }
         </label>
         <div class=${ classes.inputContainer }>
-            <select class=${ classes.input } value=${ selectedReplyKey } onchange=${ onChange }>
-                <option>${ messages.selectAReply }</option>
-                ${ buildOptions(selectedReplyKey, replyTitles) }
+            <select
+                value=${ selectedReplyKey }
+                class=${ classes.input }
+                onchange=${ onChange }
+            >
+                ${ buildOptions(selectedReplyKey, messages.replyTitles) }
             </select>
         </div>
     </div>
     <div class="ln_solid"></div>
-    <div class=${ classes.formGroup }>
+    <div class=${ classes.formGroup } data-replyKey=${ selectedReplyKey }>
         ${ selectedReplyKey ? genericTemplate(selectedReplyKey, selectedReply, replies, utterances, classes.reply) : null }
     </div>
 </div>
