@@ -7,8 +7,8 @@ const botModel = {
         type: null
     },
     reducers: {
-        set: data => data,
-        setFacebookPage: (page, state) => ({
+        set: (state, data) => data,
+        setFacebookPage: (state, page) => ({
             ...state,
             facebook: {
                 ...state.facebook,
@@ -17,7 +17,7 @@ const botModel = {
                 pageName: page.name
             }
         }),
-        setVtexStore: (update, state) => ({
+        setVtexStore: (state, update) => ({
             ...state,
             vtex: {
                 ...state.vtex,

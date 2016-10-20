@@ -16,9 +16,10 @@ export default {
     external: [
         'choo',
         'choo/html',
-        'choo/http',
+        'xhr',
         'ramda',
         'insert-css',
+        'sheet-router/qs',
         'querystring'
     ],
     plugins: [

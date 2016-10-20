@@ -14,7 +14,11 @@ const mainCss = css`
     width: 100%;
     height: 100%;
 }
-
+.login {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
 .checkboxRow {
     width: 20px;
 }

@@ -5,10 +5,11 @@ import repliesFormComponent from '../components/replyListForm';
 
 const createOnChange = send => e => {
     e.preventDefault();
-    return send('ui:selectReply', e.target.value);
+    send('ui:selectReply', e.target.value);
+    return send('location:set', { pathname: '/replies' });
 };
 
-const createOnSubmit = (selectedReplyKey, selectedReply, bot, send) => e => {
+const createOnSubmit = (selectedReplyKey, selectedReply = {}, bot, send) => e => {
     e.preventDefault();
     const fieldNames = ['title', 'text', 'subtitle', 'logo', 'url'];
     let updates = {};
@@ -41,16 +42,24 @@ const replyClasses = {
 const classes = Object.assign({}, formClasses, { reply: replyClasses });
 export default (state, prev, send) => {
     const selectedReplyKey = state.ui.selectedReply;
-    const selectedReply = path(state.ui.selectedReply.split('.'), state.replies);
+    const selectedReply = selectedReplyKey
+        ? path(state.ui.selectedReply.split('.'), state.replies)
+        : null;
+    const replyTitles = state.intents.names
+        .filter(name => name !== 'none')
+        .reduce((previous, name) => Object.assign(previous, { [name]: name })
+        , {});
     const onChange = createOnChange(send);
     const onSubmit = createOnSubmit(selectedReplyKey, selectedReply, state.bot, send);
     const content = repliesFormComponent(
+        replyTitles,
         selectedReplyKey,
         state.replies,
         selectedReply,
+        state.intents.utterances,
         classes,
         messages.replies.ecommerce,
-        state.api.loadingReplies || state.api.updatingBot,
+        state.api.loadingBot || state.api.updatingBot,
         onChange,
         onSubmit
     );

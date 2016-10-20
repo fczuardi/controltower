@@ -125,6 +125,27 @@ exports.right = function(str){
 };
 
 },{}],6:[function(require,module,exports){
+module.exports = extend
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function extend() {
+    var target = {}
+
+    for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i]
+
+        for (var key in source) {
+            if (hasOwnProperty.call(source, key)) {
+                target[key] = source[key]
+            }
+        }
+    }
+
+    return target
+}
+
+},{}],"xhr":[function(require,module,exports){
 "use strict";
 var window = require("global/window")
 var isFunction = require("is-function")
@@ -361,28 +382,4 @@ function getXml(xhr) {
 
 function noop() {}
 
-},{"global/window":2,"is-function":3,"parse-headers":4,"xtend":7}],7:[function(require,module,exports){
-module.exports = extend
-
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-function extend() {
-    var target = {}
-
-    for (var i = 0; i < arguments.length; i++) {
-        var source = arguments[i]
-
-        for (var key in source) {
-            if (hasOwnProperty.call(source, key)) {
-                target[key] = source[key]
-            }
-        }
-    }
-
-    return target
-}
-
-},{}],"choo/http":[function(require,module,exports){
-module.exports = require('xhr')
-
-},{"xhr":6}]},{},[]);
+},{"global/window":2,"is-function":3,"parse-headers":4,"xtend":6}]},{},[]);

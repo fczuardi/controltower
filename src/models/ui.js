@@ -8,6 +8,7 @@ const uiModel = {
             'home',
             'channels',
             'ecommerce',
+            'intents',
             'replies',
             'mutedChats',
             'admins',
@@ -15,44 +16,44 @@ const uiModel = {
         ],
         facebookPages: [],
         selectedMutedUsers: [],
-        selectedReply: 'start'
+        selectedReply: null
     },
     reducers: {
-        enableSection: (name, state) => (
+        enableSection: (state, name) => (
             state.enabledSections.includes(name) ? state : {
                 ...state,
                 enabledSections: state.enabledSections.concat([name])
             }
         ),
-        disableSection: (name, state) => ({
+        disableSection: (state, name) => ({
             ...state,
             enabledSections: state.enabledSections.filter(item => item !== name)
         }),
-        selectSection: (name, state) => ({
+        selectSection: (state, name) => ({
             ...state,
             selectedSection: name
         }),
-        setFbPages: (facebookPages, state) => ({
+        setFbPages: (state, facebookPages) => ({
             ...state,
             facebookPages
         }),
-        selectBot: (botId, state) => ({
+        selectBot: (state, botId) => ({
             ...state,
             selectedBot: botId
         }),
-        selectReply: (replyKey, state) => ({
+        selectReply: (state, replyKey) => ({
             ...state,
             selectedReply: replyKey
         }),
-        selectMutedUser: (index, state) => ({
+        selectMutedUser: (state, index) => ({
             ...state,
             selectedMutedUsers: state.selectedMutedUsers.concat([index])
         }),
-        deselectMutedUser: (index, state) => ({
+        deselectMutedUser: (state, index) => ({
             ...state,
             selectedMutedUsers: state.selectedMutedUsers.filter(i => i !== index)
         }),
-        setSelectedMutedUsers: (data, state) => ({
+        setSelectedMutedUsers: (state, data) => ({
             ...state,
             selectedMutedUsers: data
         })

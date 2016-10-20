@@ -1,5 +1,5 @@
-import http from 'choo/http';
-import qs from 'querystring';
+import http from 'xhr';
+import { stringify as qsStringify } from 'querystring';
 
 const defaultOptions = token => ({
     json: true,
@@ -13,38 +13,38 @@ const createApiModel = config => ({
     state: {
         token: null,
         updatingBot: false,
-        loadingUsers: false,
-        loadingReplies: false
+        loadingBot: false,
+        loadingUsers: false
     },
     reducers: {
-        set: data => data,
-        updateBotBegin: (data, state) => ({
+        set: (state, data) => data,
+        updateBotBegin: state => ({
             ...state,
             updatingBot: true
         }),
-        updateBotEnd: (data, state) => ({
+        updateBotEnd: state => ({
             ...state,
             updatingBot: false
         }),
-        loadingUsersBegin: (data, state) => ({
+        loadingUsersBegin: state => ({
             ...state,
             loadingUsers: true
         }),
-        loadingUsersEnd: (data, state) => ({
+        loadingUsersEnd: state => ({
             ...state,
             loadingUsers: false
         }),
-        loadingRepliesBegin: (data, state) => ({
+        loadingBotBegin: state => ({
             ...state,
-            loadingReplies: true
+            loadingBot: true
         }),
-        loadingRepliesEnd: (data, state) => ({
+        loadingBotEnd: state => ({
             ...state,
-            loadingReplies: false
+            loadingBot: false
         })
     },
     effects: {
-        getCustomer: (data, state, send, done) => {
+        getCustomer: (state, data, send, done) => {
             const url = `${config.apiUrl}/v1/customers`;
             const options = defaultOptions(state.token);
             http.post(url, options, (error, response) => {
@@ -53,46 +53,65 @@ const createApiModel = config => ({
                     return done();
                 }
                 send('customer:set', response.body, done);
-                return send('api:getBot', { botId: response.body.bots[0] }, done);
+                if (response.body.bots.length === 1) {
+                    return send('api:getBot', { botId: response.body.bots[0] }, done);
+                }
+                return done();
             });
         },
-        getBot: (data, state, send, done) => {
+        getBot: (state, data, send, done) => {
             const url = `${config.apiUrl}/v1/bots/${data.botId}`;
             const options = defaultOptions(state.token);
-            send('api:loadingRepliesBegin', null, done);
+            send('api:loadingBotBegin', null, done);
             http.get(url, options, (error, response) => {
+                console.log(response);
                 if (error) {
+                    console.log('response', response.body);
                     console.error(error);
                     return done();
                 }
+                const bot = response.body;
+                send('ui:selectBot', bot.id, done);
                 send('ui:enableSection', 'admins', done);
-                if (response.body.facebook) {
+                if (bot.facebook) {
                     send('ui:enableSection', 'channels', done);
                 } else {
                     send('ui:disableSection', 'channels', done);
                 }
-                if (response.body.vtex) {
+                if (bot.vtex) {
                     send('ui:enableSection', 'ecommerce', done);
                 } else {
                     send('ui:disableSection', 'ecommerce', done);
                 }
-                if (response.body.replies) {
+                if (bot.replies) {
+                    const selectedReply = bot.type === 'ecommerce'
+                        ? 'start'
+                        : null;
                     send('ui:enableSection', 'replies', done);
-                    send('replies:set', JSON.parse(response.body.replies), done);
-                    send('api:loadingRepliesEnd', null, done);
+                    send('replies:set', JSON.parse(bot.replies), done);
+                    send('ui:selectReply', selectedReply, done);
+                    send('api:loadingBotEnd', null, done);
                 } else {
                     send('ui:disableSection', 'replies', done);
                 }
-                send('api:getMutedChats', response.body, done);
-                return send('bot:set', response.body, done);
+                if (bot.sage && bot.sage.spellId) {
+                    send('ui:enableSection', 'intents', done);
+                    send('sage:setId', bot.sage.spellId, done);
+                    send('sage:getSpell', { field: 'intents' }, done);
+                    send('sage:getSpell', { field: 'utterances' }, done);
+                } else {
+                    send('ui:disableSection', 'intents', done);
+                }
+                send('api:getMutedChats', bot, done);
+                return send('bot:set', bot, done);
             });
         },
-        getMutedChats: (bot, state, send, done) => {
+        getMutedChats: (state, bot, send, done) => {
             const query = {
                 botId: bot.id,
                 botStatus: 'muted'
             };
-            const url = `${config.apiUrl}/v1/users/?${qs.stringify(query)}`;
+            const url = `${config.apiUrl}/v1/users/?${qsStringify(query)}`;
             const options = defaultOptions(state.token);
             send('api:loadingUsersBegin', null, done);
             http.get(url, options, (error, response) => {
@@ -105,7 +124,7 @@ const createApiModel = config => ({
                 return send('users:setMuted', response.body, done);
             });
         },
-        unMuteChats: (data, state, send, done) => {
+        unMuteChats: (state, data, send, done) => {
             const url = `${config.apiUrl}/v1/users`;
             const options = defaultOptions(state.token);
             const body = {
@@ -126,7 +145,7 @@ const createApiModel = config => ({
                     response.body.map(item => item.id), done);
             });
         },
-        updateBot: (data, state, send, done) => {
+        updateBot: (state, data, send, done) => {
             const url = `${config.apiUrl}/v1/bots/${data.botId}`;
             const options = defaultOptions(state.token);
             const facebookUpdate = !data.facebookPage ? {} : {
@@ -155,6 +174,26 @@ const createApiModel = config => ({
                     return done();
                 }
                 return send('bot:set', response.body, done);
+            });
+        },
+        acceptInvite: (state, data, send, done) => {
+            const url = `${config.apiUrl}/v1/bots/${data.botId}`;
+            const options = defaultOptions(state.token);
+            const update = {
+                admins: 'me',
+                customerId: data.ownerId,
+                inviteCode: data.inviteCode
+            };
+            send('api:updateBotBegin', null, done);
+            http.put(url, { ...options, json: update }, (error, response) => {
+                send('api:updateBotEnd', null, done);
+                if (error || response.body.error) {
+                    console.error(error || response.body.error);
+                    send('invite:setError', (error || response.body.error), done);
+                    return done();
+                }
+                window.location.search = '';
+                return done();
             });
         }
     }
