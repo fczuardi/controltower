@@ -11,7 +11,7 @@ var html = _interopDefault(require('choo/html'));
 
 var config = {
     controltower: {
-        apiUrl: 'https://zvll8fpfa4.execute-api.us-east-1.amazonaws.com/latest'
+        apiUrl: 'https://y437us1qni.execute-api.us-east-1.amazonaws.com/latest'
     },
     sage: {
         apiUrl: 'https://idxpyugwsa.execute-api.us-east-1.amazonaws.com/dev'
@@ -19,7 +19,7 @@ var config = {
     facebook: {
         appId: '1691821884476309',
         loginParams: {
-            scope: 'public_profile,email,pages_show_list,manage_pages'
+            scope: 'public_profile,email,pages_show_list,manage_pages,pages_messaging'
         },
         userFields: 'id,name,email'
     }
@@ -957,6 +957,11 @@ var messages = {
                     Selecione uma página para ser o contato de
                     Facebook Messenger com o qual as pessoas farão consultas de
                     rastreio de pedidos via chat.
+                `,
+                noPageFoundMessage: `
+                Para configurar o contato de Facebook Messenger com o qual
+                as pessoas farão consultas de rastreio de pedidos via chat,
+                é preciso que você tenha uma página no facebook.
                 `
             },
             page: 'Página',
@@ -1337,13 +1342,20 @@ const createSubmit = (bot, pages, send) => e => {
     return send('bot:setFacebookPage', newPage);
 };
 
+// Returns true if the user own or administrates
+// any Facebook page, false otherwise.
+const hasPages = pages => pages.length !== 0;
+
 var channelsContent = ((state, prev, send) => {
     const pages = state.ui.facebookPages;
     const currentPage = state.bot.facebook;
     const isUpdating = state.api.updatingBot;
     const onSubmit = createSubmit(state.bot, pages, send);
-    const form = pageListFormComponent(pages, currentPage, isUpdating, formClasses, messages.channels.facebook, onSubmit);
-    const panels = [panel(form, messages.channels.facebook.title, messages.channels.facebook.description.trackOrder)];
+    // just show the form if user has any pages
+    const form = hasPages(pages) ? pageListFormComponent(pages, currentPage, isUpdating, formClasses, messages.channels.facebook, onSubmit) : '';
+    // set the description according to user's pages number
+    const description = hasPages(pages) ? messages.channels.facebook.description.trackOrder : messages.channels.facebook.description.noPageFoundMessage;
+    const panels = [panel(form, messages.channels.facebook.title, description)];
     return view(messages.channels.title, panels);
 });
 
@@ -1581,6 +1593,16 @@ const genericTemplate = (selectedReplyKey, selectedReply = { text: '' }, replies
 // const replyTitles = messages.replyTitles;
 
 var repliesFormComponent = ((replyTitles, selectedReplyKey, replies, selectedReply, utterances, classes, messages, isLoading, onChange, onSubmit) => {
+    console.log('1', replyTitles);
+    console.log('2', selectedReplyKey);
+    console.log('3', replies);
+    console.log('4', selectedReply);
+    console.log('5', utterances);
+    console.log('6', classes);
+    console.log('7', messages);
+    console.log('8', isLoading);
+    console.log('9', onChange);
+    console.log('10', onSubmit);
     const fields = html`
 <div>
     <div class=${ classes.formGroup }>
