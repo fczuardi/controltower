@@ -91,6 +91,9 @@ const createSageModel = config => ({
                 */
                 if (data.field === 'intents') {
                     const intentNames = response.body.map(intentObj => intentObj.name);
+                    if (intentNames.length > 1) {
+                        send('ui:enableSection', 'replies', done);
+                    }
                     return send('intents:setNames', intentNames, done);
                 }
                 /* EXAMPLE RESPONSE (field = utterances)
@@ -180,6 +183,7 @@ const createSageModel = config => ({
                 send('intents:addUtterance', {
                     intent: data.intent, utterance: data.utterance
                 }, done);
+                send('ui:enableSection', 'replies', done);
                 return done();
             });
         },

@@ -90,6 +90,11 @@ export default {
     },
     replies: {
         title: 'Editar Respostas',
+        faq: {
+            title: 'Perguntas Frequentes',
+            description: `Selecione um dos temas de perguntas 
+                para editar a resposta correspondente`
+        },
         ecommerce: {
             title: 'E-commerce',
             description: `
