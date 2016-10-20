@@ -359,7 +359,7 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-},{"util/":22}],2:[function(require,module,exports){
+},{"util/":21}],2:[function(require,module,exports){
 module.exports = applyHook
 
 // apply arguments onto an array of functions, useful for hooks
@@ -582,7 +582,7 @@ function dispatcher (hooks) {
         const newState = xtend(_state)
 
         if (onActionHooks.length) {
-          applyHook(onActionHooks, data, _state, name, caller, createSend)
+          applyHook(onActionHooks, _state, data, name, caller, createSend)
         }
 
         // validate if a namespace exists. Namespaces are delimited by ':'.
@@ -596,14 +596,14 @@ function dispatcher (hooks) {
         const _reducers = ns ? reducers[ns] : reducers
         if (_reducers && _reducers[actionName]) {
           if (ns) {
-            const reducedState = _reducers[actionName](data, _state[ns])
+            const reducedState = _reducers[actionName](_state[ns], data)
             newState[ns] = xtend(_state[ns], reducedState)
           } else {
-            mutate(newState, reducers[actionName](data, _state))
+            mutate(newState, reducers[actionName](_state, data))
           }
           reducersCalled = true
           if (onStateChangeHooks.length) {
-            applyHook(onStateChangeHooks, data, newState, _state, actionName, createSend)
+            applyHook(onStateChangeHooks, newState, data, _state, actionName, createSend)
           }
           _state = newState
           cb(null, newState)
@@ -612,8 +612,8 @@ function dispatcher (hooks) {
         const _effects = ns ? effects[ns] : effects
         if (!reducersCalled && _effects && _effects[actionName]) {
           const send = createSend('effect: ' + name)
-          if (ns) _effects[actionName](data, _state[ns], send, cb)
-          else _effects[actionName](data, _state, send, cb)
+          if (ns) _effects[actionName](_state[ns], data, send, cb)
+          else _effects[actionName](_state, data, send, cb)
           effectsCalled = true
         }
 
@@ -660,7 +660,7 @@ function wrapHook (value, transforms) {
   return value
 }
 
-},{"./apply-hook":2,"assert":1,"xtend":26,"xtend/mutable":27}],4:[function(require,module,exports){
+},{"./apply-hook":2,"assert":1,"xtend":25,"xtend/mutable":26}],4:[function(require,module,exports){
 var document = require('global/document')
 var hyperx = require('hyperx')
 var onload = require('on-load')
@@ -808,191 +808,9 @@ function belCreateElement (tag, props, children) {
 module.exports = hyperx(belCreateElement)
 module.exports.createElement = belCreateElement
 
-},{"global/document":7,"hyperx":10,"on-load":13}],5:[function(require,module,exports){
+},{"global/document":6,"hyperx":9,"on-load":12}],5:[function(require,module,exports){
 
 },{}],6:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],7:[function(require,module,exports){
 (function (global){
 var topLevel = typeof global !== 'undefined' ? global :
     typeof window !== 'undefined' ? window : {}
@@ -1011,7 +829,7 @@ if (typeof document !== 'undefined') {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"min-document":5}],8:[function(require,module,exports){
+},{"min-document":5}],7:[function(require,module,exports){
 (function (global){
 if (typeof window !== "undefined") {
     module.exports = window;
@@ -1024,7 +842,7 @@ if (typeof window !== "undefined") {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 module.exports = attributeToProperty
 
 var transform = {
@@ -1045,7 +863,7 @@ function attributeToProperty (h) {
   }
 }
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var attrToProp = require('hyperscript-attribute-to-property')
 
 var VAR = 0, TEXT = 1, OPEN = 2, CLOSE = 3, ATTR = 4
@@ -1310,7 +1128,7 @@ var closeRE = RegExp('^(' + [
 ].join('|') + ')(?:[\.#][a-zA-Z0-9\u007F-\uFFFF_:-]+)*$')
 function selfClosing (tag) { return closeRE.test(tag) }
 
-},{"hyperscript-attribute-to-property":9}],11:[function(require,module,exports){
+},{"hyperscript-attribute-to-property":8}],10:[function(require,module,exports){
 'use strict';
 // Create a range object for efficently rendering strings to elements.
 var range;
@@ -1963,7 +1781,7 @@ function morphdom(fromNode, toNode, options) {
 
 module.exports = morphdom;
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 const window = require('global/window')
 const assert = require('assert')
 
@@ -2009,7 +1827,7 @@ function nanoraf (render, raf) {
   }
 }
 
-},{"assert":1,"global/window":8}],13:[function(require,module,exports){
+},{"assert":1,"global/window":7}],12:[function(require,module,exports){
 /* global MutationObserver */
 var document = require('global/document')
 var window = require('global/window')
@@ -2098,27 +1916,189 @@ function eachMutation (nodes, fn) {
   }
 }
 
-},{"global/document":7,"global/window":8}],14:[function(require,module,exports){
-const assert = require('assert')
+},{"global/document":6,"global/window":7}],13:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
 
-module.exports = match
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
 
-// get url path section from a url
-// strip querystrings / hashes
-// strip protocol
-// strip hostname and port (both ip and route)
-// str -> str
-function match (route) {
-  assert.equal(typeof route, 'string')
+var cachedSetTimeout;
+var cachedClearTimeout;
 
-  return route.trim()
-    .replace(/[\?|#].*$/, '')
-    .replace(/^(?:https?\:)\/\//, '')
-    .replace(/^.*?(\/.*)/, '$1')
-    .replace(/\/$/, '')
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
 }
 
-},{"assert":1}],15:[function(require,module,exports){
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],14:[function(require,module,exports){
 const document = require('global/document')
 const assert = require('assert')
 const xtend = require('xtend')
@@ -2139,31 +2119,20 @@ function createLocation (state, patch) {
     const newLocation = {
       pathname: document.location.pathname,
       search: document.location.search,
-      hash: document.location.hash
+      hash: document.location.hash,
+      href: document.location.href
     }
-    newLocation.href = createHref(newLocation)
     return newLocation
   } else {
     assert.equal(typeof state, 'object', 'sheet-router/create-location: state should be an object')
     if (typeof patch === 'string') {
       const newLocation = parseUrl(patch)
-      newLocation.href = createHref(newLocation)
       return newLocation
     } else {
       assert.equal(typeof patch, 'object', 'sheet-router/create-location: patch should be an object')
       const newLocation = xtend(state, patch)
-      newLocation.href = createHref(newLocation)
       return newLocation
     }
-  }
-
-  // compute a href similar to node's href
-  // (obj) -> str
-  function createHref (location) {
-    var ret = location.pathname
-    if (location.hash) ret += (location.hash)
-    if (location.search) ret += (location.search)
-    return ret
   }
 
   // parse a URL into a kv object inside the browser
@@ -2173,14 +2142,15 @@ function createLocation (state, patch) {
     a.href = url
 
     return {
-      href: a.pathname,
+      href: a.href,
+      pathname: a.pathname,
       search: a.search,
       hash: a.hash
     }
   }
 }
 
-},{"assert":1,"global/document":7,"xtend":26}],16:[function(require,module,exports){
+},{"assert":1,"global/document":6,"xtend":25}],15:[function(require,module,exports){
 const document = require('global/document')
 const window = require('global/window')
 const assert = require('assert')
@@ -2197,7 +2167,7 @@ function history (cb) {
   }
 }
 
-},{"assert":1,"global/document":7,"global/window":8}],17:[function(require,module,exports){
+},{"assert":1,"global/document":6,"global/window":7}],16:[function(require,module,exports){
 const window = require('global/window')
 const assert = require('assert')
 
@@ -2208,15 +2178,15 @@ const noRoutingAttrName = 'data-no-routing'
 // handle a click if is anchor tag with an href
 // and url lives on the same domain. Replaces
 // trailing '#' so empty links work as expected.
-// fn(str) -> null
-function href (cb) {
+// (fn(str), obj?) -> undefined
+function href (cb, root) {
   assert.equal(typeof cb, 'function', 'sheet-router/href: cb must be a function')
 
   window.onclick = function (e) {
     if ((e.button && e.button !== 0) || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
 
     const node = (function traverse (node) {
-      if (!node) return
+      if (!node || node === root) return
       if (node.localName !== 'a') return traverse(node.parentNode)
       if (node.href === undefined) return traverse(node.parentNode)
       if (window.location.host !== node.host) return traverse(node.parentNode)
@@ -2229,16 +2199,28 @@ function href (cb) {
     if (isRoutingDisabled) return
 
     e.preventDefault()
-    const href = node.href.replace(/#$/, '')
-    cb(href)
-    window.history.pushState({}, null, href)
+    cb({
+      pathname: node.pathname,
+      search: node.search,
+      href: node.href,
+      hash: node.hash
+    })
   }
 }
 
-},{"assert":1,"global/window":8}],18:[function(require,module,exports){
-const pathname = require('pathname-match')
+},{"assert":1,"global/window":7}],17:[function(require,module,exports){
 const wayfarer = require('wayfarer')
 const assert = require('assert')
+
+/* eslint-disable no-useless-escape */
+const protocol = '^(http(s)?(:\/\/))?(www\.)?'
+const domain = '[a-zA-Z0-9-_\.]+'
+const qs = '[\?].*$'
+/* eslint-enable no-useless-escape */
+
+const prefix = new RegExp(protocol + domain)
+const normalize = new RegExp('#')
+const suffix = new RegExp(qs)
 
 module.exports = sheetRouter
 
@@ -2271,7 +2253,7 @@ function sheetRouter (opts, tree) {
   // tree[1] is an array
   ;(function walk (tree, fullRoute) {
     if (typeof tree[0] === 'string') {
-      var route = tree[0].replace(/^\//, '')
+      var route = tree[0].replace(/^[#\/]/, '')
     } else {
       var rootArr = tree[0]
     }
@@ -2322,7 +2304,7 @@ function sheetRouter (opts, tree) {
     } else if (route === prevRoute) {
       return prevCallback(arg1, arg2, arg3, arg4, arg5)
     } else {
-      prevRoute = pathname(pathname(route))
+      prevRoute = pathname(route)
       prevCallback = router(prevRoute)
       return prevCallback(arg1, arg2, arg3, arg4, arg5)
     }
@@ -2330,7 +2312,7 @@ function sheetRouter (opts, tree) {
 }
 
 // wrap a function in a function so it can be called at a later time
-// fn -> null -> fn
+// fn -> obj -> (any, any, any, any, any)
 function thunkify (cb) {
   return function (params) {
     return function (arg1, arg2, arg3, arg4, arg5) {
@@ -2339,7 +2321,17 @@ function thunkify (cb) {
   }
 }
 
-},{"assert":1,"pathname-match":14,"wayfarer":23}],19:[function(require,module,exports){
+// replace everything in a route but the pathname and hash
+// TODO(yw): ditch 'suffix' and allow qs routing
+// str -> str
+function pathname (route) {
+  return route
+    .replace(prefix, '')
+    .replace(suffix, '')
+    .replace(normalize, '/')
+}
+
+},{"assert":1,"wayfarer":22}],18:[function(require,module,exports){
 const walk = require('wayfarer/walk')
 const assert = require('assert')
 
@@ -2353,7 +2345,7 @@ function walkSheetRouter (router, cb) {
   return walk(router, cb)
 }
 
-},{"assert":1,"wayfarer/walk":25}],20:[function(require,module,exports){
+},{"assert":1,"wayfarer/walk":24}],19:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -2378,14 +2370,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2975,7 +2967,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":21,"_process":6,"inherits":20}],23:[function(require,module,exports){
+},{"./support/isBuffer":20,"_process":13,"inherits":19}],22:[function(require,module,exports){
 const assert = require('assert')
 const trie = require('./trie')
 
@@ -3039,7 +3031,7 @@ function Wayfarer (dft) {
   }
 }
 
-},{"./trie":24,"assert":1}],24:[function(require,module,exports){
+},{"./trie":23,"assert":1}],23:[function(require,module,exports){
 const mutate = require('xtend/mutable')
 const assert = require('assert')
 const xtend = require('xtend')
@@ -3156,7 +3148,7 @@ Trie.prototype.mount = function (route, trie) {
   }
 }
 
-},{"assert":1,"xtend":26,"xtend/mutable":27}],25:[function(require,module,exports){
+},{"assert":1,"xtend":25,"xtend/mutable":26}],24:[function(require,module,exports){
 const assert = require('assert')
 
 module.exports = walk
@@ -3189,7 +3181,7 @@ function walk (router, transform) {
   })('', trie.trie)
 }
 
-},{"assert":1}],26:[function(require,module,exports){
+},{"assert":1}],25:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -3210,7 +3202,7 @@ function extend() {
     return target
 }
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -3229,7 +3221,7 @@ function extend(target) {
     return target
 }
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 var bel = require('bel') // turns template tag into DOM elements
 var morphdom = require('morphdom') // efficiently diffs + morphs two DOM elements
 var defaultEvents = require('./update-events.js') // default events to be copied when dom elements update
@@ -3265,7 +3257,7 @@ module.exports.update = function (fromNode, toNode, opts) {
   }
 }
 
-},{"./update-events.js":29,"bel":4,"morphdom":11}],29:[function(require,module,exports){
+},{"./update-events.js":28,"bel":4,"morphdom":10}],28:[function(require,module,exports){
 module.exports = [
   // attribute events (can be set with attributes)
   'onclick',
@@ -3376,7 +3368,7 @@ function choo (opts) {
 
   // update the DOM after every state mutation
   // (obj, obj, obj, str, fn) -> null
-  function render (data, state, prev, name, createSend) {
+  function render (state, data, prev, name, createSend) {
     if (!_frame) {
       _frame = nanoraf(function (state, prev) {
         const newTree = _router(state.location.pathname, state, prev)
@@ -3425,7 +3417,12 @@ function choo (opts) {
       return function chooWrap (params) {
         return function (state) {
           const nwPrev = prev
-          const nwState = prev = xtend(state, { params: params })
+          prev = state
+
+          // TODO(yw): find a way to wrap handlers so params shows up in state
+          const nwState = xtend(state)
+          nwState.location = xtend(nwPrev.location, { params: params })
+
           if (opts.freeze !== false) Object.freeze(nwState)
           return handler(nwState, nwPrev, send)
         }
@@ -3439,23 +3436,40 @@ function choo (opts) {
 function createLocationModel (opts) {
   return {
     namespace: 'location',
-    state: createLocation(),
+    state: mutate(createLocation(), { params: {} }),
     subscriptions: createSubscriptions(opts),
-    effects: { set: setLocation },
+    effects: { set: setLocation, touch: touchLocation },
     reducers: { update: updateLocation }
   }
 
-  function updateLocation (location, state) {
-    return location
+  // update the location on the state
+  // try and jump to an anchor on the page if it exists
+  // (obj, obj) -> obj
+  function updateLocation (state, data) {
+    if (opts.history !== false && data.hash && data.hash !== state.hash) {
+      const el = document.querySelector(data.hash)
+      if (el) el.scrollIntoView(true)
+    }
+    return data
+  }
+
+  // update internal location only
+  // (str, obj, fn, fn) -> null
+  function touchLocation (state, data, send, done) {
+    const newLocation = createLocation(state, data)
+    send('location:update', newLocation, done)
   }
 
   // set a new location e.g. "/foo/bar#baz?beep=boop"
   // (str, obj, fn, fn) -> null
-  function setLocation (patch, state, send, done) {
-    const newLocation = createLocation(state, patch)
+  function setLocation (state, data, send, done) {
+    const newLocation = createLocation(state, data)
+
+    // update url bar if it changed
     if (opts.history !== false && newLocation.href !== state.href) {
       window.history.pushState({}, null, newLocation.href)
     }
+
     send('location:update', newLocation, done)
   }
 
@@ -3464,16 +3478,16 @@ function createLocationModel (opts) {
 
     if (opts.history !== false) {
       subs.handleHistory = function (send, done) {
-        onHistoryChange(function navigate (pathname) {
-          send('location:set', { pathname: pathname }, done)
+        onHistoryChange(function navigate (href) {
+          send('location:touch', href, done)
         })
       }
     }
 
     if (opts.href !== false) {
       subs.handleHref = function (send, done) {
-        onHref(function navigate (pathname) {
-          send('location:set', { pathname: pathname }, done)
+        onHref(function navigate (location) {
+          send('location:set', location, done)
         })
       }
     }
@@ -3482,4 +3496,4 @@ function createLocationModel (opts) {
   }
 }
 
-},{"assert":1,"barracks":3,"nanoraf":12,"sheet-router":18,"sheet-router/create-location":15,"sheet-router/history":16,"sheet-router/href":17,"sheet-router/walk":19,"xtend":26,"xtend/mutable":27,"yo-yo":28}]},{},[]);
+},{"assert":1,"barracks":3,"nanoraf":11,"sheet-router":17,"sheet-router/create-location":14,"sheet-router/history":15,"sheet-router/href":16,"sheet-router/walk":18,"xtend":25,"xtend/mutable":26,"yo-yo":27}]},{},[]);
