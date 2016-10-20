@@ -112,6 +112,16 @@ export default (
     onChange,
     onSubmit
 ) => {
+    console.log('1', replyTitles);
+    console.log('2', selectedReplyKey);
+    console.log('3', replies);
+    console.log('4', selectedReply);
+    console.log('5', utterances);
+    console.log('6', classes);
+    console.log('7', messages);
+    console.log('8', isLoading);
+    console.log('9', onChange);
+    console.log('10', onSubmit);
     const fields = html`
 <div>
     <div class=${classes.formGroup}>

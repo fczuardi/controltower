@@ -13,23 +13,32 @@ const createSubmit = (bot, pages, send) => e => {
     return send('bot:setFacebookPage', newPage);
 };
 
+// Returns true if the user own or administrates
+// any Facebook page, false otherwise.
+const hasPages = pages => pages.length !== 0;
+
 export default (state, prev, send) => {
     const pages = state.ui.facebookPages;
     const currentPage = state.bot.facebook;
     const isUpdating = state.api.updatingBot;
     const onSubmit = createSubmit(state.bot, pages, send);
-    const form = pageListFormComponent(
+    // just show the form if user has any pages
+    const form = hasPages(pages) ? pageListFormComponent(
         pages,
         currentPage,
         isUpdating,
         formClasses,
         messages.channels.facebook,
         onSubmit
-    );
+    ) : '';
+    // set the description according to user's pages number
+    const description = hasPages(pages) ?
+                messages.channels.facebook.description.trackOrder
+                : messages.channels.facebook.description.noPageFoundMessage;
     const panels = [panel(
         form,
         messages.channels.facebook.title,
-        messages.channels.facebook.description.trackOrder
+        description
     )];
     return view(messages.channels.title, panels);
 };
