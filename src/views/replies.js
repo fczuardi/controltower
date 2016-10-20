@@ -45,10 +45,14 @@ export default (state, prev, send) => {
     const selectedReply = selectedReplyKey
         ? path(state.ui.selectedReply.split('.'), state.replies)
         : null;
-    const replyTitles = state.intents.names
+    const intentNames = state.intents.names
         .filter(name => name !== 'none')
         .reduce((previous, name) => Object.assign(previous, { [name]: name })
         , {});
+    const ecommerceReplyTitles = messages.replies.ecommerce.replyTitles;
+    const replyTitles = state.bot.type === 'faq'
+        ? intentNames
+        : ecommerceReplyTitles;
     const onChange = createOnChange(send);
     const onSubmit = createOnSubmit(selectedReplyKey, selectedReply, state.bot, send);
     const content = repliesFormComponent(
@@ -65,8 +69,8 @@ export default (state, prev, send) => {
     );
     const panels = [panel(
         content,
-        messages.replies.ecommerce.title,
-        messages.replies.ecommerce.description
+        messages.replies[state.bot.type].title,
+        messages.replies[state.bot.type].description
     )];
     return view(messages.replies.title, panels);
 };
