@@ -1362,11 +1362,8 @@ var channelsContent = ((state, prev, send) => {
     const currentPage = state.bot.facebook;
     const isUpdating = state.api.updatingBot;
     const onSubmit = createSubmit(state.bot, pages, send);
-    // just show the form if user has any pages
-    const form = hasPages(pages) ? pageListFormComponent(pages, currentPage, isUpdating, formClasses, messages.channels.facebook, onSubmit) : '';
-    // set the description according to user's pages number
-    const description = hasPages(pages) ? messages.channels.facebook.description.trackOrder : messages.channels.facebook.description.noPageFoundMessage;
-    const panels = [panel(form, messages.channels.facebook.title, description)];
+    const form = pageListFormComponent(pages, currentPage, isUpdating, formClasses, messages.channels.facebook, onSubmit);
+    const panels = [panel(form, messages.channels.facebook.title, messages.channels.facebook.description.trackOrder)];
     return view(messages.channels.title, panels);
 });
 
@@ -1560,11 +1557,7 @@ const genericTemplate = (selectedReplyKey, selectedReply = { text: '' }, replies
     const subtitleOrText = subtitle || text;
     const subtitleFieldName = template === 'generic' ? 'subtitle' : 'text';
     const subtitleInput = !subtitleOrText || isButton ? null : html`
-        <textarea
-            class=${ classes.subtitle }
-            name=${ subtitleFieldName }
-            key=${ selectedReplyKey }
-            value=${ subtitleOrText }
+        <textarea class=${ classes.subtitle } name="subtitle"
         >${ subtitleOrText }</textarea>`;
     const answer = template !== 'generic' ? subtitleInput : html`
         <div class=${ classes.body }>
@@ -1606,19 +1599,7 @@ const genericTemplate = (selectedReplyKey, selectedReply = { text: '' }, replies
     `;
 };
 
-// const replyTitles = messages.replyTitles;
-
-var repliesFormComponent = ((replyTitles, selectedReplyKey, replies, selectedReply, utterances, classes, messages, isLoading, onChange, onSubmit) => {
-    console.log('1', replyTitles);
-    console.log('2', selectedReplyKey);
-    console.log('3', replies);
-    console.log('4', selectedReply);
-    console.log('5', utterances);
-    console.log('6', classes);
-    console.log('7', messages);
-    console.log('8', isLoading);
-    console.log('9', onChange);
-    console.log('10', onSubmit);
+var repliesFormComponent = ((selectedReplyKey, replies, selectedReply, classes, messages, isLoading, onChange, onSubmit) => {
     const fields = html`
 <div>
     <div class=${ classes.formGroup }>

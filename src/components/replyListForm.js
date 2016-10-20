@@ -51,8 +51,8 @@ const genericTemplate = (
     const subtitleFieldName = template === 'generic' ? 'subtitle' : 'text';
     const subtitleInput = (!subtitleOrText || isButton) ? null
         : html`
-        <textarea
-            class=${classes.subtitle}
+        <textarea 
+            class=${classes.subtitle} 
             name=${subtitleFieldName}
             key=${selectedReplyKey}
             value=${subtitleOrText}
