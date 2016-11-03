@@ -5,7 +5,7 @@ a generic control center web app aka "web admin", "dashboard", "panel"…
 [![npm version](https://badge.fury.io/js/controltower.svg)](https://badge.fury.io/js/controltower)
 [![Build Status](https://travis-ci.org/fczuardi/controltower.svg?branch=master)](https://travis-ci.org/fczuardi/controltower)
 [![dependencies Status](https://david-dm.org/fczuardi/controltower/status.svg)](https://david-dm.org/fczuardi/controltower)
-[![License](https://img.shields.io/badge/license-AGPL-lightgrey.svg)][license]
+[![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)][license]
 [see all badges…][badges]
 
 <a href="https://openclipart.org/detail/216736/airport-control-tower"><img src="https://openclipart.org/download/216736/airport-control-tower.svg" /></a>
