@@ -93,7 +93,7 @@
   "homepage": "https://github.com/fczuardi/controltower#readme",
   "dependencies": {
     "choo": "^4.0.0-0",
-    "ramda": "^0.22.1",
+    "ramda": "^0.24.0",
     "xhr": "^2.2.2"
   }
 }
